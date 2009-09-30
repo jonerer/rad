@@ -105,6 +105,12 @@ class Map(gtk.DrawingArea):
 	# den här kallas samtidigt om queue_draw verkar d som.
         self.context = widget.window.cairo_create()
 
+	# skapa en pixbuf och lägg den i minnet.
+	# bara en gång.
+	#if not hasattr(self, "_pixbuf"):
+	#	self._pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, \
+	#			False, 8, event.area.width, event.area.height)
+
         # Regionen vi ska rita på
         self.context.rectangle(event.area.x,
                                event.area.y,
@@ -144,6 +150,7 @@ class Map(gtk.DrawingArea):
 		pixel_focus_diff =  self._focus_pixel[0] - self._last_focus_pixel[0], \
 			self._focus_pixel[1] - self._last_focus_pixel[1]
 			
+	#self._pixbuf.fill(0xffffffff)
 	# försöka få tag på en pixbuf eller nått att rita på?
 	# Ritar kartan
 	for tile in tiles:
@@ -151,6 +158,10 @@ class Map(gtk.DrawingArea):
 	    x, y = self.gps_to_pixel(tile.get_bounds()["min_longitude"],
 				     tile.get_bounds()["min_latitude"])
 	    tile.draw(self.context, x, y)
+	    #pixbuf-grejen: funkar inte, tror den försöker kopiera utanför målet
+	    #tile_pic = tile.get_picture()
+	    #tile_pic.copy_area(0, 0, tile_pic.get_width(), tile_pic.get_height(), \
+		#self._pixbuf, int(x), int(y))
 
 	# Ritar ut eventuella objekt
 	objects = self.__map.get_objects()
@@ -159,8 +170,10 @@ class Map(gtk.DrawingArea):
 				     item["object"].get_coordinate()["latitude"])
 
 	    if x != 0 and y != 0:
-		item["object"].draw(self.context, x, y)
-
+		item["object"].draw(self._pixbuf, x, y)
+	# till pixbuf-lösningen:
+	#self.context.set_source_pixbuf(self._pixbuf, 0, 0)
+	#self.context.paint()
 
    
     def gps_to_pixel(self, lon, lat):
