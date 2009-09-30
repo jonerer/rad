@@ -23,6 +23,10 @@ class Map(gtk.DrawingArea):
         self.__allow_movement = False
         self.__last_movement_timestamp = 0.0
         self.__zoom_level = 1
+	self._is_dirty = True
+	self._last_tiles = None
+	self._last_focus_pixel = 0,0
+	self._focus_pixel = 0,0
         
         # queue_draw() ärvs från klassen gtk.DrawingArea
         map.set_redraw_function(self.queue_draw)
@@ -37,7 +41,7 @@ class Map(gtk.DrawingArea):
                         gtk.gdk.LEAVE_NOTIFY_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
-
+	
     def change_zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
         level = self.__map.get_level(self.__zoom_level)
@@ -51,6 +55,7 @@ class Map(gtk.DrawingArea):
                 self.__zoom_level -= 1
 
         # Ritar ny nivå
+	self._is_dirty = True
         self.queue_draw()
 
     # Hanterar rörelse av kartbilden
@@ -65,6 +70,8 @@ class Map(gtk.DrawingArea):
 
     def handle_button_release_event(self, widget, event):
         self.__allow_movement = False
+	self._is_dirty = True
+	self.queue_draw()
         return True
 
     def handle_motion_notify_event(self, widget, event):
@@ -83,15 +90,19 @@ class Map(gtk.DrawingArea):
                                              self.__movement_from["y"] - y)
                 self.__map.set_focus(self.__origin_position["longitude"] + lon,
                                      self.__origin_position["latitude"] - lat)
+		self._focus_pixel = (self.__movement_from["x"] - x,
+					self.__movement_from["y"] - y)
                 self.__movement_from["x"] = x
                 self.__movement_from["y"] = y
             
-                # Ritar om kartan
-                self.queue_draw()
+                # Ritar om kartan. eller?
+		#self._is_dirty = True
+                #self.queue_draw()
 
         return True
 
     def handle_expose_event(self, widget, event):
+	# den här kallas samtidigt om queue_draw verkar d som.
         self.context = widget.window.cairo_create()
 
         # Regionen vi ska rita på
@@ -100,42 +111,57 @@ class Map(gtk.DrawingArea):
                                event.area.width,
                                event.area.height)
         self.context.clip()
+	
         self.draw()
 
         return False
 
     def set_gps_data(self, gps_data):
         self.__gps_data =  gps_data
-        self.queue_draw()
+	self._is_dirty = True
 
     def draw(self):
-        # Hämtar alla tiles för en nivå
-        level = self.__map.get_level(self.__zoom_level)
-        # Plockar ur de tiles vi söker från nivån
-        tiles, cols, rows = level.get_tiles(self.__map.get_focus())
-        self.__cols = cols
-        self.__rows = rows
+	if self._is_dirty:
+		# Hämtar alla tiles för en nivå
+		level = self.__map.get_level(self.__zoom_level)
+		# Plockar ur de tiles vi söker från nivån
+		tiles, cols, rows = level.get_tiles(self.__map.get_focus())
+		self.__cols = cols
+		self.__rows = rows
 
-        self.__bounds["min_longitude"] = tiles[0].get_bounds()["min_longitude"]
-        self.__bounds["min_latitude"] = tiles[0].get_bounds()["min_latitude"]
-        self.__bounds["max_longitude"] = tiles[-1].get_bounds()["max_longitude"]
-        self.__bounds["max_latitude"] = tiles[-1].get_bounds()["max_latitude"]
+		self.__bounds["min_longitude"] = tiles[0].get_bounds()["min_longitude"]
+		self.__bounds["min_latitude"] = tiles[0].get_bounds()["min_latitude"]
+		self.__bounds["max_longitude"] = tiles[-1].get_bounds()["max_longitude"]
+		self.__bounds["max_latitude"] = tiles[-1].get_bounds()["max_latitude"]
 
-        # Ritar kartan
-        for tile in tiles:
-            #img = tile.get_picture()
-            x, y = self.gps_to_pixel(tile.get_bounds()["min_longitude"],
-                                     tile.get_bounds()["min_latitude"])
-            tile.draw(self.context, x, y)
+		self._is_dirty = False
+		self._last_focus_pixel = self._focus_pixel
+		self._last_tiles = tiles
+	else:
+		# here, don't redraw the whole map, just move it around.
+		# TODO: this thing.
+		tiles = self._last_tiles
+		pixel_focus_diff =  self._focus_pixel[0] - self._last_focus_pixel[0], \
+			self._focus_pixel[1] - self._last_focus_pixel[1]
+			
+	# försöka få tag på en pixbuf eller nått att rita på?
+	# Ritar kartan
+	for tile in tiles:
+	    #img = tile.get_picture()
+	    x, y = self.gps_to_pixel(tile.get_bounds()["min_longitude"],
+				     tile.get_bounds()["min_latitude"])
+	    tile.draw(self.context, x, y)
 
-        # Ritar ut eventuella objekt
-        objects = self.__map.get_objects()
-        for item in objects:
-            x, y = self.gps_to_pixel(item["object"].get_coordinate()["longitude"],
-                                     item["object"].get_coordinate()["latitude"])
+	# Ritar ut eventuella objekt
+	objects = self.__map.get_objects()
+	for item in objects:
+	    x, y = self.gps_to_pixel(item["object"].get_coordinate()["longitude"],
+				     item["object"].get_coordinate()["latitude"])
 
-            if x != 0 and y != 0:
-                item["object"].draw(self.context, x, y)
+	    if x != 0 and y != 0:
+		item["object"].draw(self.context, x, y)
+
+
    
     def gps_to_pixel(self, lon, lat):
         cols = self.__cols
