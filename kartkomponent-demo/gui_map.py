@@ -170,7 +170,7 @@ class Map(gtk.DrawingArea):
 				     item["object"].get_coordinate()["latitude"])
 
 	    if x != 0 and y != 0:
-		item["object"].draw(self._pixbuf, x, y)
+		    item["object"].draw(self.context, x, y)
 	# till pixbuf-lösningen:
 	#self.context.set_source_pixbuf(self._pixbuf, 0, 0)
 	#self.context.paint()
