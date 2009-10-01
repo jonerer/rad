@@ -3,16 +3,16 @@ from xml.dom import minidom
 import data_storage
 
 class MapXML:
-    __name = None
-    __levels = {}
-    __path = None
+    _name = None
+    _levels = {}
+    _path = None
 
     def handle_name_node(self, node):
-        self.__name = node.attributes['id'].value
+        self._name = node.attributes['id'].value
 
     def handle_area_node(self, node):
         tiles = self.create_tiles(node.attributes['path'].value)
-        self.__levels[int(node.attributes['level'].value)] = tiles
+        self._levels[int(node.attributes['level'].value)] = tiles
 
     def handle_base_node(self, node):
         return [node.attributes['width'].value,
@@ -29,7 +29,7 @@ class MapXML:
                   "max_longitude":float(node.attributes['maxlon'].value)}
 
         return [int(node.attributes['id'].value),
-                self.__path + node.attributes['file'].value,
+                self._path + node.attributes['file'].value,
                 bounds,
                 node.attributes['type'].value]
 
@@ -42,7 +42,7 @@ class MapXML:
 
         tiles = None
         xmldoc = minidom.parse(open(path)).documentElement
-        self.__path = path[0:path.rfind("/") + 1]
+        self._path = path[0:path.rfind("/") + 1]
 
         for node in xmldoc.childNodes:
             if node.nodeType != node.TEXT_NODE:
@@ -68,10 +68,10 @@ class MapXML:
         return tiles
 
     def get_name(self):
-        return self.__name
+        return self._name
 
     def get_levels(self):
-        return self.__levels
+        return self._levels
 
     def __init__(self, filename):
         xmldoc = minidom.parse(open(filename)).documentElement
