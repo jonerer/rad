@@ -84,17 +84,8 @@ class Picture(object):
             self.load_picture()
             return self._picture
 
-class Bounds:
-    _bounds = None
-
-    def set_bounds(self, bounds):
-        self._bounds = bounds
-
-    def get_bounds(self):
-        return self._bounds
-
 # Lagrar en kartbild och dess koordinatavgränsningar
-class MapTile(Picture, Bounds):
+class MapTile(Picture):
     _type = None
 
     def set_type(self, type):
@@ -106,7 +97,7 @@ class MapTile(Picture, Bounds):
     def __init__(self, id, path, bounds, type):
         self.name = id
         self.set_path_to_picture(path)
-        self.set_bounds(bounds)
+        self.bounds = bounds
         self.set_type(type)
 
 # Lagrar alla MapTiles (kartbilder)
@@ -169,7 +160,7 @@ class Tiles(object):
         return self._bounds
 
     def add_tile(self, tile):
-        self.update_bounds(tile.get_bounds())
+        self.update_bounds(tile.bounds)
         self._tiles[self._col_pos][self._row_pos] = tile
 
         if tile.get_type() == "end":
@@ -263,7 +254,7 @@ class Tiles(object):
 # Datastruktur som lagrar kartans bild och de generella objekt som ska ritas ut
 # på denna. Med generella objekt menas objekt som hela tiden ska vara på kartan,
 # som ej försvinner när exempelvis ett uppdrag avslutats.
-class MapData(Bounds):
+class MapData(object):
     _objects = []
     _mission_objects = []
     _levels = {}
@@ -278,7 +269,7 @@ class MapData(Bounds):
         self.set_level(1, levels[1])
         self.set_level(2, levels[2])
         self.set_level(3, levels[3])
-        self.set_bounds(levels[1].get_bounds())
+        self.bounds = levels[1].get_bounds()
 
     # Ställer in Tiles-objekt för en bestämd nivå
     def set_level(self, level, tiles):

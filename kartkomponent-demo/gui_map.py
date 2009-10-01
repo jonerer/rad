@@ -135,10 +135,10 @@ class Map(gtk.DrawingArea):
 		self._cols = cols
 		self._rows = rows
 
-		self._bounds["min_longitude"] = tiles[0].get_bounds()["min_longitude"]
-		self._bounds["min_latitude"] = tiles[0].get_bounds()["min_latitude"]
-		self._bounds["max_longitude"] = tiles[-1].get_bounds()["max_longitude"]
-		self._bounds["max_latitude"] = tiles[-1].get_bounds()["max_latitude"]
+		self._bounds["min_longitude"] = tiles[0].bounds["min_longitude"]
+		self._bounds["min_latitude"] = tiles[0].bounds["min_latitude"]
+		self._bounds["max_longitude"] = tiles[-1].bounds["max_longitude"]
+		self._bounds["max_latitude"] = tiles[-1].bounds["max_latitude"]
 
 		self._is_dirty = False
 		self._last_focus_pixel = self._focus_pixel
@@ -155,8 +155,8 @@ class Map(gtk.DrawingArea):
 	# Ritar kartan
 	for tile in tiles:
 	    #img = tile.get_picture()
-	    x, y = self.gps_to_pixel(tile.get_bounds()["min_longitude"],
-				     tile.get_bounds()["min_latitude"])
+	    x, y = self.gps_to_pixel(tile.bounds["min_longitude"],
+				     tile.bounds["min_latitude"])
 	    tile.draw(self.context, x, y)
 	    #pixbuf-grejen: funkar inte, tror den försöker kopiera utanför målet
 	    #tile_pic = tile.get_picture()
