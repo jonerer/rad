@@ -4,7 +4,7 @@ import math
 import time
 
 class Map(gtk.DrawingArea):
-    __bounds = {"min_latitude":0,
+    _bounds = {"min_latitude":0,
                 "max_latitude":0,
                 "min_longitude":0,
                 "max_longitude":0}
@@ -13,16 +13,16 @@ class Map(gtk.DrawingArea):
         gtk.DrawingArea.__init__(self)
         
         # Variabler
-        self.__map = map
-        self.__pos = {"x":0, "y":0}
-        self.__origin_position = None
-        self.__cols = 0
-        self.__rows = 0
-        self.__gps_data = None
-        self.__movement_from = {"x": 0, "y":0}
-        self.__allow_movement = False
-        self.__last_movement_timestamp = 0.0
-        self.__zoom_level = 1
+        self._map = map
+        self._pos = {"x":0, "y":0}
+        self._origin_position = None
+        self._cols = 0
+        self._rows = 0
+        self._gps_data = None
+        self._movement_from = {"x": 0, "y":0}
+        self._allow_movement = False
+        self._last_movement_timestamp = 0.0
+        self._zoom_level = 1
 	self._is_dirty = True
 	self._last_tiles = None
 	self._last_focus_pixel = 0,0
@@ -44,15 +44,15 @@ class Map(gtk.DrawingArea):
 	
     def change_zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
-        level = self.__map.get_level(self.__zoom_level)
+        level = self._map.get_level(self._zoom_level)
         level.unload_tiles("all")
       
         if change == "+":
-            if self.__zoom_level < 3:
-                self.__zoom_level += 1
+            if self._zoom_level < 3:
+                self._zoom_level += 1
         else:
-            if self.__zoom_level > 1:
-                self.__zoom_level -= 1
+            if self._zoom_level > 1:
+                self._zoom_level -= 1
 
         # Ritar ny nivå
 	self._is_dirty = True
@@ -60,22 +60,22 @@ class Map(gtk.DrawingArea):
 
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
-        self.__movement_from["x"] = event.x
-        self.__movement_from["y"] = event.y
-        self.__origin_position = self.__map.get_focus()
-        self.__last_movement_timestamp = time.time()
-        self.__allow_movement = True
+        self._movement_from["x"] = event.x
+        self._movement_from["y"] = event.y
+        self._origin_position = self._map.get_focus()
+        self._last_movement_timestamp = time.time()
+        self._allow_movement = True
 
         return True
 
     def handle_button_release_event(self, widget, event):
-        self.__allow_movement = False
+        self._allow_movement = False
 	self._is_dirty = True
 	self.queue_draw()
         return True
 
     def handle_motion_notify_event(self, widget, event):
-        if self.__allow_movement:
+        if self._allow_movement:
             if event.is_hint:
                 x, y, state = event.window.get_pointer()
             else:
@@ -85,15 +85,15 @@ class Map(gtk.DrawingArea):
 
             # Genom tidskontroll undviker vi oavsiktlig rörelse av kartan,
             # t ex ifall någon råkar nudda skärmen med ett finger eller liknande.
-            if time.time() > self.__last_movement_timestamp + 0.1:
-                lon, lat = self.pixel_to_gps(self.__movement_from["x"] - x,
-                                             self.__movement_from["y"] - y)
-                self.__map.set_focus(self.__origin_position["longitude"] + lon,
-                                     self.__origin_position["latitude"] - lat)
-		self._focus_pixel = (self.__movement_from["x"] - x,
-					self.__movement_from["y"] - y)
-                self.__movement_from["x"] = x
-                self.__movement_from["y"] = y
+            if time.time() > self._last_movement_timestamp + 0.1:
+                lon, lat = self.pixel_to_gps(self._movement_from["x"] - x,
+                                             self._movement_from["y"] - y)
+                self._map.set_focus(self._origin_position["longitude"] + lon,
+                                     self._origin_position["latitude"] - lat)
+		self._focus_pixel = (self._movement_from["x"] - x,
+					self._movement_from["y"] - y)
+                self._movement_from["x"] = x
+                self._movement_from["y"] = y
             
                 # Ritar om kartan. eller?
 		#self._is_dirty = True
@@ -123,22 +123,22 @@ class Map(gtk.DrawingArea):
         return False
 
     def set_gps_data(self, gps_data):
-        self.__gps_data =  gps_data
+        self._gps_data =  gps_data
 	self._is_dirty = True
 
     def draw(self):
 	if self._is_dirty:
 		# Hämtar alla tiles för en nivå
-		level = self.__map.get_level(self.__zoom_level)
+		level = self._map.get_level(self._zoom_level)
 		# Plockar ur de tiles vi söker från nivån
-		tiles, cols, rows = level.get_tiles(self.__map.get_focus())
-		self.__cols = cols
-		self.__rows = rows
+		tiles, cols, rows = level.get_tiles(self._map.get_focus())
+		self._cols = cols
+		self._rows = rows
 
-		self.__bounds["min_longitude"] = tiles[0].get_bounds()["min_longitude"]
-		self.__bounds["min_latitude"] = tiles[0].get_bounds()["min_latitude"]
-		self.__bounds["max_longitude"] = tiles[-1].get_bounds()["max_longitude"]
-		self.__bounds["max_latitude"] = tiles[-1].get_bounds()["max_latitude"]
+		self._bounds["min_longitude"] = tiles[0].get_bounds()["min_longitude"]
+		self._bounds["min_latitude"] = tiles[0].get_bounds()["min_latitude"]
+		self._bounds["max_longitude"] = tiles[-1].get_bounds()["max_longitude"]
+		self._bounds["max_latitude"] = tiles[-1].get_bounds()["max_latitude"]
 
 		self._is_dirty = False
 		self._last_focus_pixel = self._focus_pixel
@@ -164,7 +164,7 @@ class Map(gtk.DrawingArea):
 		#self._pixbuf, int(x), int(y))
 
 	# Ritar ut eventuella objekt
-	objects = self.__map.get_objects()
+	objects = self._map.get_objects()
 	for item in objects:
 	    x, y = self.gps_to_pixel(item["object"].get_coordinate()["longitude"],
 				     item["object"].get_coordinate()["latitude"])
@@ -177,20 +177,20 @@ class Map(gtk.DrawingArea):
 
    
     def gps_to_pixel(self, lon, lat):
-        cols = self.__cols
-        rows = self.__rows
-        width = self.__bounds["max_longitude"] - self.__bounds["min_longitude"]
-        height = self.__bounds["min_latitude"] - self.__bounds["max_latitude"]
+        cols = self._cols
+        rows = self._rows
+        width = self._bounds["max_longitude"] - self._bounds["min_longitude"]
+        height = self._bounds["min_latitude"] - self._bounds["max_latitude"]
       
         # Ger i procent var vi befinner oss på width och height
-        where_lon = (lon - self.__bounds["min_longitude"]) / width
-        where_lat = (self.__bounds["min_latitude"] - lat) / height
+        where_lon = (lon - self._bounds["min_longitude"]) / width
+        where_lat = (self._bounds["min_latitude"] - lat) / height
       
         # Ger i procent var focus befinner sig på width och height
-        where_focus_lon = (self.__map.get_focus()["longitude"] - \
-                           self.__bounds["min_longitude"]) / width
-        where_focus_lat = (self.__bounds["min_latitude"] - \
-                           self.__map.get_focus()["latitude"]) / height
+        where_focus_lon = (self._map.get_focus()["longitude"] - \
+                           self._bounds["min_longitude"]) / width
+        where_focus_lat = (self._bounds["min_latitude"] - \
+                           self._map.get_focus()["latitude"]) / height
       
         # Placerar origo i skärmens centrum
         rect = self.get_allocation()
@@ -205,13 +205,13 @@ class Map(gtk.DrawingArea):
    
     def pixel_to_gps(self, movement_x, movement_y):
         # Hämtar alla tiles för en nivå
-        level = self.__map.get_level(self.__zoom_level)
+        level = self._map.get_level(self._zoom_level)
         # Plockar ur de tiles vi söker från nivån
-        tiles, cols, rows = level.get_tiles(self.__map.get_focus())
+        tiles, cols, rows = level.get_tiles(self._map.get_focus())
       
         # Gps per pixlar
-        width = self.__bounds["max_longitude"] - self.__bounds["min_longitude"]
-        height = self.__bounds["min_latitude"] - self.__bounds["max_latitude"]
+        width = self._bounds["max_longitude"] - self._bounds["min_longitude"]
+        height = self._bounds["min_latitude"] - self._bounds["max_latitude"]
         gps_per_pix_width = width / (cols * 300)
         gps_per_pix_height = height / (rows * 160)
       

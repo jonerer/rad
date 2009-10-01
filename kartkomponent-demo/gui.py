@@ -5,8 +5,8 @@ import gobject
 import gui_map
 
 class Gui(hildon.Program):
-    __map = None
-    __map_change_zoom = None
+    _map = None
+    _map_change_zoom = None
 
     def on_window_state_change(self, widget, event, *args):
         if event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN:
@@ -31,17 +31,17 @@ class Gui(hildon.Program):
                 self.view.next_page()
         # Zoom -
         elif event.keyval == 65477:
-            self.__map_change_zoom("-")
+            self._map_change_zoom("-")
         # Zoom +
         elif event.keyval == 65476:
-            self.__map_change_zoom("+")
+            self._map_change_zoom("+")
 
     def __init__(self, map):
         # Initierar hildon (GUI-biblioteket för N810)
         hildon.Program.__init__(self)
 
         # Sparar handdatorns karta.
-        self.__map = map
+        self._map = map
 
         # Skapar programmets fönster
         self.window = hildon.Window()
@@ -75,14 +75,14 @@ class Gui(hildon.Program):
 
     # Skapar vyn för kartan
     def create_map_view(self):
-        frame = gtk.Frame(self.__map.get_name() + " <longitude, latitude>")
+        frame = gtk.Frame(self._map.name + " <longitude, latitude>")
         frame.set_border_width(5)
 
-        map = gui_map.Map(self.__map)
+        map = gui_map.Map(self._map)
         frame.add(map)
 
         # Sparar undan funktionen som möjliggör zoomning
-        self.__map_change_zoom = map.change_zoom
+        self._map_change_zoom = map.change_zoom
 
         return frame
 
