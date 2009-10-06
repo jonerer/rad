@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+import thread
+import time
+
 import data_storage
 import map_xml_reader
 import gui
-
-# Kartan
 print "Läser in kartinformation från kartdata/map.xml"
+        
+# Kartan
 mapxml = map_xml_reader.MapXML("kartdata/map.xml")
 
 map = data_storage.MapData(mapxml.get_name(),
@@ -15,18 +18,19 @@ map = data_storage.MapData(mapxml.get_name(),
 map.set_focus(15.5726, 58.4035)
 
 # Ritar ut tre objekt
-map.add_object("Ambulans1", data_storage.MapObject({"longitude":15.57796,
-                                                    "latitude":58.40479},
-                                                   "ikoner/ambulans.png"))
-map.add_object("Ambulans1", data_storage.MapObject({"longitude":15.57806,
-                                                    "latitude":58.40579},
-                                                   "ikoner/ambulans.png"))
-map.add_object("Brandbil1", data_storage.MapObject({"longitude":15.5729,
-                                                    "latitude":58.40193},
-                                                   "ikoner/brandbil.png"))
-map.add_object("Sjukhus1", data_storage.MapObject({"longitude":15.5629,
-                                                   "latitude":58.4093},
-                                                  "ikoner/sjukhus.png"))
+map.add_object("Ambulans1", data_storage.MapObject(
+    {"longitude":15.57796,"latitude":58.40479},
+    "ikoner/ambulans.png"))
+map.add_object("Ambulans1", data_storage.MapObject(
+    {"longitude":15.57806, "latitude":58.40579},
+    "ikoner/ambulans.png"))
+map.add_object("Brandbil1", data_storage.MapObject(
+    {"longitude":15.5729,"latitude":58.40193},
+    "ikoner/brandbil.png"))
+map.add_object("Sjukhus1", data_storage.MapObject(
+    {"longitude":15.5629, "latitude":58.4093},
+    "ikoner/sjukhus.png"))
+
 # Ritar ut en svart cirkel
 #
 # Nedan används två kommandon för utritningen.
@@ -36,7 +40,7 @@ map.add_object("Sjukhus1", data_storage.MapObject({"longitude":15.5629,
 #   set_source_rgb: Ställer in cirkelns färg.
 # Andra exempel på kommandon finns här:
 #   http://www.tortall.net/mu/wiki/CairoTutorial
-#   http://www.tortall.net/mu/wiki/PyGTKCairoTutorial
+#   :http://www.tortall.net/mu/wiki/PyGTKCairoTutorial
 # Övrigt
 #   Det kanske upplevs underligt att x, y och math.pi används i uttrycken,
 #   var definieras variablerna? x och y räknas ut av objektets draw-funktion
