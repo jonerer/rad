@@ -1,0 +1,22 @@
+
+1. skaffa dessa:
+sudo apt-get install pkg-config build-essential gcc-3.4 libsdl1.2-dev zlib1g-dev svn
+
+2. ställ dig i hemkatalogen o kör:
+svn co https://qemu-arm-eabi.svn.sourceforge.net/svnroot/qemu-arm-eabi qemu-arm-eabi
+cd qemu-arm-eabi/tags/qemu-arm-eabi-0.3
+./get-qemu
+cd qemu-arm-eabi
+./configure --target-list=arm-linux-user --static
+make
+
+3. kopia över qemu:
+sudo cp arm-linux-user/qemu-arm /scratchbox/devkits/cputransp/bin/qemu-arm-eabi-sb2
+
+4. öppna cputrans-method o lägg till en rad
+sudo vim /scratchbox/devkits/cputransp/etc/cputransp-methods
+lägg till: qemu-arm-eabi-sb2
+
+5. öppna configen o ändra en rad
+vim /scratchbox/users/<username>/targets/DIABLO_ARMEL.config
+o ändra raden till: SBOX_CPUTRANSPARENCY_METHOD=/scratchbox/devkits/cputransp/bin/qemu-eabi-sb2
