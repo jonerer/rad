@@ -1,0 +1,70 @@
+#
+# OpenSSL configuration file.
+#
+
+# Establish working directory.
+
+dir			= .
+
+[ ca ]
+default_ca		= CA_default
+
+[ CA_default ]
+serial			= $dir/serial
+database		= $dir/index.txt
+new_certs_dir		= $dir/newcert
+certificate		= $dir/cacert.pem
+private_key		= $dir/private/cakey.pem
+default_days		= 365
+default_md		= md5
+preserve		= no
+email_in_dn		= no
+nameopt			= default_ca
+certopt			= default_ca
+policy			= policy_match
+
+[ policy_match ]
+countryName		= match
+stateOrProvinceName	= match
+organizationName	= match
+organizationalUnitName	= optional
+commonName		= supplied
+emailAddress		= optional
+
+[ req ]
+default_bits		= 1024			# Size of keys
+default_keyfile		= key.pem		# name of generated keys
+default_md		= md5			# message digest algorithm
+string_mask		= nombstr		# permitted characters
+distinguished_name	= req_distinguished_name
+req_extensions		= v3_req
+
+[ req_distinguished_name ]
+# Variable name		  Prompt string
+#----------------------	  ----------------------------------
+0.organizationName	= Raddningspatrullen
+organizationalUnitName	= Squad 1
+emailAddress		= raddningspatrullen@googlegroups.com 
+emailAddress_max	= 40
+localityName		= Linkoping
+stateOrProvinceName	= Ostergotland 
+countryName		= SE 
+countryName_min		= 2
+countryName_max		= 2
+commonName		= itgroup1 
+commonName_max		= 64
+
+# Default values for the above, for consistency and less typing.
+# Variable name			  Value
+#------------------------------	  ------------------------------
+0.organizationName_default	= Raddningspatrullen
+localityName_default		= Linkoping
+stateOrProvinceName_default	= Ostergotland
+countryName_default		= SE
+commonName_default		= raddnigspat
+[ v3_req ]
+basicConstraints	= CA:FALSE
+subjectKeyIdentifier	= hash
+#authorityKeyIdentifier	= keyid:always,issuer:always
+
+
