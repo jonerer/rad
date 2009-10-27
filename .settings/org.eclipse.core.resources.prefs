@@ -1,7 +1,3 @@
-#Thu Oct 01 11:07:34 CEST 2009
+#Tue Oct 27 11:15:47 CET 2009
 eclipse.preferences.version=1
-encoding//kartkomponent-demo/data_storage.py=utf-8
-encoding//kartkomponent-demo/gui.py=utf-8
-encoding//kartkomponent-demo/gui_map.py=utf-8
-encoding//kartkomponent-demo/main.py=utf-8
-encoding//kartkomponent-demo/map_xml_reader.py=utf-8
+encoding//main/main.py=utf-8
