@@ -7,10 +7,26 @@ if sys.version_info[1] == 3:
     print "nu glömde du skriva python2.5... trooooooliiiigt"
     sys.exit(0)
 
-import dbus
-import map_thread
+import dbus, dbus.glib, dbus.service
 
-bus = dbus.SessionBus()
+import gui_thread
+#from dbus.mainloop.glib import DBusGMainLoop
+#import gobject
+print "före hax"
+#dbus_loop = DBusGMainLoop(set_as_default=True)
 
-map_thread.run()
+print  "efter hax"
 
+#bus = dbus.SessionBus(mainloop=dbus_loop)
+print "efter bus"
+#proxy = bus.get_object("rad.main",
+#		"/rad/main/echo")
+
+print "efter proxy"
+gui_thread.run()
+print "efter map_thread"
+
+#loop = gobject.MainLoop()
+print "mloop"
+#thread.start_new_thread(loop.run, tuple())
+print "DONEloop"

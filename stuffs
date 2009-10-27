@@ -1,5 +1,7 @@
 hello world-tutorial:
 http://pymaemo.garage.maemo.org/documentation/pymaemo_tutorial/python_maemo_howto.html
+fast
+http://pymaemo.garage.maemo.org/installation_scratchbox.html
 om dbus bökar:
 dbus-uuidgen > /var/lib/dbus/machine-id
 
