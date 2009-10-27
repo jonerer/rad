@@ -1,5 +1,5 @@
 import socket, ssl
-HOST = '192.168.1.36'                 # Symbolic name meaning all available interfaces
+HOST = '127.0.1.1'                 # Symbolic name meaning all available interfaces
 PORT = 443              # Arbitrary non-privileged port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print HOST
@@ -19,6 +19,7 @@ print 'Connected by', addr
 #    if not data: break
 #    conn.send(data)
 # null data means the client is finished with us
+print socket.gethostbyname(socket.gethostname()) 
 while True:
     data = connstream.read()
     if not data: break
