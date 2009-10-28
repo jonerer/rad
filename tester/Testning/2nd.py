@@ -1,54 +1,27 @@
 import gtk
 import hildon
-import liblocation
-import gobject
+import gpsbt
+import time
 
 class helloWorld(hildon.Program):
-    print "1"
-    def gps(self):
-        print "2"
-        # required to be initialized when using gpsd_control stuff
-        gobject.threads_init()
     
-        # create a gps device object (which is a full pythonic gobject)
-        gps = liblocation.gps_device_get_new()
-    
-        # connect its gobject 'changed' signal to our callback function
-        gps.connect('changed', self.notify_gps_update)
-    
-        # create a gpsd_control object (which is a full pythonic gobject)
-        gpsd_control = liblocation.gpsd_control_get_default()
-    
-        # are we the first one to grab gpsd?  If so, we can and must
-        # start it running.  If we didn't grab it first, then we cannot
-        # control it.
-        if gpsd_control.struct().can_control:
-            liblocation.gpsd_control_start(gpsd_control)   
-    
-        # wait for 'changed' event callbacks
-        mainloop = gobject.MainLoop()
-        try:
-            mainloop.run()
-        except KeyboardInterrupt:
-            print "k."
-        
-    def notify_gps_update(self, gps_dev):
-        print "3"
-        # Note: not all structure elements are used here,
-        # but they are all made available to python.
-        # Accessing the rest is left as an exercise.
-    
-        # struct() gives access to the underlying ctypes data.
-        # ctypes magically converts things for us.
-        gps_struct = gps_dev.struct()    
-        # Not sure if fix can ever be None, but check just in case.
-        fix = gps_struct.fix
-        self.latitude = fix.latitude
-        self.longitude = fix.longitude
-        self.label.set_label(self.latitude + "  "  + self.longitude)
+    def has_a_fix(self, gps):
+        gps.get_fix()
+        return gps.satellites_used > 0
 
+    con = gpsbt.start()
+    time.sleep(2.0) # wait for gps to come up
+    gps = gpsbt.gps()
+    
+    print "Waiting for the sun... err... a fix"
+    while not has_a_fix(gps):
+        print "Wai-ting..."
+        time.sleep(5)    
+    
+    # do something
+    #gpsbt.stop(con)
+    
     def __init__(self):
-        print "4"
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.connect("destroy", gtk.main_quit)
@@ -66,16 +39,17 @@ class helloWorld(hildon.Program):
         self.label.show()
         
     def whoop(self, label):
-        print "5"
-        self.gps()
+        
+        x = self.gps.longitude
+        y = self.gps.latitude
+        self.label.set_label(str(x) +"  "+ str(y))
+        
         
 
     def run(self):
-        print "6"
         self.window.show_all()
         gtk.main()
 
         
 app = helloWorld()
-print "7"
 app.run()
