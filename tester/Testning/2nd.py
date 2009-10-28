@@ -58,8 +58,8 @@ class helloWorld(hildon.Program):
             print 'signal_strength', sv.signal_strength
             print 'in_use', sv.in_use
         print
-        
-        return (fix.latitude, fix.longitude)
+        self.latitude = fix.latitude
+        self.longitude = fix.longitude
 
     def __init__(self):
         hildon.Program.__init__(self)
@@ -81,8 +81,7 @@ class helloWorld(hildon.Program):
 
 
     def whoop(self, label):
-        alt, long = self.gps()
-        self.label.set_label(alt + "  "  + long)
+        self.label.set_label(self.latitude + "  "  + self.longitude)
 
     def run(self):
         self.window.show_all()
