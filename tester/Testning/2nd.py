@@ -4,8 +4,9 @@ import liblocation
 import gobject
 
 class helloWorld(hildon.Program):
-
+        print "1"
     def gps(self):
+        print "2"
         # required to be initialized when using gpsd_control stuff
         gobject.threads_init()
     
@@ -32,6 +33,7 @@ class helloWorld(hildon.Program):
             print "k."
         
     def notify_gps_update(self, gps_dev):
+        print "3"
         # Note: not all structure elements are used here,
         # but they are all made available to python.
         # Accessing the rest is left as an exercise.
@@ -46,6 +48,7 @@ class helloWorld(hildon.Program):
         self.label.set_label(self.latitude + "  "  + self.longitude)
 
     def __init__(self):
+        print "4"
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.connect("destroy", gtk.main_quit)
@@ -63,12 +66,16 @@ class helloWorld(hildon.Program):
         self.label.show()
         
     def whoop(self, label):
+        print "5"
         self.gps()
         
 
     def run(self):
+        print "6"
         self.window.show_all()
         gtk.main()
+
         
 app = helloWorld()
+print "7"
 app.run()
