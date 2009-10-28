@@ -11,5 +11,5 @@ osso_c.set_rpc_callback("spam.eggs.osso_test_receiver",
         "/spam/eggs/osso-test_receiver", 
         "spam.eggs.osso_test_receiver", callback_func, osso_c)
 gtk.main()
-
+# not works lol
 
