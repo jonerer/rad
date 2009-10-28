@@ -65,6 +65,7 @@ class helloWorld(hildon.Program):
         self.longitude = fix.longitude
 
     def __init__(self):
+        self.gps()
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.connect("destroy", gtk.main_quit)
