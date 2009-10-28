@@ -4,7 +4,7 @@ import liblocation
 import gobject
 
 class helloWorld(hildon.Program):
-        print "1"
+    print "1"
     def gps(self):
         print "2"
         # required to be initialized when using gpsd_control stuff
