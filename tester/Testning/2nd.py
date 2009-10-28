@@ -80,16 +80,14 @@ class helloWorld(hildon.Program):
         self.box1.pack_start(self.label, True, True, 0)
         self.button.show()
         self.label.show()
-        self.gps()
         
-
-
     def whoop(self, label):
         self.label.set_label(self.latitude + "  "  + self.longitude)
 
     def run(self):
         self.window.show_all()
         gtk.main()
+        self.gps()
         
 app = helloWorld()
 app.run()
