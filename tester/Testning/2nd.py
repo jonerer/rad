@@ -38,31 +38,12 @@ class helloWorld(hildon.Program):
     
         # struct() gives access to the underlying ctypes data.
         # ctypes magically converts things for us.
-        gps_struct = gps_dev.struct()
-        print 'online', gps_struct.online
-        print 'status', gps_struct.status
-    
+        gps_struct = gps_dev.struct()    
         # Not sure if fix can ever be None, but check just in case.
         fix = gps_struct.fix
-        if fix:
-            print 'mode', fix.mode
-            print 'gps time', fix.time
-            print 'latitude', fix.latitude
-            print 'longitude', fix.longitude
-    
-        print 'satellites_in_view', gps_struct.satellites_in_view
-        print 'satellites_in_use', gps_struct.satellites_in_use
-    
-        # satellites is an iterator.
-        for sv in gps_struct.satellites:
-            print 'prn', sv.prn
-            print 'elevation', sv.elevation
-            print 'azimuth', sv.azimuth
-            print 'signal_strength', sv.signal_strength
-            print 'in_use', sv.in_use
-        print
         self.latitude = fix.latitude
         self.longitude = fix.longitude
+        self.label.set_label(self.latitude + "  "  + self.longitude)
 
     def __init__(self):
         hildon.Program.__init__(self)
@@ -78,16 +59,16 @@ class helloWorld(hildon.Program):
         self.button.connect("clicked",self.whoop)
         self.box1.pack_start(self.button, True, True, 0)
         self.box1.pack_start(self.label, True, True, 0)
-        self.button.show()
+        self.button.shself.label.set_label(self.latitude + "  "  + self.longitude)ow()
         self.label.show()
         
     def whoop(self, label):
-        self.label.set_label(self.latitude + "  "  + self.longitude)
+        self.gps()
+        
 
     def run(self):
         self.window.show_all()
         gtk.main()
-        self.gps()
         
 app = helloWorld()
 app.run()
