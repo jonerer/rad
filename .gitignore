@@ -3,3 +3,4 @@
 *.swp
 *.pyo
 .classpath
+.*project
