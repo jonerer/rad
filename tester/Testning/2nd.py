@@ -59,7 +59,7 @@ class helloWorld(hildon.Program):
         self.button.connect("clicked",self.whoop)
         self.box1.pack_start(self.button, True, True, 0)
         self.box1.pack_start(self.label, True, True, 0)
-        self.button.shself.label.set_label(self.latitude + "  "  + self.longitude)ow()
+        self.button.show()
         self.label.show()
         
     def whoop(self, label):
