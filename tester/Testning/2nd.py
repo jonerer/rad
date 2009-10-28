@@ -26,7 +26,10 @@ class helloWorld(hildon.Program):
     
         # wait for 'changed' event callbacks
         mainloop = gobject.MainLoop()
-        mainloop.run()
+        try:
+            mainloop.run()
+        except KeyboardInterrupt:
+            print "k."
         
     def notify_gps_update(self, gps_dev):
         # Note: not all structure elements are used here,
