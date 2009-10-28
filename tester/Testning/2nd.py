@@ -1,37 +1,65 @@
 import gtk
 import hildon
-import time
-import gpsbt
+import liblocation
+import gobject
 
 class helloWorld(hildon.Program):
 
     def gps(self):
-        context = gpsbt.start()
+        # required to be initialized when using gpsd_control stuff
+        gobject.threads_init()
+    
+        # create a gps device object (which is a full pythonic gobject)
+        gps = liblocation.gps_device_get_new()
+    
+        # connect its gobject 'changed' signal to our callback function
+        gps.connect('changed', self.notify_gps_update)
+    
+        # create a gpsd_control object (which is a full pythonic gobject)
+        gpsd_control = liblocation.gpsd_control_get_default()
+    
+        # are we the first one to grab gpsd?  If so, we can and must
+        # start it running.  If we didn't grab it first, then we cannot
+        # control it.
+        if gpsd_control.struct().can_control:
+            liblocation.gpsd_control_start(gpsd_control)   
+    
+        # wait for 'changed' event callbacks
+        mainloop = gobject.MainLoop()
+        mainloop.run()
         
-        if context == None:
-            print 'Problem while connecting!'
-            return
+    def notify_gps_update(self, gps_dev):
+        # Note: not all structure elements are used here,
+        # but they are all made available to python.
+        # Accessing the rest is left as an exercise.
+    
+        # struct() gives access to the underlying ctypes data.
+        # ctypes magically converts things for us.
+        gps_struct = gps_dev.struct()
+        print 'online', gps_struct.online
+        print 'status', gps_struct.status
+    
+        # Not sure if fix can ever be None, but check just in case.
+        fix = gps_struct.fix
+        if fix:
+            print 'mode', fix.mode
+            print 'gps time', fix.time
+            print 'latitude', fix.latitude
+            print 'longitude', fix.longitude
+    
+        print 'satellites_in_view', gps_struct.satellites_in_view
+        print 'satellites_in_use', gps_struct.satellites_in_use
+    
+        # satellites is an iterator.
+        for sv in gps_struct.satellites:
+            print 'prn', sv.prn
+            print 'elevation', sv.elevation
+            print 'azimuth', sv.azimuth
+            print 'signal_strength', sv.signal_strength
+            print 'in_use', sv.in_use
+        print
         
-        # ensure that GPS device is ready to connect and to receive commands
-        time.sleep(2)
-        gpsdevice = gpsbt.gps()
-        
-        # read 3 times and show information
-        for a in range(4):
-            gpsdevice.get_fix()
-            time.sleep(2)
-            
-            # print information stored under 'fix' variable
-            print 'Altitude: %.3f'%gpsdevice.fix.altitude
-            # dump all information available
-            print gpsdevice
-        
-        #Spara GPS coordinater
-        alt = gpsdevice.fix.altitude
-        long = gpsdevice.fix.longitude
-        # ends Bluetooth connection
-        gpsbt.stop(context)
-        return (alt, long)
+        return (fix.latitude, fix.longitude)
 
     def __init__(self):
         hildon.Program.__init__(self)
