@@ -65,7 +65,7 @@ class helloWorld(hildon.Program):
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.connect("destroy", gtk.main_quit)
-        self.add_wi130ndow(self.window)
+        self.add_window(self.window)
         
         self.box1 = gtk.VBox(False, 0)
         self.window.add(self.box1)
