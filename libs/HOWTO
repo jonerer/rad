@@ -1,0 +1,4 @@
+för att "installera" ett python-paket, kopiera det till /usr/lib/python2.5/site-packages
+
+t.ex. [sbox-DIABLO_ARMEL: ~/rad/libs] > cp -r sqlalchemy/ /usr/lib/python2.5/site-packages/
+
