@@ -9,7 +9,7 @@ class SocketServer(object):
     keypath = "ca/key.pem"
     BUFF = 8192
 
-    def __init__(self, HOST='127.0.1.1', PORT = 443):
+    def __init__(self, HOST='130.236.219.241', PORT = 443):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         context = Context(TLSv1_METHOD)
         context.use_certificate_file((self.certpath))
@@ -18,19 +18,18 @@ class SocketServer(object):
         conn.bind((HOST,PORT))
         print 'Server is listening...'
         conn.listen(5)
-        self.socketclienttable = {}
+        #self.socketclienttable is a dictionary of clients, where each client have an unique id, self.clientid
+        self.socketclienttable = {} 
         self.clientid = 0
+        threading.Thread(target=self.sendinput).start()
         while True:
-        # Waiting for new client to accept
+        # Waiting for new client to accept, sslsocket is the socket that will be used for communication with this client after a client sets up a connection with the server
             sslsocket, addr = conn.accept()
-            print 'Connected to', addr
             self.socketclienttable[self.clientid] = sslsocket
             self.clientid = self.clientid + 1
             threading.Thread(target=self.receive,args=(self.clientid-1,)).start()
-            while True:
-                    hejsan = self.sendinput()
-                    self.send(sslsocket,hejsan)
 
+    #Handle the clients requests
     def receive(self, id):
         sslsocket = self.socketclienttable[id]
         output = ""
@@ -48,7 +47,8 @@ class SocketServer(object):
         except KeyboardInterrupt:
             sslsocket.close()
             exit()
-
+    
+    #sends a string to a specific client 
     def send(self, socket, str):
         socket.write("start")
         totalsent =  0
@@ -59,9 +59,14 @@ class SocketServer(object):
             totalsent = totalsent + sent
         socket.write("end")
 
-    
+    #Takes input from the server and sends to all clients
     def sendinput(self):
-        input = raw_input()
+        while True:
+            input = raw_input()
+            for key, value in self.socketclienttable.iteritems():
+                print value
+                self.send(value, input)
+            print "Treading in sendinput", threading.activeCount()
         return input
 
-tjabba = SocketServer()
+server = SocketServer()

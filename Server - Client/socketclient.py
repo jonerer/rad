@@ -10,16 +10,18 @@ class SocketClient(object):
     cacertpath = "ca/cacert.pem"
     BUFF = 8192
 
-    def __init__(self,HOST='127.0.1.1', PORT = 443):
+    def __init__(self,HOST='130.236.219.241', PORT = 443):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         context = Context(TLSv1_METHOD)
         context.use_certificate_file(self.cacertpath)
         self.sslsocket = Connection(context,s)
         self.sslsocket.connect((HOST,PORT))
+        #starting a thread that listen to what server sends which the clients need to be able to send and recive data at the same time
         threading.Thread(target=self.receive).start()
         print "Yeah, tråden fungerar"
         target=self.sendinput()
-
+    
+    #sending string to server
     def send(self,str):
         self.sslsocket.write("start")
         totalsent =  0
@@ -30,6 +32,7 @@ class SocketClient(object):
             totalsent = totalsent + sent
         self.sslsocket.write("end")
     
+    #Sending input to server
     def sendinput(self):
         while True:
             input = raw_input()
@@ -37,6 +40,7 @@ class SocketClient(object):
                 self.sslsocket.close()
             self.send(input) 
 
+    #getting data from server
     def receive(self):
         output = ""
         print "Du är i receive"
@@ -55,4 +59,4 @@ class SocketClient(object):
             self.sslsocket.close()
             exit()
 
-hejsan = SocketClient()
+client = SocketClient()
