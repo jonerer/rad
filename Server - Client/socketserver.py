@@ -41,11 +41,6 @@ class SocketServer(object):
                     while True:
                         data = sslsocket.recv(self.BUFF)
                         if data == "end":
-                            if output == "hejsan":
-                                print "lol"
-                                #hejsan = self.sendinput()
-                                self.send(sslsocket,"hejsan") 
-                                #threading.Thread(target=self.send,args=((sslsocket, "hi client"))).start()
                             print output
                             output = ""
                             break
