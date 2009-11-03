@@ -11,8 +11,11 @@ class helloWorld(hildon.Program):
     
     def gpsStart(self):
         con = gpsbt.start()
+        if context == None:
+            print 'Problem while connecting!'
+            return
         time.sleep(2.0) # wait for gps to come up
-        #gps = gpsbt.gps()
+        gps = gpsbt.gps()
         
         print "Waiting for the sun... err... a fix"
         while not self.has_a_fix(self, gps):
