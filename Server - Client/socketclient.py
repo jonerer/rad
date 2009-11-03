@@ -34,29 +34,27 @@ class SocketClient(object):
     
     #Sending input to server
     def sendinput(self):
-        while True:
-            input = raw_input()
-            if input == "exit": 
-                self.sslsocket.close()
-            self.send(input) 
+        try:
+            while True:
+                input = raw_input()
+                self.send(input)
+        except KeyboardInterrupt:
+            print "You are now in interrupt root"
+            self.sslsocket.close()
 
     #getting data from server
     def receive(self):
         output = ""
         print "Du är i receive"
-        try:
-            while True:
-                data = self.sslsocket.recv(self.BUFF)
-                if data == "start":
-                    while True:
-                        data = self.sslsocket.recv(self.BUFF)
-                        if data == "end":
-                            print output
-                            output = ""
-                            break
-                        output = output + data
-        except KeyboardInterrupt:
-            self.sslsocket.close()
-            exit()
+        while True:
+            data = self.sslsocket.recv(self.BUFF)
+            if data == "start":
+                while True:
+                    data = self.sslsocket.recv(self.BUFF)
+                    if data == "end":
+                        print output
+                        output = ""
+                        break
+                    output = output + data
 
 client = SocketClient()

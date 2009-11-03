@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*
-import socket, threading
+import socket, threading, sys
 from OpenSSL.SSL import Context, Connection, TLSv1_METHOD
 
 class SocketServer(object):
@@ -33,20 +33,16 @@ class SocketServer(object):
     def receive(self, id):
         sslsocket = self.socketclienttable[id]
         output = ""
-        try: 
-            while True:
-                data = sslsocket.recv(self.BUFF)
-                if data == "start":
-                    while True:
-                        data = sslsocket.recv(self.BUFF)
-                        if data == "end":
-                            print output
-                            output = ""
-                            break
-                        output = output + data
-        except KeyboardInterrupt:
-            sslsocket.close()
-            exit()
+        while True:
+            data = sslsocket.recv(self.BUFF)
+            if data == "start":
+                while True:
+                    data = sslsocket.recv(self.BUFF)
+                    if data == "end":
+                        print output
+                        output = ""
+                        break
+                    output = output + data
     
     #sends a string to a specific client 
     def send(self, socket, str):
@@ -63,10 +59,12 @@ class SocketServer(object):
     def sendinput(self):
         while True:
             input = raw_input()
+            if input == "quit":
+                quit = True
+                sys.exit(0)
             for key, value in self.socketclienttable.iteritems():
                 print value
                 self.send(value, input)
-            print "Treading in sendinput", threading.activeCount()
         return input
 
 server = SocketServer()
