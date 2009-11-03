@@ -12,7 +12,7 @@ class helloWorld(hildon.Program):
     def gpsStart(self):
         con = gpsbt.start()
         time.sleep(2.0) # wait for gps to come up
-        gps = gpsbt.gps()
+        #gps = gpsbt.gps()
         
         print "Waiting for the sun... err... a fix"
         while not self.has_a_fix(self, gps):
@@ -51,7 +51,6 @@ class helloWorld(hildon.Program):
     def run(self):
         self.window.show_all()
         gtk.main()
-
-        
+    
 app = helloWorld()
 app.run()
