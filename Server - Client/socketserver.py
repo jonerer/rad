@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*
-import socket, threading, sys
+import socket, threading, sys, Queue
 from OpenSSL.SSL import Context, Connection, TLSv1_METHOD, SysCallError
 
 class SocketServer(object):
@@ -22,7 +22,9 @@ class SocketServer(object):
         #self.socketclienttable is a dictionary of clients, where each client have an unique id, self.clientid
         self.socketclienttable = {} 
         self.clientid = 0
+        self.q = Queue.Queue()
         threading.Thread(target=self.sendinput).start()
+        threading.Thread(target=self.main).start()
         try:
             while True:
         # Waiting for new client to accept, sslsocket is the socket that will be used for communication with this client after a client sets up a connection with the server
@@ -47,7 +49,8 @@ class SocketServer(object):
                     while True:
                         data = sslsocket.recv(self.BUFF)
                         if data == "end":
-                            print output
+                            #print output
+                            self.q.put(output)
                             output = ""
                             break
                         output = output + data
@@ -74,5 +77,12 @@ class SocketServer(object):
             input = raw_input()
             for key, value in self.socketclienttable.iteritems():
                 self.send(value, input)
+
+    def main(self):
+        while True:
+            self.parse(self.q.get())
+
+    def parse(self,str):
+        print str
 
 server = SocketServer()
