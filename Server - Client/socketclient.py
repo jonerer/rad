@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*
 # Echo client program
 import socket, threading, sys, time # require a certificate from the server
-from OpenSSL.SSL import Context, Connection, TLSv1_METHOD, SysCallError
+from OpenSSL.SSL import Context, Connection, TLSv1_METHOD
+from OpenSSL import SSL
+
+#varför vill inte tråden "sendinput" lyssna på keyboardinterrupt?
 
 class SocketClient(object):
     """This class sends all info to the server
@@ -9,28 +12,40 @@ class SocketClient(object):
 
     cacertpath = "ca/cacert.pem"
     BUFF = 8192
-    socketactive = False
 
     def __init__(self,HOST='localhost', PORT = 443):
-        for x in range(7):
-            if self.socketactive == False:
-                self.reconnect()
-                time.sleep(10)
+        self.mutex = threading.Semaphore(1)
+        self.connected = False
+        self.connect()
 
-    def reconnect(self,HOST='localhost', PORT = 443):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            context = Context(TLSv1_METHOD)
-            context.use_certificate_file(self.cacertpath)
-            context.set_timeout(2)
-            self.sslsocket = Connection(context,s)
-            self.sslsocket.connect((HOST,PORT))
-            #starting a thread that listen to what server sends which the clients need to be able to send and recive data at the same time
-            threading.Thread(target=self.receive).start()
-            target=self.sendinput()
-            self.socketactive = True
-        except socket.error:
-            print "You failed to connect retrying......."
+    def connect(self,HOST='localhost', PORT = 443):
+        print "You are trying to connect..."
+        for x in range(7):
+            if not self.connected:
+                try:
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    context = Context(TLSv1_METHOD)
+                    context.use_certificate_file(self.cacertpath)
+                    context.set_timeout(2)
+                    self.sslsocket = Connection(context,s)
+                    self.sslsocket.connect((HOST,PORT))
+                    #starting a thread that listen to what server sends which the clients need to be able to send and recive data at the same time
+                    t = threading.Thread(target=self.receive)
+                    t.daemon = True
+                    t.start()
+                    if self.sslsocket:
+                        self.connected = True
+                    print "connection established"
+                    #self.authentication("Kalle", "te")
+                    t = threading.Thread(target=self.sendinput)
+                    t.start()
+                except socket.error:
+                    print "You failed to connect retrying......."
+                    time.sleep(5)
+
+    def authentication(self, username, password):
+        self.sslsocket.send(username)
+        self.sslsocket.send(password)
 
     #sending string to server
     def send(self,str):
@@ -43,14 +58,22 @@ class SocketClient(object):
                     raise RuntimeError, "socket connection broken"
                 totalsent = totalsent + sent
             self.sslsocket.write("end")
-        except SysCallError:
+        except SSL.SysCallError:
             print "your server is dead, you have to resend data"
-            self.socketactive = False
+            self.connected = False
+            self.sslsocket.shutdown()
             self.sslsocket.close()
-            for x in range(7):
-                self.reconnect()
-                time.sleep(10)
-    
+            self.mutex.acquire()
+            print "Du är inne i connect via send SysCallError"
+            self.connect()
+            self.mutex.release()
+        except SSL.Error:
+            self.connected = False
+            self.mutex.acquire()
+            print "Du är inne i connect via send ssl error"
+            self.connect()
+            self.mutex.release()
+
     #Sending input to server
     def sendinput(self):
         try:
@@ -58,8 +81,10 @@ class SocketClient(object):
                 input = raw_input()
                 self.send(input)
         except KeyboardInterrupt:
+            print "du är inne i sendinput"
+            self.sslsocket.shutdown()
             self.sslsocket.close()
-            sys.exit(0)
+            exit(0)
 
     #getting data from server
     def receive(self):
@@ -75,10 +100,14 @@ class SocketClient(object):
                             output = ""
                             break
                         output = output + data
-        except SysCallError:
+        except SSL.SysCallError:
             print "OMG Server is down"
+            self.connected = False
+            print self.connected
             self.sslsocket.shutdown()
             self.sslsocket.close() 
-            self.socketactive = False
+            self.mutex.acquire()
+            self.connect()
+            self.mutex.release()
 
-client = SocketClient()
+SocketClient()

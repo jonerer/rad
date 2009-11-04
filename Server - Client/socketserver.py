@@ -34,6 +34,7 @@ class SocketServer(object):
                 threading.Thread(target=self.receive,args=(self.clientid-1,)).start()
         except KeyboardInterrupt:
             for key, value in self.socketclienttable.iteritems():
+                value.shutdown()
                 value.close()
             sys.exit(0)
 
@@ -58,6 +59,7 @@ class SocketServer(object):
             print "klient", str(sslsocket), "disconnected"
             print "SysCallError i receive"
             del self.socketclienttable[id]
+            sslsocket.shutdown()
             sslsocket.close()
 
     #sends a string to a specific client 
@@ -85,4 +87,4 @@ class SocketServer(object):
     def parse(self,str):
         print str
 
-server = SocketServer()
+SocketServer()
