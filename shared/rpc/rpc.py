@@ -15,11 +15,8 @@ def set_name(new_name):
     osso_c = osso.Context(name, "0.0.1", False)
     osso_rpc = osso.Rpc(osso_c)
 
-def _receiver_wrap(callback, interface, method, arguments, args):
-    val = callback(interface, method, arguments, **args)
-    return simplejson.dumps(val)
-
 def receive(interface, method, arguments, user_data):
+    print "en gång plz %s, %s, %s" % (interface, method, arguments)
     try:
         if method not in callbacks:
             return "ERROR: no such callback registered"
@@ -28,12 +25,12 @@ def receive(interface, method, arguments, user_data):
             str_kwargs = {}
             for key in kwargs:
                 str_kwargs[str(key)] = kwargs[key]
-            #return str(arguments[0]) + str(str_kwargs)
             val = callbacks[method](**str_kwargs)
         else:
             val = callbacks[method]()
         return simplejson.dumps(val)
     except Exception, e:
+        # only return strings
         return str(e)
 
 def send(target_name, method, **kwargs):
@@ -41,13 +38,22 @@ def send(target_name, method, **kwargs):
         rpc_args = tuple()
     else:
         rpc_args = (simplejson.dumps(kwargs),)
-    val = osso_rpc.rpc_run("rad.%s" % target_name,
+    if target_name == name:
+        # target is local
+        if str(method) not in callbacks:
+            return "ERROR: no such callback (local) registered"
+        if len(kwargs) > 0:
+            val = callbacks[str(method)](**kwargs)
+        else:
+            val = callbacks[str(method)]()
+    else:
+        val = osso_rpc.rpc_run("rad.%s" % target_name,
             "/rad/%s" % target_name,
             "rad.%s" % target_name,
             method,
             rpc_args,
             wait_reply=True)
-    print "sendade... fick %s" % val
+    return val
 
 def register(cb_name, callback):
     if name is None:

@@ -2,7 +2,7 @@
 from xml.dom import minidom
 import data_storage
 
-class MapXML:
+class MapXML(object):
     _name = None
     _levels = {}
     _path = None

@@ -2,6 +2,8 @@
 import gtk
 import math
 import time
+from shared import rpc
+#from tester.osso import rpc
 
 class Map(gtk.DrawingArea):
     _bounds = {"min_latitude":0,
@@ -27,7 +29,8 @@ class Map(gtk.DrawingArea):
         self._last_tiles = None
         self._last_focus_pixel = 0,0
         self._focus_pixel = 0,0
-        
+    
+        rpc.register("update_map", self.force_draw)
         # queue_draw() ärvs från klassen gtk.DrawingArea
         map.set_redraw_function(self.queue_draw)
       
@@ -126,6 +129,10 @@ class Map(gtk.DrawingArea):
         self._gps_data =  gps_data
         self._is_dirty = True
 
+    def force_draw(self):
+        self._is_dirty = True
+        self.queue_draw()
+
     def draw(self):
         if self._is_dirty:
             # Hämtar alla tiles för en nivå
@@ -150,18 +157,12 @@ class Map(gtk.DrawingArea):
             pixel_focus_diff =  self._focus_pixel[0] - self._last_focus_pixel[0], \
                 self._focus_pixel[1] - self._last_focus_pixel[1]
                 
-        #self._pixbuf.fill(0xffffffff)
-        # försöka få tag på en pixbuf eller nått att rita på?
         # Ritar kartan
         for tile in tiles:
             #img = tile.get_picture()
             x, y = self.gps_to_pixel(tile.bounds["min_longitude"],
                          tile.bounds["min_latitude"])
             tile.draw(self.context, x, y)
-            #pixbuf-grejen: funkar inte, tror den försöker kopiera utanför målet
-            #tile_pic = tile.get_picture()
-            #tile_pic.copy_area(0, 0, tile_pic.get_width(), tile_pic.get_height(), \
-            #self._pixbuf, int(x), int(y))
 
         # Ritar ut eventuella objekt
         objects = self._map.get_objects()
@@ -171,10 +172,6 @@ class Map(gtk.DrawingArea):
 
             if x != 0 and y != 0:
                 item["object"].draw(self.context, x, y)
-        # till pixbuf-lösningen:
-        #self.context.set_source_pixbuf(self._pixbuf, 0, 0)
-        #self.context.paint()
-
    
     def gps_to_pixel(self, lon, lat):
         cols = self._cols

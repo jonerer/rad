@@ -7,7 +7,7 @@ def run():
     print "Läser in kartinformation från kartdata/map.xml"
             
     # Kartan
-    mapxml = map_xml_reader.MapXML("kartdata/map.xml")
+    mapxml = map_xml_reader.MapXML("static/kartdata/map.xml")
 
     map = data_storage.MapData(mapxml.get_name(),
                                mapxml.get_levels())

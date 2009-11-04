@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import gtk
 import hildon
-import gobject
 import gui_map
 
 class Gui(hildon.Program):
