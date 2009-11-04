@@ -31,6 +31,8 @@ class SocketServer(object):
                 self.clientid = self.clientid + 1
                 threading.Thread(target=self.receive,args=(self.clientid-1,)).start()
         except KeyboardInterrupt:
+            for key, value in self.socketclienttable.iteritems():
+                value.close()
             sys.exit(0)
 
     #Handle the clients requests
@@ -68,16 +70,9 @@ class SocketServer(object):
 
     #Takes input from the server and sends to all clients
     def sendinput(self):
-        try:
-            while True:
-                input = raw_input()
-                for key, value in self.socketclienttable.iteritems():
-                    self.send(value, input)
-            return input
-        except KeyboardInterrupt:
-            print "Du har kört sendinput interrupt"
+        while True:
+            input = raw_input()
             for key, value in self.socketclienttable.iteritems():
-                value.close()
-            sys.exit(0)
+                self.send(value, input)
 
 server = SocketServer()
