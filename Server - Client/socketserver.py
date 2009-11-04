@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 import socket, threading, sys
-from OpenSSL.SSL import Context, Connection, TLSv1_METHOD
+from OpenSSL.SSL import Context, Connection, TLSv1_METHOD, SysCallError
 
 class SocketServer(object):
     """This class is setting up a server that is listining to port 443
@@ -9,11 +9,12 @@ class SocketServer(object):
     keypath = "ca/key.pem"
     BUFF = 8192
 
-    def __init__(self, HOST='130.236.219.241', PORT = 443):
+    def __init__(self, HOST='localhost', PORT = 443):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         context = Context(TLSv1_METHOD)
         context.use_certificate_file((self.certpath))
-        context.use_privatekey_file(self.keypath) 
+        context.use_privatekey_file(self.keypath)
+        context.set_timeout(2)
         conn = Connection(context,s)
         conn.bind((HOST,PORT))
         print 'Server is listening...'
@@ -33,38 +34,53 @@ class SocketServer(object):
     def receive(self, id):
         sslsocket = self.socketclienttable[id]
         output = ""
-        while True:
-            data = sslsocket.recv(self.BUFF)
-            if data == "start":
-                while True:
-                    data = sslsocket.recv(self.BUFF)
-                    if data == "end":
-                        print output
-                        output = ""
-                        break
-                    output = output + data
-    
+        try:
+            while True:
+                data = sslsocket.recv(self.BUFF)
+                print str(data)
+                if data == "fuckthisshit":
+                    sslsocket.write("fuckthisshit")
+                    sslsocket.close()
+                    del self.socketclienttable[id]
+                    break
+                if data == "start":
+                    while True:
+                        data = sslsocket.recv(self.BUFF)
+                        if data == "end":
+                            print output
+                            output = ""
+                            break
+                        output = output + data
+        except SysCallError:
+            del self.socketclienttable[id]
+            sslsocket.close()
+
     #sends a string to a specific client 
     def send(self, socket, str):
-        socket.write("start")
-        totalsent =  0
-        while totalsent < str.__len__():
-            sent = socket.write(str[totalsent:])
-            if sent == 0:
-                raise RuntimeError, "socket connection broken"
-            totalsent = totalsent + sent
-        socket.write("end")
+        try:
+            socket.write("start")
+            totalsent =  0
+            while totalsent < str.__len__():
+                sent = socket.write(str[totalsent:])
+                if sent == 0:
+                    raise RuntimeError, "socket connection broken"
+                totalsent = totalsent + sent
+            socket.write("end")
+        except SysCallError:
+            self.socketclienttable.remove(socket)
+            socket.close()
 
     #Takes input from the server and sends to all clients
     def sendinput(self):
-        while True:
-            input = raw_input()
-            if input == "quit":
-                quit = True
-                sys.exit(0)
+        try:
+            while True:
+                input = raw_input()
+                for key, value in self.socketclienttable.iteritems():
+                    print value
+                    self.send(value, input)
+            return input
+        except KeyboardInterrupt:
             for key, value in self.socketclienttable.iteritems():
-                print value
-                self.send(value, input)
-        return input
+                    self.send(value, "fuckthisshitservergoingdown")
 
 server = SocketServer()
