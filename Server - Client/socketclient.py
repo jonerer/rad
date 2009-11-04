@@ -4,26 +4,18 @@ import socket, threading, sys, time # require a certificate from the server
 from OpenSSL.SSL import Context, Connection, TLSv1_METHOD, SysCallError
 
 class SocketClient(object):
-    """This class talks to the server
+    """This class sends all info to the server
     """
 
     cacertpath = "ca/cacert.pem"
     BUFF = 8192
+    socketactive = False
 
     def __init__(self,HOST='localhost', PORT = 443):
-        #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #context = Context(TLSv1_METHOD)
-        #context.use_certificate_file(self.cacertpath)
-        #context.set_timeout(2)
-        #self.sslsocket = Connection(context,s)
-        #self.sslsocket.connect((HOST,PORT))
-        #starting a thread that listen to what server sends which the clients need to be able to send and recive data at the same time
-        #threading.Thread(target=self.receive).start()
-        #print "Yeah, tråden fungerar"
-        #target=self.sendinput()
         for x in range(7):
-            self.reconnect()
-            time.sleep(10)
+            if self.socketactive == False:
+                self.reconnect()
+                time.sleep(10)
 
     def reconnect(self,HOST='localhost', PORT = 443):
         try:
@@ -33,13 +25,12 @@ class SocketClient(object):
             context.set_timeout(2)
             self.sslsocket = Connection(context,s)
             self.sslsocket.connect((HOST,PORT))
-            print self.sslsocket
             #starting a thread that listen to what server sends which the clients need to be able to send and recive data at the same time
             threading.Thread(target=self.receive).start()
-            print "Yeah, tråden fungerar"
             target=self.sendinput()
+            self.socketactive = True
         except socket.error:
-            print "You failed to connect retrying"
+            print "You failed to connect retrying......."
 
     #sending string to server
     def send(self,str):
@@ -54,6 +45,7 @@ class SocketClient(object):
             self.sslsocket.write("end")
         except SysCallError:
             print "your server is dead, you have to resend data"
+            self.socketactive = False
             self.sslsocket.close()
             for x in range(7):
                 self.reconnect()
@@ -72,13 +64,9 @@ class SocketClient(object):
     #getting data from server
     def receive(self):
         output = ""
-        print "Du är i receive"
         try:
             while True:
                 data = self.sslsocket.recv(self.BUFF)
-                if data == "fuckthisshit":
-                    self.sslsocket.close()
-                    break
                 if data == "start":
                     while True: 
                         data = self.sslsocket.recv(self.BUFF)
@@ -89,6 +77,8 @@ class SocketClient(object):
                         output = output + data
         except SysCallError:
             print "OMG Server is down"
+            self.sslsocket.shutdown()
             self.sslsocket.close() 
+            self.socketactive = False
 
 client = SocketClient()
