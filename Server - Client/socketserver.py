@@ -52,6 +52,7 @@ class SocketServer(object):
                             break
                         output = output + data
         except SysCallError:
+            print "klient", str(sslsocket), "disconnected"
             del self.socketclienttable[id]
             sslsocket.close()
 
