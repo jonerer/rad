@@ -21,7 +21,9 @@ class Buttons:
 
         self.window.set_title("Image'd Buttons!")
 
-
+        for a in dir(gtk):
+            print a
+        #self.skriv = gtk.gtk_entry_new()
         self.skriv = gtk.Entry()
 
         button = gtk.Button()
