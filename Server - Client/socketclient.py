@@ -13,12 +13,12 @@ class SocketClient(object):
     cacertpath = "ca/cacert.pem"
     BUFF = 8192
 
-    def __init__(self,HOST='localhost', PORT = 443):
+    def __init__(self,HOST='130.236.219.232', PORT = 443):
         self.mutex = threading.Semaphore(1)
         self.connected = False
         self.connect()
 
-    def connect(self,HOST='localhost', PORT = 443):
+    def connect(self,HOST='130.236.219.232', PORT = 443):
         print "You are trying to connect..."
         for x in range(7):
             if not self.connected:
