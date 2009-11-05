@@ -23,5 +23,5 @@ def main():
 rpc.set_name("rpcsender")
 while True:
     lat, lon = main()
-    print rpc.send("pinger", "ping_with_coordinates", lat, lon)
+    print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
 

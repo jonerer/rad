@@ -29,9 +29,7 @@ class Map(gtk.DrawingArea):
         self._last_tiles = None
         self._last_focus_pixel = 0,0
         self._focus_pixel = 0,0
-    
-        rpc.set_name("pinger")
-        rpc.register("ping_with_coordinates", self.update)
+        
         rpc.register("update_map", self.force_draw)
         # queue_draw() ärvs från klassen gtk.DrawingArea
         map.set_redraw_function(self.queue_draw)
@@ -46,9 +44,6 @@ class Map(gtk.DrawingArea):
                         gtk.gdk.LEAVE_NOTIFY_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
-    
-    def update(self, lat, lon):
-        print "lat: %d, lon: %d" %lat,lon 
     
     def change_zoom(self, change):
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå

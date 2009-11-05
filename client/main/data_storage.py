@@ -3,6 +3,7 @@ import time
 import gtk
 import struct
 import math
+from shared import rpc
 
 # Tar reda på en PNG-bilds storlek
 def png_size(path):
@@ -323,13 +324,22 @@ class MapObject(Picture):
     # {"latitude":float, "longitude":float}
     # type är objektets typ, anges med siffra. Kan vara en ambulans, polisbil,
     # ett träd eller vad man nu hittar på.
-    def __init__(self, coordinate, *path):
+    def __init__(self, coordinate, path, is_self=False):
         self.set_coordinate(coordinate)
+        #call set_coordinate to update self pos
+        #if self=true makes u update the object position
+        if is_self:
+            rpc.register("ping_with_coordinates", self.make_dict)
+
         if len(path) == 1:
-            self.set_path_to_picture(*path)
+            self.set_path_to_picture([path,])
         else:
             self.set_commands(path)
-
+    #Make dict to sen to set_coordinate
+    def make_dict(self, lon, lat):
+        dict = {"longitude":lon,"latitude":lat}
+        self.set_coordinate(dict)
+        
     def set_coordinate(self, coordinate):
         self._coordinate = coordinate
 
