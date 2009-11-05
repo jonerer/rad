@@ -46,14 +46,13 @@ map.add_object("Sjukhus1", data_storage.MapObject(
     {"longitude":15.5629, "latitude":58.4093},
     "static/ikoner/sjukhus.png"))
 map.add_object("jonas", data_storage.mapObject(
-    {"longitude":15.5829,"latitude":58.4093},"static/ikoner/JonasInGlases", True)
+    {"longitude":15.5829,"latitude":58.4093},"static/ikoner/JonasInGlases", True))
 #map.add_object("Shape1", data_storage.MapObject({"longitude":15.5829,
 #                                                 "latitude":58.4093},
 #                                                "arc(x - 5, y - 5, 10, 0, 2 * math.pi)",
 #                                                "set_source_rgb(0, 0, 0)"))
-
 # Skapar grafiska interfacet.
-print "Skapar programmets GUI."
+print "Skapar programmets GUI"
 app = gui.Gui(map)
 
 # Kör programmet
