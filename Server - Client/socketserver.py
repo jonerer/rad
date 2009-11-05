@@ -9,7 +9,7 @@ class SocketServer(object):
     keypath = "ca/key.pem"
     BUFF = 8192
 
-    def __init__(self, HOST='localhost', PORT = 443):
+    def __init__(self, HOST='130.236.219.232', PORT = 443):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         context = Context(TLSv1_METHOD)
         context.use_certificate_file((self.certpath))
@@ -34,7 +34,7 @@ class SocketServer(object):
         # Waiting for new client to accept, sslsocket is the socket that will be used for communication with this client after a client sets up a connection with the server
                 sslsocket, addr = conn.accept()
                 self.client_table[self.id_counter] = sslsocket
-                self.id_counter = self.clientid + 1
+                self.id_counter = self.id_counter + 1
                 threading.Thread(target=self.client_handler,args=(self.id_counter-1,)).start()
         except KeyboardInterrupt:
             for key, value in self.client_table.iteritems():
@@ -46,22 +46,13 @@ class SocketServer(object):
     def client_handler(self, id):
         sslsocket = self.client_table[id]
         print "Klient: ", str(sslsocket), " ansluten"
-
-        username = receive(sslsocket)
-        password = receive(sslsocket)
-        if username == "arne" and password == "banan":
-            print "Klient: ", str(sslsocket), " autentiserad"
-            self.send(id, "OK")
-        else:
-            sslsocket.shutdown()
-            sslsocket.close()
-            exit()
         while True:
-            output = self.receive(sslsocket)
-            self.q.put(output)
+            output = self.receive(id)
+            self.in_q.put((id, output))
         
 
-    def receive(self, sslsocket):
+    def receive(self, id):
+        sslsocket = self.client_table[id]
         output = ""
         try:
             data = sslsocket.recv(self.BUFF)
@@ -82,7 +73,7 @@ class SocketServer(object):
 
     #Sends a string to a specific socket 
     def send(self, id, str):
-        socket = client_table[id]
+        socket = self.client_table[id]
         socket.write("start")
         totalsent =  0
         while totalsent < str.__len__():
@@ -97,9 +88,9 @@ class SocketServer(object):
         while True:
             input = raw_input()
             for id, socket in self.client_table.iteritems():
-                out_q.put((id, input))
+                self.out_q.put((id, input))
 
-    def in_processer(self):
+    def in_processor(self):
         while True:
             self.parse(self.in_q.get())
 

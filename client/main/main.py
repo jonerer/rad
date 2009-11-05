@@ -47,7 +47,7 @@ map.add_object("Sjukhus1", data_storage.MapObject(
     "static/ikoner/sjukhus.png"))
 map.add_object("jonas", data_storage.MapObject(
     {"longitude":15.5829,"latitude":58.4093},
-    "static/ikoner/JonasInGlases.jpg", True))
+    "static/ikoner/JonasInGlases.png", True))
 
 #map.add_object("Shape1", data_storage.MapObject({"longitude":15.5829,
 #                                                 "latitude":58.4093},
