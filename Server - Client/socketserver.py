@@ -39,22 +39,35 @@ class SocketServer(object):
             sys.exit(0)
 
     #Handle the clients requests
-    def receive(self, id):
+    def client_handler(self, id):
         sslsocket = self.socketclienttable[id]
-        print "klient", str(sslsocket), "connected"
+        print "Klient: ", str(sslsocket), " ansluten"
+
+        username = receive(sslsocket)
+        password = receive(sslsocket)
+        if username == "Arne" and password == "banan":
+            print "Klient: ", str(sslsocket), " autentiserad"
+        else:
+            sslsocket.shutdown()
+            sslsocket.close()
+            exit()
+        while True:
+            output = self.receive(sslsocket)
+            self.q.put(output)
+        
+
+    def receive(self, sslsocket):
         output = ""
         try:
-            while True:
-                data = sslsocket.recv(self.BUFF)
-                if data == "start":
-                    while True:
-                        data = sslsocket.recv(self.BUFF)
-                        if data == "end":
-                            #print output
-                            self.q.put(output)
-                            output = ""
-                            break
-                        output = output + data
+            data = sslsocket.recv(self.BUFF)
+            if data == "start":
+                while True:
+                    data = sslsocket.recv(self.BUFF)
+                    if data == "end":
+                        return output
+                        output = ""
+                        break
+                    output = output + data
         except SysCallError:
             print "klient", str(sslsocket), "disconnected"
             print "SysCallError i receive"
@@ -62,7 +75,7 @@ class SocketServer(object):
             sslsocket.shutdown()
             sslsocket.close()
 
-    #sends a string to a specific client 
+    #Sends a string to a specific client 
     def send(self, socket, str):
         socket.write("start")
         totalsent =  0
