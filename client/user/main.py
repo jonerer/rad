@@ -13,13 +13,14 @@ def main():
         # read 3 times and show information
         for a in range(4):
             gpsdevice.get_fix()
-            time.sleep(2)
+            time.sleep(15)
         while gpsdevice.get_position() == (0,0):
             time.sleep(1)  
         lon, lat = gpsdevice.get_position()
         print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
     #stop gps devices
     gpsbt.stop(context)
-    
+
 main()
+
 
