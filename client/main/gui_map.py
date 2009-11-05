@@ -46,6 +46,7 @@ class Map(gtk.DrawingArea):
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
     
     def change_zoom(self, change):
+        
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
         level = self._map.get_level(self._zoom_level)
         level.unload_tiles("all")

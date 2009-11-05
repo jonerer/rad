@@ -61,29 +61,123 @@ class Gui(hildon.Program):
         # Mer om hur Notebook fungerar står här:
         # http://www.pygtk.org/pygtk2tutorial/sec-Notebooks.html
         self.view = gtk.Notebook()
-        self.view.set_show_tabs(True)
+        self.view.set_show_tabs(False)
         self.view.set_show_border(False)
         self.view.insert_page(self.create_map_view())
         self.view.insert_page(self.create_settings_view())
-
+        self.view.show()
         # Lägger in vyn i fönstret
         self.window.add(self.view)
 
         # Skapar menyn
         self.window.set_menu(self.create_menu())
 
+
     # Skapar vyn för kartan
     def create_map_view(self):
-        frame = gtk.Frame(self._map.name + " <longitude, latitude>")
-        frame.set_border_width(5)
-
+        
+        def openButton_press_callback(self, widget, data=None):
+            openButton.hide()
+            closeButton.show()
+            vbox1.show()
+            return
+        def closeButton_press_callback(self, widget, data=None):
+            openButton.show()
+            closeButton.hide()
+            vbox1.hide()
+            return        
+            
+        hbox1 = gtk.HBox(homogeneous=False, spacing=1)
+        hbox2 = gtk.HBox(homogeneous=False, spacing=1)
+        vbox1 = gtk.VBox(homogeneous=False, spacing=1)
         map = gui_map.Map(self._map)
-        frame.add(map)
+        
+        #SHOW / HIDE buttons
+        openButton = gtk.Button()
+        openArrow = gtk.Arrow(gtk.ARROW_LEFT, gtk.SHADOW_ETCHED_IN)
+        openButton.connect("clicked", openButton_press_callback, None)
+        closeButton = gtk.Button()
+        closeArrow = gtk.Arrow(gtk.ARROW_RIGHT, gtk.SHADOW_ETCHED_IN)
+        closeButton.connect("clicked", closeButton_press_callback, None) 
+        openButton.add(openArrow)
+        openButton.show()
+        openArrow.show()
+        closeButton.add(closeArrow)      
+        closeButton.hide()
+        closeArrow.show()
+        
+        # OBJECT FRAME
+        objectFrame = gtk.Frame(None)
+        noInfo = gtk.Label("No Active Object")
+        objectFrame.add(noInfo)
+        objectFrame.set_size_request(300, 300)
+        noInfo.show()
+        objectFrame.show()
+        
+        # QUICK MENU
+        menuBox = gtk.HBox()
+        no = gtk.Label("No Active Object")
+        
+        
+        mainButton = gtk.Button()
+        menuBox.pack_start(mainButton)
+        buff1 = gtk.gdk.PixbufAnimation("static/ikoner/brandbil.png")
+        image1 = gtk.Image()
+        image1.set_from_animation(buff1)
+        image1.show()
+        mainButton.add(image1)
+        
+        
+        missionButton = gtk.Button()
+        menuBox.pack_start(missionButton)
+        buff2 = gtk.gdk.PixbufAnimation("static/ikoner/ambulans.png")
+        image2 = gtk.Image()
+        image2.set_from_animation(buff2)
+        image2.show()
+        missionButton.add(image2)
+        
+        missionButton2 = gtk.Button()
+        menuBox.pack_start(missionButton2)
+        buff3 = gtk.gdk.PixbufAnimation("static/ikoner/sjukhus.png")
+        image3 = gtk.Image()
+        image3.set_from_animation(buff3)
+        image3.show()
+        missionButton2.add(image3)
+        
+        missionButton3 = gtk.Button()
+        menuBox.pack_start(missionButton3)
+        buff4 = gtk.gdk.PixbufAnimation("static/ikoner/ambulans.png")
+        image4 = gtk.Image()
+        image4.set_from_animation(buff4)
+        image4.show()
+        missionButton3.add(image4)
+        
+        menuBox.show()
+        mainButton.show()
+        missionButton.show()
+        missionButton2.show()
+        missionButton3.show()
+        menuBox.set_spacing(0)
 
+        
+
+        
+
+        hbox1.pack_start(map, expand=True, fill=True, padding=0)
+        hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
+        hbox2.pack_start(openButton, expand=False, fill=False, padding=0)
+        hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
+        hbox2.pack_start(vbox1, expand=False, fill=True, padding=0)
+        vbox1.pack_start(objectFrame, expand=True, fill=True, padding=0)
+        vbox1.pack_start(menuBox, expand=False, fill=False, padding=0)
+        
+        hbox1.show()
+        hbox2.show()
+        map.show()
         # Sparar undan funktionen som möjliggör zoomning
         self._map_change_zoom = map.change_zoom
-
-        return frame
+        
+        return hbox1
 
     # Skapar vyn för inställningar
     def create_settings_view(self):
@@ -174,5 +268,5 @@ class Gui(hildon.Program):
         gtk.main_quit()
 
     def run(self):
-        self.window.show_all()
+        self.window.show()
         gtk.main()
