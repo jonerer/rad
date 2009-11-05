@@ -17,36 +17,41 @@ class SocketServer(object):
         context.set_timeout(2)
         conn = Connection(context,s)
         conn.bind((HOST,PORT))
+
         print 'Server is listening...'
         conn.listen(5)
-        #self.socketclienttable is a dictionary of clients, where each client have an unique id, self.clientid
-        self.socketclienttable = {} 
-        self.clientid = 0
-        self.q = Queue.Queue()
+        # self.client_table is a dictionary of clients
+        # where key = unique id and value = socket
+        self.client_table = {} 
+        self.id_counter = 0
+        self.in_q = Queue.Queue()
+        self.out_q = Queue.Queue()
         threading.Thread(target=self.sendinput).start()
-        threading.Thread(target=self.main).start()
+        threading.Thread(target=self.in_processor).start()
+        threading.Thread(target=self.out_processor).start()
         try:
             while True:
         # Waiting for new client to accept, sslsocket is the socket that will be used for communication with this client after a client sets up a connection with the server
                 sslsocket, addr = conn.accept()
-                self.socketclienttable[self.clientid] = sslsocket
-                self.clientid = self.clientid + 1
-                threading.Thread(target=self.receive,args=(self.clientid-1,)).start()
+                self.client_table[self.id_counter] = sslsocket
+                self.id_counter = self.clientid + 1
+                threading.Thread(target=self.client_handler,args=(self.id_counter-1,)).start()
         except KeyboardInterrupt:
-            for key, value in self.socketclienttable.iteritems():
+            for key, value in self.client_table.iteritems():
                 value.shutdown()
                 value.close()
             sys.exit(0)
 
     #Handle the clients requests
     def client_handler(self, id):
-        sslsocket = self.socketclienttable[id]
+        sslsocket = self.client_table[id]
         print "Klient: ", str(sslsocket), " ansluten"
 
         username = receive(sslsocket)
         password = receive(sslsocket)
-        if username == "Arne" and password == "banan":
+        if username == "arne" and password == "banan":
             print "Klient: ", str(sslsocket), " autentiserad"
+            self.send(id, "OK")
         else:
             sslsocket.shutdown()
             sslsocket.close()
@@ -71,12 +76,13 @@ class SocketServer(object):
         except SysCallError:
             print "klient", str(sslsocket), "disconnected"
             print "SysCallError i receive"
-            del self.socketclienttable[id]
+            del self.client_table[id]
             sslsocket.shutdown()
             sslsocket.close()
 
-    #Sends a string to a specific client 
-    def send(self, socket, str):
+    #Sends a string to a specific socket 
+    def send(self, id, str):
+        socket = client_table[id]
         socket.write("start")
         totalsent =  0
         while totalsent < str.__len__():
@@ -90,14 +96,19 @@ class SocketServer(object):
     def sendinput(self):
         while True:
             input = raw_input()
-            for key, value in self.socketclienttable.iteritems():
-                self.send(value, input)
+            for id, socket in self.client_table.iteritems():
+                out_q.put((id, input))
 
-    def main(self):
+    def in_processer(self):
         while True:
-            self.parse(self.q.get())
+            self.parse(self.in_q.get())
 
     def parse(self,str):
         print str
+
+    def out_processor(self):
+        while True:
+            id, data = self.out_q.get()
+            self.send(id, data)
 
 SocketServer()
