@@ -1,55 +1,39 @@
 import gtk
 import hildon
-import gpsbt
-import time
+import gps
+
 
 class helloWorld(hildon.Program):
     
-    def has_a_fix(self, gps):
-        gps.get_fix()
-        return gps.satellites_used > 0
-    
-    def gpsStart(self):
-        con = gpsbt.start()
-        if context == None:
-            print 'Problem while connecting!'
-            return
-        time.sleep(2.0) # wait for gps to come up
-        gps = gpsbt.gps()
-        
-        print "Waiting for the sun... err... a fix"
-        while not self.has_a_fix(self, gps):
-            print "Wai-ting..."
-            time.sleep(5)    
-        
-        # do something
-        #gpsbt.stop(con)
-    
     def __init__(self):
-        self.gpsStart()
         hildon.Program.__init__(self)
         self.window = hildon.Window()
         self.window.connect("destroy", gtk.main_quit)
         self.add_window(self.window)
-        
         self.box1 = gtk.VBox(False, 0)
         self.window.add(self.box1)
-        
         self.label = gtk.Label("hello Jonas")
+        
         self.button = gtk.Button("Widget")
+        self.button2 = gtk.Button("lek")
+        
         self.button.connect("clicked",self.whoop)
+        self.button2.connect("clicked",self.whip)
+        
         self.box1.pack_start(self.button, True, True, 0)
         self.box1.pack_start(self.label, True, True, 0)
+        self.box1.pack_start(self.button2, True, True, 0)
+        
         self.button.show()
+        self.button2.show()
         self.label.show()
         
+    def whip(self, label):
+        self.label.set_label("tjenare")
     def whoop(self, label):
-        
-        x = self.gps.longitude
-        y = self.gps.latitude
-        self.label.set_label(str(x) +"  "+ str(y))
-        
-        
+        self.label.set_label("whip")
+        x, y = gps.main()
+        self.label.set_label("Lat: "+ str(x) +"  Lon: "+ str(y))
 
     def run(self):
         self.window.show_all()
