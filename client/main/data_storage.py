@@ -331,10 +331,11 @@ class MapObject(Picture):
         if is_self:
             rpc.register("ping_with_coordinates", self.make_dict)
 
-        if len(path) == 1:
-            self.set_path_to_picture([path,])
-        else:
-            self.set_commands(path)
+#        if len(path) == 1:
+        self.set_path_to_picture(path)
+#        else:
+#            self.set_commands(path)
+            
     #Make dict to sen to set_coordinate
     def make_dict(self, lon, lat):
         dict = {"longitude":lon,"latitude":lat}
