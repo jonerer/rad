@@ -88,7 +88,7 @@ class SocketServer(object):
         while True:
             input = raw_input()
             for id, socket in self.client_table.iteritems():
-                out_q.put((id, input))
+                self.out_q.put((id, input))
 
     def in_processor(self):
         while True:
