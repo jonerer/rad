@@ -9,7 +9,7 @@ class SocketServer(object):
     keypath = "ca/key.pem"
     BUFF = 8192
 
-    def __init__(self, HOST='130.236.219.232', PORT = 443):
+    def __init__(self, HOST='130.236.216.131', PORT = 443):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         context = Context(TLSv1_METHOD)
         context.use_certificate_file((self.certpath))
