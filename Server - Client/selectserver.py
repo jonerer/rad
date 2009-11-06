@@ -11,7 +11,7 @@ in_queue = {}
 in_buffer = {}
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(("localhost", 443))
+s.bind(("130.236.219.121", 442))
 s.setblocking(0)
 s.settimeout(0)
 s.listen(5)
@@ -32,7 +32,7 @@ while True:
         read_list, write_list, error_list = select.select(
             client_sockets.values(),
             client_sockets.values(),
-            client_sockets.values(), 1)
+            client_sockets.values(), 0)
 
         for sock in read_list:
             # TODO: fixa in_buffern :p
@@ -43,7 +43,7 @@ while True:
                 print "lägger till %s" % read
                 for fileno, target_queue in out_queue.iteritems():
                     if sock.fileno() != fileno:
-                        target_queue.put("%s hälsar: %s" % (client_sockets, read))
+                        target_queue.put("%s hälsar: %s" % (sock.fileno(), read))
 
         for sock in write_list:
             if out_buffer[sock.fileno()] == "" and \
@@ -55,10 +55,18 @@ while True:
                 sent = sock.send(out_buffer[sock.fileno()])
                 if sent != len(out_buffer[sock.fileno()]):
                     out_buffer[sock.fileno()] = out_buffer[sock.fileno()][sent:]
+                else:
+                    out_buffer[sock.fileno()] = ""
 
         for sock in error_list:
             print "fel på %s" % sock.fileno()
-    except (KeyboardInterrupt, socket.error):
+    except KeyboardInterrupt:
+        s.shutdown(socket.SHUT_RDWR)
+        s.close()
+        for sock in client_sockets.values():
+            sock.shutdown(socket.SHUT_RDWR)
+            sock.close()
+    except socket.error:
         s.shutdown(socket.SHUT_RDWR)
         s.close()
         for sock in client_sockets.values():

@@ -4,47 +4,51 @@ import socket, sys, time, select, time
 # require a certificate from the server
 from Queue import Queue
 import threading
+import gtk
 
-#HOST = "130.236.219.232"
-HOST = "localhost"
-PORT = 443
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((HOST, PORT))
-s.setblocking(0)
-
-# TODO: fixa in-buffer o in-kö
-
-out_queue = Queue()
-out_buffer = ""
+if "--no-connect" in sys.argv:
+    no_connect = True
 
 def read_keys():
     while True:
+        global connection
         input = raw_input()
-        out_queue.put(input)
+        connection.out_queue.put(input)
 
-threading.Thread(target=read_keys).start()
+class Connection(object):
+    def __init__(self):
+        self.host_addr = "130.236.219.121"
+        #self.host_addr = "localhost"
+        self.host_port = 442
 
-while True:
-    read_list, write_list, xlist = select.select([s,], [s,], [s,], 0)
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect((self.host_addr, self.host_port))
 
-    if read_list:
-        read = s.recv(1024)
-        if read != "":
-            print read
+        self.out_queue = Queue()
+        self.out_buffer = ""
 
-    if write_list:
-        if out_queue.qsize() != 0:
-            print "nurå"
-        if out_buffer == "" and not out_queue.empty():
-            out_buffer = out_queue.get()
+        threading.Thread(target=self.send).start()
 
-        if out_buffer != "":
-            print "här ska skrivas! %s" % out_buffer
-            sent = s.send(out_buffer)
-            if sent != len(out_buffer):
-                print "lyckades inte tömma hela buffern."
-                out_buffer = out_buffer[sent:]
+    def receive(self):
+        while True:
+            read = self.s.recv(1024)
+            if read != "":
+                print "> %s" % read
+
+    def send(self):
+        while True:
+            if self.out_buffer == "":
+                self.out_buffer = self.out_queue.get() # blocks
+
+            sent = self.s.send(self.out_buffer)
+            if sent != len(self.out_buffer):
+                print "lyckades inte tömma hela"
+                self.out_buffer = self.out_buffer[sent:]
             else:
-                out_buffer = ""
-    
+                self.out_buffer = ""
+
+
+connection = Connection()
+if "--read-keys" in sys.argv or True: # ha true nu iaf
+    threading.Thread(target=read_keys).start()
+connection.receive()

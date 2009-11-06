@@ -12,7 +12,8 @@ os.environ["PYTHONPATH"] = add_py_path
 #os.environ["PYTHONPATH"] = os.environ["PYTHONPATH"] + ":" \
 #        + join(expanduser("~"), "rad")
 
-command = "run-standalone.sh python2.5 client/%s/main.py" % sys.argv[1]
+command = "run-standalone.sh python2.5 client/%s/main.py %s" \
+        % (sys.argv[1], " ".join(sys.argv[2:]))
 print "Setting PYTHONPATH and running '%s'" % command
 #os.system(path_command)
 os.system(command)
