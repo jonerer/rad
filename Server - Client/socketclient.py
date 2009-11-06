@@ -17,8 +17,10 @@ class SocketClient(object):
         self.mutex = threading.Semaphore(1)
         self.connected = False
         self.connect()
+        self.host_addr = HOST
+        self.host_port = PORT
 
-    def connect(self,HOST='130.236.219.232', PORT = 443):
+    def connect(self):
         print "You are trying to connect..."
         for x in range(7):
             if not self.connected:
@@ -28,7 +30,7 @@ class SocketClient(object):
                     context.use_certificate_file(self.cacertpath)
                     context.set_timeout(2)
                     self.sslsocket = Connection(context,s)
-                    self.sslsocket.connect((HOST,PORT))
+                    self.sslsocket.connect((self.host_addr,self.host_port))
                     #starting a thread that listen to what server sends which the clients need to be able to send and recive data at the same time
                     t = threading.Thread(target=self.receive)
                     t.daemon = True
@@ -40,7 +42,7 @@ class SocketClient(object):
                     t = threading.Thread(target=self.sendinput)
                     t.start()
                 except socket.error:
-                    print "You failed to connect retrying......."
+                    print "You failed to connect, retrying......."
                     time.sleep(5)
 
     def authentication(self, username, password):

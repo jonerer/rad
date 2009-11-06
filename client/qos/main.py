@@ -5,6 +5,10 @@ import socket, sys, time, select, time
 from Queue import Queue
 import threading
 import gtk
+from shared import rpc
+from simplejson import loads, dumps
+
+rpc.set_name("qos")
 
 if "--no-connect" in sys.argv:
     no_connect = True
@@ -35,6 +39,10 @@ class Connection(object):
             if read != "":
                 print "> %s" % read
 
+    def add_packet(self, packet):
+        """ receives stuff from dbus and DOO EEETT"""
+        self.out_queue.put(packet)
+
     def send(self):
         while True:
             if self.out_buffer == "":
@@ -51,4 +59,13 @@ class Connection(object):
 connection = Connection()
 if "--read-keys" in sys.argv or True: # ha true nu iaf
     threading.Thread(target=read_keys).start()
+
+def request_login(username, password):
+    connection.add_packet(dumps({"action": "login", 
+        "username": username, 
+        "password": password}))
+
+rpc.register("request_login", request_login)
+rpc.register("add_packet", connection.add_packet)
+
 connection.receive()
