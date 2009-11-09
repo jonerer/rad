@@ -65,6 +65,7 @@ class Gui(hildon.Program):
         self.view.set_show_border(False)
         self.view.insert_page(self.create_map_view())
         self.view.insert_page(self.create_settings_view())
+        self.view.insert_page(self.create_login_view())
         self.view.show()
         # Lägger in vyn i fönstret
         self.window.add(self.view)
@@ -94,10 +95,18 @@ class Gui(hildon.Program):
         
         #SHOW / HIDE buttons
         openButton = gtk.Button()
-        openArrow = gtk.Arrow(gtk.ARROW_LEFT, gtk.SHADOW_ETCHED_IN)
+        buff5 = gtk.gdk.PixbufAnimation("static/ikoner/resultset_first.png")
+        openArrow = gtk.Image()
+        openArrow.set_from_animation(buff5)
+        openArrow.show()
         openButton.connect("clicked", openButton_press_callback, None)
+        
         closeButton = gtk.Button()
-        closeArrow = gtk.Arrow(gtk.ARROW_RIGHT, gtk.SHADOW_ETCHED_IN)
+        buff6 = gtk.gdk.PixbufAnimation("static/ikoner/resultset_last.png")
+        closeArrow = gtk.Image()
+        closeArrow.set_from_animation(buff6)
+        closeArrow.show()
+        
         closeButton.connect("clicked", closeButton_press_callback, None) 
         openButton.add(openArrow)
         openButton.show()
@@ -107,12 +116,12 @@ class Gui(hildon.Program):
         closeArrow.show()
         
         # OBJECT FRAME
-        objectFrame = gtk.Frame(None)
+        objectBox = gtk.HBox(homogeneous=False, spacing=1)
         noInfo = gtk.Label("No Active Object")
-        objectFrame.add(noInfo)
-        objectFrame.set_size_request(300, 300)
+        objectBox.pack_start(noInfo, expand=False, fill=False, padding=1)
+        objectBox.set_size_request(300, 300)
         noInfo.show()
-        objectFrame.show()
+        objectBox.show()
         
         # QUICK MENU
         menuBox = gtk.HBox()
@@ -121,7 +130,7 @@ class Gui(hildon.Program):
         
         mainButton = gtk.Button()
         menuBox.pack_start(mainButton)
-        buff1 = gtk.gdk.PixbufAnimation("static/ikoner/brandbil.png")
+        buff1 = gtk.gdk.PixbufAnimation("static/ikoner/cog.png")
         image1 = gtk.Image()
         image1.set_from_animation(buff1)
         image1.show()
@@ -130,7 +139,7 @@ class Gui(hildon.Program):
         
         missionButton = gtk.Button()
         menuBox.pack_start(missionButton)
-        buff2 = gtk.gdk.PixbufAnimation("static/ikoner/ambulans.png")
+        buff2 = gtk.gdk.PixbufAnimation("static/ikoner/book_addresses.png")
         image2 = gtk.Image()
         image2.set_from_animation(buff2)
         image2.show()
@@ -138,7 +147,7 @@ class Gui(hildon.Program):
         
         missionButton2 = gtk.Button()
         menuBox.pack_start(missionButton2)
-        buff3 = gtk.gdk.PixbufAnimation("static/ikoner/sjukhus.png")
+        buff3 = gtk.gdk.PixbufAnimation("static/ikoner/paste_plain.png")
         image3 = gtk.Image()
         image3.set_from_animation(buff3)
         image3.show()
@@ -146,7 +155,7 @@ class Gui(hildon.Program):
         
         missionButton3 = gtk.Button()
         menuBox.pack_start(missionButton3)
-        buff4 = gtk.gdk.PixbufAnimation("static/ikoner/ambulans.png")
+        buff4 = gtk.gdk.PixbufAnimation("static/ikoner/map.png")
         image4 = gtk.Image()
         image4.set_from_animation(buff4)
         image4.show()
@@ -159,16 +168,13 @@ class Gui(hildon.Program):
         missionButton3.show()
         menuBox.set_spacing(0)
 
-        
-
-        
 
         hbox1.pack_start(map, expand=True, fill=True, padding=0)
         hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
         hbox2.pack_start(openButton, expand=False, fill=False, padding=0)
         hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
         hbox2.pack_start(vbox1, expand=False, fill=True, padding=0)
-        vbox1.pack_start(objectFrame, expand=True, fill=True, padding=0)
+        vbox1.pack_start(objectBox, expand=True, fill=True, padding=0)
         vbox1.pack_start(menuBox, expand=False, fill=False, padding=0)
         
         hbox1.show()
@@ -178,7 +184,39 @@ class Gui(hildon.Program):
         self._map_change_zoom = map.change_zoom
         
         return hbox1
+    
+    # Loginruta
+    def create_login_view(self):
+        
+        vbox1 = gtk.VBox(homogeneous=False, spacing=1)
+        hbox1 = gtk.HBox(homogeneous=False, spacing=1)
+        hbox2 = gtk.HBox(homogeneous=False, spacing=1)
+        userText = gtk.Entry(max=0)
+        userLabel = gtk.Label("Användare")
+        passText = gtk.Entry(max=0)
+        passLabel = gtk.Label("Lösenord")
+        okButton = gtk.Button("Klar")
 
+        vbox1.pack_start(hbox1, expand=False, fill=False, padding=1)
+        vbox1.pack_start(hbox2, expand=False, fill=False, padding=1)
+        vbox1.pack_start(okButton, expand=False, fill=False, padding=1)
+        hbox1.pack_start(userText, expand=False, fill=False, padding=1)
+        hbox1.pack_start(userLabel, expand=False, fill=False, padding=1)        
+        hbox2.pack_start(passText, expand=False, fill=False, padding=1)
+        hbox2.pack_start(passLabel, expand=True, fill=False, padding=1)
+
+        
+        userText.show()
+        userLabel.show()
+        passText.show()
+        passLabel.show()
+        okButton.show()
+        hbox1.show()
+        hbox2.show()
+        vbox1.show()
+        
+        return vbox1
+    
     # Skapar vyn för inställningar
     def create_settings_view(self):
         frame = gtk.Frame("Inställningar")
@@ -203,6 +241,7 @@ class Gui(hildon.Program):
         vbox.pack_start(btnSpara, False, False, 5)
 
         frame.add(vbox)
+        frame.show_all()
         return frame
 
     # Skapar en meny som kommer ligga längst upp i vårt program.
@@ -210,17 +249,20 @@ class Gui(hildon.Program):
         # Skapar tre stycken meny-inlägg.
         menuItemKarta = gtk.MenuItem("Karta")
         menuItemInstallningar = gtk.MenuItem("Inställningar")
+        menuItemLogin = gtk.MenuItem("Login")
         menuItemSeparator = gtk.SeparatorMenuItem()
         menuItemExit = gtk.MenuItem("Exit")
 
         menuItemKarta.connect("activate", self.handle_menu_items, 0)
         menuItemInstallningar.connect("activate", self.handle_menu_items, 1)
+        menuItemLogin.connect("activate", self.handle_menu_items, 2)
         menuItemExit.connect("activate", self.menu_exit)
 
         # Skapar en meny som vi lägger in dessa inlägg i.
         menu = gtk.Menu()
         menu.append(menuItemKarta)
         menu.append(menuItemInstallningar)
+        menu.append(menuItemLogin)
         menu.append(menuItemSeparator)
         menu.append(menuItemExit)
 
