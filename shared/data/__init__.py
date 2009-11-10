@@ -1,9 +1,26 @@
+# coding: utf-8
 from sqlalchemy import create_engine
 #ändra echo till false om du inte vill se SQL kod
-engine = create_engine('sqlite:///tutorial.db', echo=True)
 
-import defs
 from sqlalchemy.orm import sessionmaker
+from defs import *
+
+_session = None
+_engine = None
+
+def get_session(db="sqlite:///tutorial.db", echo=False):
+    global _session, _engine
+    _engine = create_engine(db, echo=echo)
+    _session = sessionmaker(bind=_engine)()
+    return _session
+
+def create_tables():
+    global _engine
+    from defs import Base
+    if _engine is None:
+        print "är none"
+        get_session()
+    Base.metadata.create_all(_engine)
 
 if __name__ == '__main__':
     # lite tester

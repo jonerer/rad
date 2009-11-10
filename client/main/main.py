@@ -15,13 +15,6 @@ if sys.version_info[1] == 3:
     sys.exit(0)
 
 rpc.set_name("main")
-def receiver(longitude, latitude):
-    map.add_object("mor_din", data_storage.MapObject(
-        {"longitude": longitude, "latitude": latitude},
-        "static/ikoner/ambulans.png"))
-    rpc.send("main", "update_map")
-    print "fick lite i mainz: lon, lat: %s, %s" % (longitude, latitude)
-rpc.register("vromm", receiver)
 
 print "Läser in kartinformation från static/kartdata/map.xml"
         
