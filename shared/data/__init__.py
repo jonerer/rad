@@ -7,11 +7,14 @@ from defs import *
 
 _session = None
 _engine = None
+_dbfile = None
 
-def get_session(db="sqlite:///tutorial.db", echo=False):
+def get_session(db="sqlite:///client/db.db", echo=False):
     global _session, _engine
-    _engine = create_engine(db, echo=echo)
-    _session = sessionmaker(bind=_engine)()
+    if _dbfile is None or _dbfile != db:
+        # new db
+        _engine = create_engine(db, echo=echo)
+        _session = sessionmaker(bind=_engine)()
     return _session
 
 def create_tables():

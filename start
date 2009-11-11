@@ -15,10 +15,14 @@ os.environ["PYTHONPATH"] = add_py_path
 if "/" not in sys.argv[1]:
     command = "run-standalone.sh python2.5 client/%s/main.py %s" \
         % (sys.argv[1], " ".join(sys.argv[2:]))
-else:
+elif ".py" not in sys.argv[1]:
     command = "run-standalone.sh python2.5 %s/main.py %s" \
         % (sys.argv[1], " ".join(sys.argv[2:]))
+else:
+    command = "run-standalone.sh python2.5 %s" \
+            % (" ".join(sys.argv[1:]))
 
+print command
 #print "Setting PYTHONPATH and running '%s'" % command
 #os.system(path_command)
 os.system(command)

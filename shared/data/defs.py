@@ -1,23 +1,41 @@
 # -*- coding: utf-8 -*
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Float, Unicode
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, \
+        Float, Unicode, Boolean, DateTime
 from sqlalchemy.orm import relation, backref
 
 Base = declarative_base()
 
 # lägg allt som ska synas utåt här: (dessa får man från from shared.data.defs import *
-__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document']
+__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm']
 
 class UnitType(Base):
     __tablename__ = "unit_types"
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
+    name = Column(Unicode, unique=True)
     image = Column(String)
 
     def __init__(self, name, image):
         self.name = name
         self.image = image
+
+class AlarmType(Base):
+    __tablename__ = "alarm_types"
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+
+class Alarm(Base):
+    __tablename__ = "alarm"
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    type_id = Column(Integer, ForeignKey("alarm_types.id"))
+    type = relation(AlarmType, backref=backref("alarm", order_by=id))
+    extrainfo = Column(Unicode)
+    coordx = Column(Float)
+    coordy = Column(Float)
+    timestamp = Column(DateTime)
+
 
 class Unit(Base):
     __tablename__ = "units"
@@ -27,9 +45,20 @@ class Unit(Base):
     coordy = Column(Float) # latitude
     type_id = Column(Integer, ForeignKey("unit_types.id"))
     type = relation(UnitType, backref=backref("units", order_by=id))
+    is_self = Column(Boolean)
 
-    def __init__(self, name):
+    def get_image(self):
+        if not self.is_self:
+            return type.image
+        else:
+            return "JonasInGlases.png"
+
+    def __init__(self, name, type, coordx=None, coordy=None, is_self=False):
         self.name = name
+        self.type = type
+        self.coordx = coordx
+        self.coordy = coordy
+        self.is_self = is_self
         
     def __repr__(self):
         return "Unit '%s' of type %s" % (self.name, self.type)
