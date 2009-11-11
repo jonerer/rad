@@ -1,31 +1,39 @@
 # -*- coding: utf-8 -*
-import socket, threading, sys, select
+import socket, threading, sys, select, struct
 from Queue import Queue
 
+class Connection(object):
+    def __init__(self, socket):
+        self.socket = socket
+        self.id = socket.fileno()
+        self.out_queue = Queue()
+        self.out_buffer = ""
+
+        self.in_queue = Queue()
+        self.in_buffer = ""
+
 client_sockets = {}
+connections = {}
 
-out_queue = {}
-out_buffer = {}
-
-in_queue = {}
-in_buffer = {}
+host_addr = "130.236.219.153"
+host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(("130.236.219.121", 442))
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
+s.bind((host_addr, host_port))
 s.setblocking(0)
 s.settimeout(0)
 s.listen(5)
 
+print "Server igång på %s:%s" % (host_addr, host_port)
 while True:
     try:
         acceptor = select.select([s,], [s,], [s,], 0)[0]
         if acceptor:
             newsocket, addr = s.accept()
             client_sockets[newsocket.fileno()] = newsocket
-            out_queue[newsocket.fileno()] = Queue()
-            out_buffer[newsocket.fileno()] = ""
-            in_buffer[newsocket.fileno()] = Queue()
-            in_queue[newsocket.fileno()] = ""
+            connections[newsocket.fileno()] = Connection(newsocket)
+
             print "new connected %s: %s, %s" % (newsocket.fileno(), newsocket, addr)
             print client_sockets
 
@@ -41,22 +49,24 @@ while True:
             read = sock.recv(1024)
             if read != "":
                 print "lägger till %s" % read
-                for fileno, target_queue in out_queue.iteritems():
+                for fileno, connection in connections.iteritems():
                     if sock.fileno() != fileno:
-                        target_queue.put("%s hälsar: %s" % (sock.fileno(), read))
+                        connection.out_queue.put("%s hälsar: %s" % \
+                                (sock.fileno(), read))
 
         for sock in write_list:
-            if out_buffer[sock.fileno()] == "" and \
-                not out_queue[sock.fileno()].empty():
+            connection = connections[sock.fileno()]
+            if connection.out_buffer == "" and \
+                not connection.out_queue.empty():
                 print "ska skriva till.... %s" % sock.fileno()
-                out_buffer[sock.fileno()] = out_queue[sock.fileno()].get()
+                connection.out_buffer = connection.out_queue.get()
 
-            if out_buffer[sock.fileno()] != "":
-                sent = sock.send(out_buffer[sock.fileno()])
-                if sent != len(out_buffer[sock.fileno()]):
-                    out_buffer[sock.fileno()] = out_buffer[sock.fileno()][sent:]
+            if connection.out_buffer != "":
+                sent = sock.send(connection.out_buffer)
+                if sent != len(connection.out_buffer):
+                    connection.out_buffer = connections[sock.fileno()].out_buffer[sent:]
                 else:
-                    out_buffer[sock.fileno()] = ""
+                    connections[sock.fileno()].out_buffer = ""
 
         for sock in error_list:
             print "fel på %s" % sock.fileno()
