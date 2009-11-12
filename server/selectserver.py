@@ -58,7 +58,6 @@ while True:
             if read != "":
                 print "lägger till %s" % read
                 if read == "pong":
-                    print "Sätter ny timestamp"
                     connection.timestamp = time.time()
                     connection.timepinged = 0
                 for fileno, connection in connections.iteritems():
@@ -86,7 +85,6 @@ while True:
 
             if time.time()-connection.timestamp > connection.pingtime: 
                 connection.timestamp = time.time()
-                print "you are now pinging" , connection.timepinged
                 if connection.timepinged == 3:
                     print "You tried to connect to klient:" , sock.fileno() , \
                             "three times you will now remove that client" 
@@ -105,8 +103,8 @@ while True:
             del client_sockets[id]
 
     except KeyboardInterrupt:
-        #s.shutdown(socket.SHUT_RDWR)
-        #s.close()
+        s.shutdown(socket.SHUT_RDWR)
+        s.close()
         for sock in client_sockets.values():
             sock.shutdown(socket.SHUT_RDWR)
             sock.close()
