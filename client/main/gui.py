@@ -66,6 +66,7 @@ class Gui(hildon.Program):
         self.view.insert_page(self.create_map_view())
         self.view.insert_page(self.create_settings_view())
         self.view.insert_page(self.create_login_view())
+        self.view.insert_page(self.create_menu_view())
         self.view.show()
         # Lägger in vyn i fönstret
         self.window.add(self.view)
@@ -73,7 +74,11 @@ class Gui(hildon.Program):
         # Skapar menyn
         self.window.set_menu(self.create_menu())
 
-
+    # Skapar Huvudmenyn
+    def create_menu_view(self):
+        frame = gtk.Frame("Poop")
+        frame.show()
+        return frame
     # Skapar vyn för kartan
     def create_map_view(self):
         
@@ -135,6 +140,7 @@ class Gui(hildon.Program):
         image1.set_from_animation(buff1)
         image1.show()
         mainButton.add(image1)
+        mainButton.connect("clicked", self.handle_menu_items, 3)
         
         
         missionButton = gtk.Button()

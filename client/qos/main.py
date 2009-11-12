@@ -21,7 +21,7 @@ def read_keys():
 
 class Connection(object):
     def __init__(self):
-        self.host_addr = "130.236.219.153"
+        self.host_addr = "130.236.217.83"
         #self.host_addr = "localhost"
         self.host_port = 442
 
@@ -41,6 +41,9 @@ class Connection(object):
                 read = self.s.recv(1024)
                 if read != "":
                     print "> %s" % read
+                    if read == "ping":
+                        print "You have to respond to a ping from server"
+                        self.out_queue.put("pong")
             except KeyboardInterrupt:
                 print "fick interrupt i receive"
                 self.connected = False
@@ -67,10 +70,12 @@ class Connection(object):
                     self.out_buffer = self.out_buffer[sent:]
                 else:
                     self.out_buffer = ""
-
+        print "Du har stängt av allt i socketen"
+        self.s.shutdown(socket.SHUT_RDWR)
+        self.s.close()
 
 connection = Connection()
-if "--read-keys" in sys.argv or True: # ha true nu iaf
+if "--read-keys" in sys.argv or True: # ha true nu iaf 
     threading.Thread(target=read_keys).start()
 
 def request_login(username, password):
