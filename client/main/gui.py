@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+        
+        # NOTEBOOK ITEM IDs
+        # ID 0 = Map_view
+        #    1 = Settings_view
+        #    2 = Login_view
+        #    3 = Menu_view
+
+        
 import gtk
 import hildon
 import gui_map
@@ -34,7 +42,8 @@ class Gui(hildon.Program):
         # Zoom +
         elif event.keyval == 65476:
             self._map_change_zoom("+")
-
+    # __INIT__------------------
+    #       Description: the INIT funktion...
     def __init__(self, map):
         # Initierar hildon (GUI-biblioteket för N810)
         hildon.Program.__init__(self)
@@ -56,10 +65,7 @@ class Gui(hildon.Program):
         # Programmet är inte i fullscreen-läge från början.
         self.window_in_fullscreen = False
 
-        # Skapar en notebook-komponent i vilken vi har olika sidor som fungerar
-        # som vyer. En sida är för kartvyn, en sida för uppdragsvyn osv.
-        # Mer om hur Notebook fungerar står här:
-        # http://www.pygtk.org/pygtk2tutorial/sec-Notebooks.html
+        
         self.view = gtk.Notebook()
         self.view.set_show_tabs(False)
         self.view.set_show_border(False)
@@ -73,13 +79,70 @@ class Gui(hildon.Program):
 
         # Skapar menyn
         self.window.set_menu(self.create_menu())
-
-    # Skapar Huvudmenyn
+    # // __INIT__-----------------
+    
+    # MENU-View--------------
+    #       Description: The Main menu view, all menu-choices will be visible here
     def create_menu_view(self):
-        frame = gtk.Frame("Poop")
-        frame.show()
-        return frame
-    # Skapar vyn för kartan
+        hbox1 = gtk.HBox(homogeneous=False, spacing=1)
+        hbox1.pack_start(self.create_quickMenu(),False,False,0)
+        hbox1.show()
+        return hbox1
+    
+    # QUICK MENU ------------------------
+    #       Description: Creates our quickmenu with the basic four buttons
+    def create_quickMenu(self):
+        menuBox = gtk.HBox()
+        no = gtk.Label("No Active Object")
+        
+        
+        mainButton = gtk.Button()
+        menuBox.pack_start(mainButton)
+        buff1 = gtk.gdk.PixbufAnimation("static/ikoner/cog.png")
+        image1 = gtk.Image()
+        image1.set_from_animation(buff1)
+        image1.show()
+        mainButton.add(image1)
+        mainButton.connect("clicked", self.handle_menu_items, 3)
+        
+        
+        missionButton = gtk.Button()
+        menuBox.pack_start(missionButton)
+        buff2 = gtk.gdk.PixbufAnimation("static/ikoner/book_addresses.png")
+        image2 = gtk.Image()
+        image2.set_from_animation(buff2)
+        image2.show()
+        missionButton.add(image2)
+        
+        missionButton2 = gtk.Button()
+        menuBox.pack_start(missionButton2)
+        buff3 = gtk.gdk.PixbufAnimation("static/ikoner/paste_plain.png")
+        image3 = gtk.Image()
+        image3.set_from_animation(buff3)
+        image3.show()
+        missionButton2.add(image3)
+        
+        missionButton3 = gtk.Button()
+        menuBox.pack_start(missionButton3)
+        buff4 = gtk.gdk.PixbufAnimation("static/ikoner/map.png")
+        image4 = gtk.Image()
+        image4.set_from_animation(buff4)
+        image4.show()
+        missionButton3.add(image4)
+        
+        menuBox.show()
+        mainButton.show()
+        missionButton.show()
+        missionButton2.show()
+        missionButton3.show()
+        menuBox.set_spacing(0)
+        menuBox.set_size_request(70, 70)
+
+        return menuBox
+    # // QUICK MENU ------------------------
+    
+    #  MAP-View------------ID 0------------------
+    #       Description: The mapview :P
     def create_map_view(self):
         
         def openButton_press_callback(self, widget, data=None):
@@ -128,52 +191,6 @@ class Gui(hildon.Program):
         noInfo.show()
         objectBox.show()
         
-        # QUICK MENU
-        menuBox = gtk.HBox()
-        no = gtk.Label("No Active Object")
-        
-        
-        mainButton = gtk.Button()
-        menuBox.pack_start(mainButton)
-        buff1 = gtk.gdk.PixbufAnimation("static/ikoner/cog.png")
-        image1 = gtk.Image()
-        image1.set_from_animation(buff1)
-        image1.show()
-        mainButton.add(image1)
-        mainButton.connect("clicked", self.handle_menu_items, 3)
-        
-        
-        missionButton = gtk.Button()
-        menuBox.pack_start(missionButton)
-        buff2 = gtk.gdk.PixbufAnimation("static/ikoner/book_addresses.png")
-        image2 = gtk.Image()
-        image2.set_from_animation(buff2)
-        image2.show()
-        missionButton.add(image2)
-        
-        missionButton2 = gtk.Button()
-        menuBox.pack_start(missionButton2)
-        buff3 = gtk.gdk.PixbufAnimation("static/ikoner/paste_plain.png")
-        image3 = gtk.Image()
-        image3.set_from_animation(buff3)
-        image3.show()
-        missionButton2.add(image3)
-        
-        missionButton3 = gtk.Button()
-        menuBox.pack_start(missionButton3)
-        buff4 = gtk.gdk.PixbufAnimation("static/ikoner/map.png")
-        image4 = gtk.Image()
-        image4.set_from_animation(buff4)
-        image4.show()
-        missionButton3.add(image4)
-        
-        menuBox.show()
-        mainButton.show()
-        missionButton.show()
-        missionButton2.show()
-        missionButton3.show()
-        menuBox.set_spacing(0)
-
 
         hbox1.pack_start(map, expand=True, fill=True, padding=0)
         hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
@@ -181,7 +198,7 @@ class Gui(hildon.Program):
         hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
         hbox2.pack_start(vbox1, expand=False, fill=True, padding=0)
         vbox1.pack_start(objectBox, expand=True, fill=True, padding=0)
-        vbox1.pack_start(menuBox, expand=False, fill=False, padding=0)
+        vbox1.pack_start(self.create_quickMenu(), expand=False, fill=False, padding=0)
         
         hbox1.show()
         hbox2.show()
@@ -190,8 +207,10 @@ class Gui(hildon.Program):
         self._map_change_zoom = map.change_zoom
         
         return hbox1
+    #  // MAP-VIEW------------ID 0------------
     
-    # Loginruta
+    #  LOGIN-View------------ID 2------------------
+    #       Description: Simple loginframe to handle logins, logical!
     def create_login_view(self):
         
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
@@ -222,8 +241,10 @@ class Gui(hildon.Program):
         vbox1.show()
         
         return vbox1
-    
-    # Skapar vyn för inställningar
+    #  // LOGIN-View------------ID 2------------------
+
+    #  SETTINGS-View------------ID 1------------------
+    #       Description: Will handle all kind of settings possible
     def create_settings_view(self):
         frame = gtk.Frame("Inställningar")
         frame.set_border_width(5)
@@ -249,8 +270,10 @@ class Gui(hildon.Program):
         frame.add(vbox)
         frame.show_all()
         return frame
+    #  // SETTINGS-View------------ID 1------------------
 
-    # Skapar en meny som kommer ligga längst upp i vårt program.
+    #  TOP MENU------------------------------
+    #       Description: Creates the dropdown-menu, its placed at the top left tab
     def create_menu(self):
         # Skapar tre stycken meny-inlägg.
         menuItemKarta = gtk.MenuItem("Karta")
@@ -273,7 +296,7 @@ class Gui(hildon.Program):
         menu.append(menuItemExit)
 
         return menu
-
+    #  // TOP MENU------------------------------
     def get_treeview(self, args):
         if len(args) == 1:
             return args[0]
