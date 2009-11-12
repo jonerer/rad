@@ -153,7 +153,6 @@ class Map(gtk.DrawingArea):
             self._last_tiles = tiles
         else:
             # here, don't redraw the whole map, just move it around.
-            # TODO: this thing.
             tiles = self._last_tiles
             pixel_focus_diff =  self._focus_pixel[0] - self._last_focus_pixel[0], \
                 self._focus_pixel[1] - self._last_focus_pixel[1]

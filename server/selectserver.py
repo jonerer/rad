@@ -2,6 +2,7 @@
 import socket, threading, sys, select, struct, time
 from Queue import Queue
 from os import popen
+from shared import buffrify
 
 class Connection(object):
     
@@ -21,7 +22,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 
-host_addr = "130.236.217.83"
+host_addr = "130.236.217.215"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,15 +57,21 @@ while True:
             print "läsa från %s" % sock.fileno()
             read = sock.recv(1024)
             if read != "":
-                print "lägger till %s" % read
-                if read == "pong":
-                    connection.timestamp = time.time()
-                    connection.timepinged = 0
-                for fileno, connection in connections.iteritems():
-                    if sock.fileno() != fileno:
-                        connection.out_queue.put("%s hälsar: %s" % \
-                                (sock.fileno(), read))
-            elif read == "":
+                connection.in_buffer += read
+                can_split = buffrify.split_buffer(connection.in_buffer)
+                if can_split is not None:
+                    connection.in_buffer = can_split[1]
+                    read = can_split[0]
+                    print "lägger till %s" % read
+                    if read == "pong":
+                        print "Sätter ny timestamp"
+                        connection.timestamp = time.time()
+                        connection.timepinged = 0
+                    for fileno, connection in connections.iteritems():
+                        if sock.fileno() != fileno:
+                            connection.out_queue.put("%s hälsar: %s" % \
+                                    (sock.fileno(), read))
+            else:
                 to_be_removed.append(sock.fileno())
 
 
@@ -73,8 +80,8 @@ while True:
 
             if connection.out_buffer == "" and \
                 not connection.out_queue.empty():
-                print "ska skriva till.... %s" % sock.fileno()
-                connection.out_buffer = connection.out_queue.get()
+                connection.out_buffer = buffrify.create_pack(connection.out_queue.get())
+                print "ska skriva %s till.... %s" % (connection.out_buffer, sock.fileno())
 
             if connection.out_buffer != "":
                 sent = sock.send(connection.out_buffer)
@@ -83,18 +90,21 @@ while True:
                 else:
                     connections[sock.fileno()].out_buffer = ""
 
+        for sock in error_list:
+            print "fel på %s" % sock.fileno()
+
+        # logics
+        for fileno, connection in connections.iteritems():
             if time.time()-connection.timestamp > connection.pingtime: 
                 connection.timestamp = time.time()
                 if connection.timepinged == 3:
-                    print "You tried to connect to klient:" , sock.fileno() , \
+                    print "You tried to connect to klient:" , connection.socket.fileno() , \
                             "three times you will now remove that client" 
                     connection.timepinged == 0
-                    to_be_removed.append(sock.fileno())
+                    to_be_removed.append(connection.socket.fileno())
                 else:
                     connection.timepinged = connection.timepinged + 1
-                    connection.socket.send("ping")
-            for sock in error_list:
-                print "fel på %s" % sock.fileno()
+                    connection.out_queue.put("ping")
 
         for id in to_be_removed:
             connections[id].socket.close()
