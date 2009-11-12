@@ -86,10 +86,95 @@ class Gui(hildon.Program):
     # MENU-View--------------
     #       Description: The Main menu view, all menu-choices will be visible here
     def create_menu_view(self):
-        hbox1 = gtk.HBox(homogeneous=False, spacing=1)
-        hbox1.pack_start(self.create_quickMenu(),False,False,0)
-        hbox1.show()
-        return hbox1
+        fixed = gtk.Fixed()
+
+        # MAP BUTTON
+        mapBoxButton = gtk.HBox(homogeneous=False, spacing=1)
+        mapButton = gtk.Button()
+        mapLabel = gtk.Label("Karta")
+        buff1 = gtk.gdk.PixbufAnimation("static/ikoner/map.png")
+        image1 = gtk.Image()
+        image1.set_from_animation(buff1)
+        image1.show()
+        mapLabel.show()
+        mapBoxButton.pack_start(image1, expand=False, fill=False, padding=5)
+        mapBoxButton.pack_start(mapLabel, expand=False, fill=False, padding=5)
+        mapButton.add(mapBoxButton)
+        mapButton.show_all()
+        mapButton.set_size_request(250, 70)
+        
+        # SETTINGS BUTTON
+        setBoxButton = gtk.HBox(homogeneous=False, spacing=1)
+        setButton = gtk.Button()
+        setLabel = gtk.Label("Installningar")
+        buff2 = gtk.gdk.PixbufAnimation("static/ikoner/cog.png")
+        image2 = gtk.Image()
+        image2.set_from_animation(buff2)
+        image2.show()
+        setLabel.show()
+        setBoxButton.pack_start(image2, expand=False, fill=False, padding=5)
+        setBoxButton.pack_start(setLabel, expand=False, fill=False, padding=5)
+        setButton.add(setBoxButton)
+        setButton.show_all()
+        setButton.set_size_request(250, 70)
+        
+        # MISSION BUTTON
+        misBoxButton = gtk.HBox(homogeneous=False, spacing=1)
+        misButton = gtk.Button()
+        misLabel = gtk.Label("Uppdrag")
+        buff3 = gtk.gdk.PixbufAnimation("static/ikoner/paste_plain.png")
+        image3 = gtk.Image()
+        image3.set_from_animation(buff3)
+        image3.show()
+        misLabel.show()
+        misBoxButton.pack_start(image3, expand=False, fill=False, padding=5)
+        misBoxButton.pack_start(misLabel, expand=False, fill=False, padding=5)
+        misButton.add(misBoxButton)
+        misButton.show_all()
+        misButton.set_size_request(250, 70)
+        
+        # CONTACTS BUTTON
+        conBoxButton = gtk.HBox(homogeneous=False, spacing=1)
+        conButton = gtk.Button()
+        conLabel = gtk.Label("Kontakter")
+        buff4 = gtk.gdk.PixbufAnimation("static/ikoner/book_addresses.png")
+        image4 = gtk.Image()
+        image4.set_from_animation(buff4)
+        image4.show()
+        conLabel.show()
+        conBoxButton.pack_start(image4, expand=False, fill=False, padding=5)
+        conBoxButton.pack_start(conLabel, expand=False, fill=False, padding=5)
+        conButton.add(conBoxButton)
+        conButton.show_all()
+        conButton.set_size_request(250, 70)
+         
+                # CONTACTS BUTTON
+        jonasBoxButton = gtk.HBox(homogeneous=False, spacing=1)
+        jonasButton = gtk.Button()
+        jonasLabel = gtk.Label("Jonas")
+        buff5 = gtk.gdk.PixbufAnimation("static/ikoner/JonasInGlases.png")
+        image5 = gtk.Image()
+        image5.set_from_animation(buff5)
+        image5.show()
+        jonasLabel.show()
+        jonasBoxButton.pack_start(image5, expand=False, fill=False, padding=5)
+        jonasBoxButton.pack_start(jonasLabel, expand=False, fill=False, padding=5)
+        jonasButton.add(jonasBoxButton)
+        jonasButton.show_all()
+        jonasButton.set_size_request(250, 70)
+         
+        vbox1 = gtk.VBox(homogeneous=False, spacing=1)
+        vbox1.pack_start(mapButton, expand=True, fill=True, padding=0)
+        vbox1.pack_start(misButton, expand=True, fill=True, padding=0)
+        vbox1.pack_start(conButton, expand=True, fill=True, padding=0)
+        vbox1.pack_start(setButton, expand=True, fill=True, padding=0)
+        vbox1.pack_start(jonasButton, expand=True, fill=True, padding=0)
+        vbox1.show()
+        fixed.put(self.create_quickMenu(), 476, 326)
+        fixed.put(vbox1, 20, 20)
+        fixed.show()
+        
+        return fixed
     
     # QUICK MENU ------------------------
     #       Description: Creates our quickmenu with the basic four buttons
@@ -131,6 +216,7 @@ class Gui(hildon.Program):
         image4.set_from_animation(buff4)
         image4.show()
         missionButton3.add(image4)
+        missionButton3.connect("clicked", self.handle_menu_items, 0)
         
         menuBox.show()
         mainButton.show()
@@ -138,7 +224,7 @@ class Gui(hildon.Program):
         missionButton2.show()
         missionButton3.show()
         menuBox.set_spacing(0)
-        menuBox.set_size_request(70, 70)
+        menuBox.set_size_request(300, 70)
 
         return menuBox
     # // QUICK MENU ------------------------
