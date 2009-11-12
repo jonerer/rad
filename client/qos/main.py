@@ -21,7 +21,7 @@ def read_keys():
 
 class Connection(object):
     def __init__(self):
-        self.host_addr = "130.236.217.157"
+        self.host_addr = "130.236.217.83"
         #self.host_addr = "localhost"
         self.host_port = 442
 

@@ -21,7 +21,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 
-host_addr = "130.236.217.157"
+host_addr = "130.236.217.83"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,11 +50,9 @@ while True:
         to_be_removed = []
 
         for sock in read_list:
-            print "Klient: ", sock.fileno()
             # TODO: fixa in_buffern :p
             # och in_queue
             connection = connections[sock.fileno()]
-
             print "läsa från %s" % sock.fileno()
             read = sock.recv(1024)
             if read != "":
@@ -67,8 +65,9 @@ while True:
                     if sock.fileno() != fileno:
                         connection.out_queue.put("%s hälsar: %s" % \
                                 (sock.fileno(), read))
-            else:
-                print "lol", read
+            elif read == "":
+                to_be_removed.append(sock.fileno())
+
 
         for sock in write_list:
             connection = connections[sock.fileno()]
