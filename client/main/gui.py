@@ -10,6 +10,8 @@
 import gtk
 import hildon
 import gui_map
+from shared.data import get_session, create_tables
+from shared.data.defs import *
 
 class Gui(hildon.Program):
     _map = None
@@ -212,6 +214,19 @@ class Gui(hildon.Program):
     #  LOGIN-View------------ID 2------------------
     #       Description: Simple loginframe to handle logins, logical!
     def create_login_view(self):
+        def dbcheck_press_callback(self, widget, data=None):   
+            session = get_session()
+            create_tables()        
+            session.bind
+            session.query(User).all()
+            user = unicode(userText.get_text())
+            password = unicode(passText.get_text())
+            for users in session.query(User).filter(User.name == user):
+                if password == users.password:
+                    statusLabel.set_label("Access granted")
+                else :
+                    statusLabel.set_label("Access denied")
+            return
         
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
         hbox1 = gtk.HBox(homogeneous=False, spacing=1)
@@ -221,6 +236,8 @@ class Gui(hildon.Program):
         passText = gtk.Entry(max=0)
         passLabel = gtk.Label("Lösenord")
         okButton = gtk.Button("Klar")
+        okButton.connect("clicked", dbcheck_press_callback, None)
+        statusLabel = gtk.Label("No status")
 
         vbox1.pack_start(hbox1, expand=False, fill=False, padding=1)
         vbox1.pack_start(hbox2, expand=False, fill=False, padding=1)
@@ -229,6 +246,7 @@ class Gui(hildon.Program):
         hbox1.pack_start(userLabel, expand=False, fill=False, padding=1)        
         hbox2.pack_start(passText, expand=False, fill=False, padding=1)
         hbox2.pack_start(passLabel, expand=True, fill=False, padding=1)
+        vbox1.pack_start(statusLabel, expand=False, fill=False, padding=1)
 
         
         userText.show()
@@ -236,6 +254,7 @@ class Gui(hildon.Program):
         passText.show()
         passLabel.show()
         okButton.show()
+        statusLabel.show()
         hbox1.show()
         hbox2.show()
         vbox1.show()
