@@ -28,6 +28,7 @@ map = data_storage.MapData(mapxml.get_name(),
 map.set_focus(15.5726, 58.4035)
 
 session = data.get_session()
+data.create_tables()
 print session.query(Unit).all()
 # Ritar ut tre objekt
 map.add_object("Ambulans1", data_storage.MapObject(
