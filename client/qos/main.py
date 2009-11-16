@@ -15,6 +15,7 @@ if "--no-connect" in sys.argv:
 
 network_listeners = {}
 
+
 def read_keys():
     global connection
     while connection.connected:
@@ -28,7 +29,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.218.203"
         #self.host_addr = "localhost"
         self.host_port = 442
         
@@ -39,8 +40,6 @@ class Connection(object):
 
         self.KeyboardInterrupt = False
         self.connected = False
-        self.reconnect()
-
 
     def reconnect(self):
         print "Du kör reconnect"
@@ -69,10 +68,9 @@ class Connection(object):
                     can_split = buffrify.split_buffer(self.in_buffer)
                     if can_split is not None:
                         self.in_buffer = can_split[1]
-                        print "> %s" % can_split[0]
                         pack = packet.Packet.from_net(can_split[0])
+                        print "> %s, %s" % (pack.type, str(pack.data))
                         if pack.type in network_listeners:
-                            print "fanns en som lyssna på %s" % pack.type
                             network_listeners[pack.type](pack)
                 else:
                     self.connected = False
@@ -121,9 +119,7 @@ connection = Connection()
 if "--read-keys" in sys.argv or True: # ha true nu iaf 
     threading.Thread(target=read_keys).start()
 
-def ping_response(packet):
-    global connection
-    print "ska svara på pingz"... men fuck it
+def ping_response(pack):
     connection.timestamp = time.time()
     connection.out_queue.put(packet.Packet("pong"))
 network_listeners["ping"] = ping_response
@@ -136,3 +132,4 @@ def request_login(username, password):
 rpc.register("request_login", request_login)
 rpc.register("add_packet", connection.add_packet)
 
+connection.reconnect()

@@ -30,7 +30,7 @@ clientrequests = {}
 clientrequests["pong"] = pong
 #clientrequests["login"] = (login,)
 
-host_addr = "130.236.76.135"
+host_addr = "130.236.218.203"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,10 +70,10 @@ while True:
                 if can_split is not None:
                     connection.in_buffer = can_split[1]
                     read = can_split[0]
-                    print "lägger till %s" % read
-                    packet = packet.Packet.from_net(read)
-                    if packet.type in clientrequests:
-                        clientrequests[packet.type](packet)
+                    pack = packet.Packet.from_net(read)
+                    print "laggar till %s=>%s" % (pack.type, str(pack.data))
+                    if pack.type in clientrequests:
+                        clientrequests[pack.type](pack)
                     for fileno, connection in connections.iteritems():
                         if sock.fileno() != fileno:
                             connection.out_queue.put("%s hälsar: %s" % \
@@ -88,7 +88,6 @@ while True:
             if connection.out_buffer == "" and \
                 not connection.out_queue.empty():
                 connection.out_buffer = buffrify.create_pack(str(connection.out_queue.get()))
-                print "ska skriva %s till.... %s" % (connection.out_buffer, sock.fileno())
 
             if connection.out_buffer != "":
                 sent = sock.send(connection.out_buffer)
