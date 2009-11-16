@@ -123,7 +123,7 @@ if "--read-keys" in sys.argv or True: # ha true nu iaf
 
 def ping_response(packet):
     global connection
-    print "ska svara på pingz"... men fuck it
+    print "ska svara på pingz ... men fuck it"
     connection.timestamp = time.time()
     connection.out_queue.put(packet.Packet("pong"))
 network_listeners["ping"] = ping_response

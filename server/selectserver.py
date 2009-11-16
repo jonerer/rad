@@ -19,16 +19,9 @@ class Connection(object):
         self.timestamp = time.time()
         self.timepinged = 0
 
-def pong(hax):
-    print "Sätter ny timestamp"
-    connection.timestamp = time.time()
-    connection.timepinged = 0
-
 client_sockets = {}
 connections = {}
 clientrequests = {}
-clientrequests["pong"] = pong
-#clientrequests["login"] = (login,)
 
 host_addr = "130.236.76.135"
 host_port = 442
@@ -71,9 +64,10 @@ while True:
                     connection.in_buffer = can_split[1]
                     read = can_split[0]
                     print "lägger till %s" % read
-                    packet = packet.Packet.from_net(read)
+                    sendpacket = packet.Packet.from_net(read)
                     if packet.type in clientrequests:
-                        clientrequests[packet.type](packet)
+                        print "Ditt packet du kör request på: ", str(sendpacket)
+                        clientrequests[packet.type](sendpacket)
                     for fileno, connection in connections.iteritems():
                         if sock.fileno() != fileno:
                             connection.out_queue.put("%s hälsar: %s" % \
@@ -133,6 +127,12 @@ while True:
                 sock.shutdown(socket.SHUT_RDWR)
                 sock.close()
 
+def pong(hax):
+    print "Sätter ny timestamp"
+    connection.timestamp = time.time()
+    connection.timepinged = 0
+clientrequests["pong"] = pong
 
 def login(hax):
     pass
+clientrequests["login"] = login
