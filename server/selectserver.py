@@ -2,7 +2,7 @@
 import socket, threading, sys, select, struct, time
 from Queue import Queue
 from os import popen
-from shared import buffrify
+from shared import buffrify, packet
 
 class Connection(object):
     
@@ -19,10 +19,18 @@ class Connection(object):
         self.timestamp = time.time()
         self.timepinged = 0
 
+def pong(hax):
+    print "Sätter ny timestamp"
+    connection.timestamp = time.time()
+    connection.timepinged = 0
+
 client_sockets = {}
 connections = {}
+clientrequests = {}
+clientrequests["pong"] = pong
+#clientrequests["login"] = (login,)
 
-host_addr = "130.236.217.215"
+host_addr = "130.236.76.135"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -63,10 +71,9 @@ while True:
                     connection.in_buffer = can_split[1]
                     read = can_split[0]
                     print "lägger till %s" % read
-                    if read == "pong":
-                        print "Sätter ny timestamp"
-                        connection.timestamp = time.time()
-                        connection.timepinged = 0
+                    packet = packet.Packet.from_net(read)
+                    if packet.type in clientrequests:
+                        clientrequests[packet.type](packet)
                     for fileno, connection in connections.iteritems():
                         if sock.fileno() != fileno:
                             connection.out_queue.put("%s hälsar: %s" % \
@@ -80,7 +87,7 @@ while True:
 
             if connection.out_buffer == "" and \
                 not connection.out_queue.empty():
-                connection.out_buffer = buffrify.create_pack(connection.out_queue.get())
+                connection.out_buffer = buffrify.create_pack(str(connection.out_queue.get()))
                 print "ska skriva %s till.... %s" % (connection.out_buffer, sock.fileno())
 
             if connection.out_buffer != "":
@@ -104,7 +111,8 @@ while True:
                     to_be_removed.append(connection.socket.fileno())
                 else:
                     connection.timepinged = connection.timepinged + 1
-                    connection.out_queue.put("ping")
+                    ping = packet.Packet("ping")
+                    connection.out_queue.put(ping)
 
         for id in to_be_removed:
             connections[id].socket.close()
@@ -125,3 +133,6 @@ while True:
                 sock.shutdown(socket.SHUT_RDWR)
                 sock.close()
 
+
+def login(hax):
+    pass
