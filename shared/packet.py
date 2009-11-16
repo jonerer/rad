@@ -44,5 +44,8 @@ if __name__ == "__main__":
     #print a.timestamp
     assert str(a) == str(Packet.from_net(str(a)))
     #print b
+    c = Packet("ping") #works with None-data?
+    assert str(c) == str(Packet.from_net(str(c)))
+    #print Packet.from_net(str(c)).data
     print "shit works!"
 

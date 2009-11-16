@@ -4,12 +4,10 @@ import thread
 import time
 import sys
 import os
-from shared import rpc
-#from tester.osso import rpc
 import gui
 import data_storage
 import map_xml_reader
-from shared import data
+from shared import data, rpc
 from shared.data.defs import *
 
 if sys.version_info[1] == 3:

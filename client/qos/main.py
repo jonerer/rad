@@ -5,7 +5,7 @@ import socket, sys, time, select, time
 import Queue
 import threading
 import gtk
-from shared import rpc, buffrify
+from shared import rpc, buffrify, packet
 from simplejson import loads, dumps
 
 rpc.set_name("qos")
@@ -19,12 +19,8 @@ def read_keys():
     global connection
     while connection.connected:
         input = raw_input()
-        connection.out_queue.put(input)
-
-def ping_listener(info):
-    pass
-
-network_listeners["ping"] = (ping_listener,)
+        connection.out_queue.put(packet.Packet("chat",
+            message=input))
 
 class Connection(object):
 
@@ -74,10 +70,10 @@ class Connection(object):
                     if can_split is not None:
                         self.in_buffer = can_split[1]
                         print "> %s" % can_split[0]
-                        if can_split[0] == "ping":
-                            self.timestamp = time.time()
-                            print "You have to respond to a ping from server"
-                            self.out_queue.put("pong")
+                        pack = packet.Packet.from_net(can_split[0])
+                        if pack.type in network_listeners:
+                            print "fanns en som lyssna på %s" % pack.type
+                            network_listeners[pack.type](pack)
                 else:
                     self.connected = False
                     print "fick en tom read i client"
@@ -97,7 +93,7 @@ class Connection(object):
                 try:
                     new_out_buffer = self.out_queue.get(True, 1)
                         # blocks for a while
-                    self.out_buffer = buffrify.create_pack(new_out_buffer)
+                    self.out_buffer = buffrify.create_pack(str(new_out_buffer))
                 except Queue.Empty:
                     pass
             if self.out_buffer != "":
@@ -124,6 +120,13 @@ class Connection(object):
 connection = Connection()
 if "--read-keys" in sys.argv or True: # ha true nu iaf 
     threading.Thread(target=read_keys).start()
+
+def ping_response(packet):
+    global connection
+    print "ska svara på pingz"... men fuck it
+    connection.timestamp = time.time()
+    connection.out_queue.put(packet.Packet("pong"))
+network_listeners["ping"] = ping_response
 
 def request_login(username, password):
     connection.add_packet(dumps({"action": "login", 
