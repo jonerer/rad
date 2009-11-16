@@ -13,7 +13,7 @@ rpc.set_name("qos")
 if "--no-connect" in sys.argv:
     no_connect = True
 
-#network_listeners = []
+network_listeners = {}
 
 def read_keys():
     global connection
@@ -21,10 +21,10 @@ def read_keys():
         input = raw_input()
         connection.out_queue.put(input)
 
-#def ping_listener(info):
-#    pass
+def ping_listener(info):
+    pass
 
-#network_listeners["ping"] = (ping_listener,)
+network_listeners["ping"] = (ping_listener,)
 
 class Connection(object):
 

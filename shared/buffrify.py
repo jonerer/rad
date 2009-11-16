@@ -8,10 +8,7 @@ def split_buffer(buffer):
         con_len = int(con_len[con_len.find(" ")+1:])
         rest = buffer[delim_pos+4:]
         if len(rest) >= con_len:
-            #print "kan moffa"
-            #print rest[:con_len] + "-" + rest[con_len:]
             return rest[:con_len], rest[con_len:]
-        #print str(con_len) + rest
     return None
 
 def create_pack(data):
