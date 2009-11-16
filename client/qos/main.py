@@ -32,7 +32,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.217.215"
+        self.host_addr = "130.236.76.135"
         #self.host_addr = "localhost"
         self.host_port = 442
         
