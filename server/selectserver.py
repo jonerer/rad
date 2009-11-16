@@ -19,16 +19,15 @@ class Connection(object):
         self.timestamp = time.time()
         self.timepinged = 0
 
-def pong(hax):
-    print "Sätter ny timestamp"
-    connection.timestamp = time.time()
-    connection.timepinged = 0
-
 client_sockets = {}
 connections = {}
 clientrequests = {}
+
+def pong(connection, pack):
+    print "Sätter ny timestamp"
+    connection.timestamp = time.time()
+    connection.timepinged = 0
 clientrequests["pong"] = pong
-#clientrequests["login"] = (login,)
 
 host_addr = "130.236.218.203"
 host_port = 442
@@ -73,7 +72,7 @@ while True:
                     pack = packet.Packet.from_net(read)
                     print "laggar till %s=>%s" % (pack.type, str(pack.data))
                     if pack.type in clientrequests:
-                        clientrequests[pack.type](pack)
+                        clientrequests[pack.type](connection, pack)
                     for fileno, connection in connections.iteritems():
                         if sock.fileno() != fileno:
                             connection.out_queue.put("%s hälsar: %s" % \
@@ -135,3 +134,4 @@ while True:
 
 def login(hax):
     pass
+clientrequests["login"] = login
