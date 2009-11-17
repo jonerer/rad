@@ -31,10 +31,13 @@ clientrequests["pong"] = pong
 
 def login(connection, pack):
     print "loginhaxx"
-    print pack.data
+    loginfo = pack.data
+    username = loginfo["username"]
+    password = loginfo["password"]
+    print usern
+    print password
 clientrequests["login"] = login
-
-host_addr = "130.236.76.135"
+host_addr = "130.236.217.83"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -135,7 +138,3 @@ while True:
         for sock in client_sockets.values():
                 sock.shutdown(socket.SHUT_RDWR)
                 sock.close()
-<<<<<<< Updated upstream:server/selectserver.py
-
-=======
->>>>>>> Stashed changes:server/selectserver.py
