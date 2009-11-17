@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 # Echo client program
-import socket, sys, time, select, time
+import socket, sys, time, select
 # require a certificate from the server
 import Queue
 import threading
@@ -29,7 +29,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.103"
+        self.host_addr = "130.236.76.135"
         #self.host_addr = "localhost"
         self.host_port = 442
         
