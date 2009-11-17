@@ -29,7 +29,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.218.203"
+        self.host_addr = "130.236.76.103"
         #self.host_addr = "localhost"
         self.host_port = 442
         
@@ -124,12 +124,14 @@ def ping_response(pack):
     connection.out_queue.put(packet.Packet("pong"))
 network_listeners["ping"] = ping_response
 
-def request_login(username, password):
-    connection.add_packet(dumps({"action": "login", 
-        "username": username, 
-        "password": password}))
+def request_login(pw, user):
+    connection.out_queue.put(packet.Packet("login",\
+     username=user, password=pw))
+    #connection.add_packet(dumps({"action": "login", 
+    #    "username": username, 
+    #    "password": password}))
 
 rpc.register("request_login", request_login)
 rpc.register("add_packet", connection.add_packet)
-
+threading.Thread(target=gtk.main()).start()
 connection.reconnect()

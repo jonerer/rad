@@ -12,6 +12,7 @@ import hildon
 import gui_map
 from shared.data import get_session, create_tables
 from shared.data.defs import *
+from shared import rpc
 
 class Gui(hildon.Program):
     _map = None
@@ -299,6 +300,7 @@ class Gui(hildon.Program):
     
     #  LOGIN-View------------ID 2------------------
     #       Description: Simple loginframe to handle logins, logical!
+
     def create_login_view(self):
         def dbcheck_press_callback(self, widget, data=None):   
             session = get_session()
@@ -306,7 +308,8 @@ class Gui(hildon.Program):
             session.bind
             session.query(User).all()
             user = unicode(userText.get_text())
-            password = unicode(passText.get_text())
+            pw = unicode(passText.get_text())
+            print rpc.send("qos", "request_login", pw=pw, user=user)
             for users in session.query(User).filter(User.name == user):
                 if password == users.password:
                     statusLabel.set_label("Access granted")

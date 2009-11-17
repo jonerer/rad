@@ -29,7 +29,12 @@ def pong(connection, pack):
     connection.timepinged = 0
 clientrequests["pong"] = pong
 
-host_addr = "130.236.218.203"
+def login(connection, pack):
+    print "loginhaxx"
+    print pack.data
+clientrequests["login"] = login
+
+host_addr = "130.236.76.103"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -131,7 +136,3 @@ while True:
                 sock.shutdown(socket.SHUT_RDWR)
                 sock.close()
 
-
-def login(hax):
-    pass
-clientrequests["login"] = login
