@@ -134,7 +134,7 @@ def request_login(pw, user):
 def login_response(pack):
     print pack.data
     login_boolean = pack.data["login"]
-    if login_boolean:
+    if not login_boolean
         print "FUCKYEAHYEAHYEAHYEA"
         print login_boolean
 network_listeners["login_response"] = login_response
