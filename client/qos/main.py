@@ -132,12 +132,16 @@ def request_login(pw, user):
     #    "password": password}))
 
 def login_response(pack):
-    print pack.data
-    login_boolean = pack.data["login"]
-    if not login_boolean
+    login_boolean = parseBoolean(pack.data["login"])
+    if login_boolean:
         print "FUCKYEAHYEAHYEAHYEA"
         print login_boolean
+    if not login_boolean:
+        print "accessdenied computer will now explode"
 network_listeners["login_response"] = login_response
+
+def parseBoolean(login):
+    return login == "True"
     
 rpc.register("request_login", request_login)
 rpc.register("add_packet", connection.add_packet)
