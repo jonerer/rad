@@ -125,13 +125,20 @@ def ping_response(pack):
 network_listeners["ping"] = ping_response
 
 def request_login(pw, user):
-    print "Du har kört request_login"
     connection.out_queue.put(packet.Packet("login",\
      username=user, password=pw))
     #connection.add_packet(dumps({"action": "login", 
     #    "username": username, 
     #    "password": password}))
 
+def login_response(pack):
+    print pack.data
+    login_boolean = pack.data["login"]
+    if login_boolean:
+        print "FUCKYEAHYEAHYEAHYEA"
+        print login_boolean
+network_listeners["login_response"] = login_response
+    
 rpc.register("request_login", request_login)
 rpc.register("add_packet", connection.add_packet)
 threading.Thread(target=connection.reconnect).start()

@@ -30,12 +30,14 @@ def pong(connection, pack):
 clientrequests["pong"] = pong
 
 def login(connection, pack):
-    print "loginhaxx"
+    loginaccept = True
     loginfo = pack.data
     username = loginfo["username"]
     password = loginfo["password"]
-    print usern
+    print username
     print password
+    login_response = packet.Packet("login_response", login="False")
+    connection.out_queue.put(login_response)
 clientrequests["login"] = login
 host_addr = "130.236.217.83"
 host_port = 442
