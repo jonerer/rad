@@ -15,7 +15,6 @@ if "--no-connect" in sys.argv:
 
 network_listeners = {}
 
-
 def read_keys():
     global connection
     while connection.connected:
@@ -23,13 +22,14 @@ def read_keys():
         connection.out_queue.put(packet.Packet("chat",
             message=input))
 
+
 class Connection(object):
 
     #The time the client need to hear from     
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.217.83"
         #self.host_addr = "localhost"
         self.host_port = 442
         
@@ -125,6 +125,7 @@ def ping_response(pack):
 network_listeners["ping"] = ping_response
 
 def request_login(pw, user):
+    print "Du har kört request_login"
     connection.out_queue.put(packet.Packet("login",\
      username=user, password=pw))
     #connection.add_packet(dumps({"action": "login", 
@@ -133,5 +134,6 @@ def request_login(pw, user):
 
 rpc.register("request_login", request_login)
 rpc.register("add_packet", connection.add_packet)
-threading.Thread(target=gtk.main()).start()
-connection.reconnect()
+threading.Thread(target=connection.reconnect).start()
+gtk.gdk.threads_init()
+gtk.main()
