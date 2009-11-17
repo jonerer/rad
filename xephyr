@@ -1,1 +1,1 @@
-Xephyr :1 -screen 800x480x16 -dpi 96 -ac &
+Xephyr :2 -screen 800x480x16 -dpi 96 -ac &
