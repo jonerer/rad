@@ -3,6 +3,37 @@ import socket, threading, sys, select, struct, time
 from Queue import Queue
 from os import popen
 from shared import buffrify, packet
+from shared.data.serverdb import get_session, create_tables
+from shared.data.serverdb.defs import *
+
+print "gör session"
+session = get_session()
+print "gör tables"
+create_tables()     
+#Om du behöver fylla på databasen igen gör dessa nedanför
+#skapar olika unittypes
+#a=UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
+#b=UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
+#c=UnitType(u"sjukhus1", "static/ikoner/sjukhus.png")
+#d=UnitType(u"jonas","static/ikoner/JonasInGlases.png")
+#session.add(b)
+#session.add(c)
+#session.add(d)
+#session.add(a)
+#session.commit()
+#skapar units
+#session.add(Unit(u"hej", a, 15.57796, 58.40479))
+#session.add(Unit(u"ho", a, 15.57806, 58.40579))
+#session.add(Unit(u"lets", b, 15.5729, 58.40193))
+#session.add(Unit(u"go", c, 15.5629, 58.4093))
+#session.add(Unit(u"III", d, 15.5829, 58.4093, True))
+#session.commit()
+#Skapar användare
+#session.add(User(u"jonas", u"mittlosen"))
+#session.add(User(u"jon", u"supersecurepassword"))
+#session.add(User(u"resman", u"superprogrammer"))
+#session.add(User(u"Filho", u"jonas"))
+#session.commit()
 
 class Connection(object):
     
@@ -29,17 +60,21 @@ def pong(connection, pack):
     connection.timepinged = 0
 clientrequests["pong"] = pong
 
-def login(connection, pack):
+def login(connection, pack): 
     loginaccept = True
+    session.bind
+    session.query(User).all()
     loginfo = pack.data
     username = loginfo["username"]
     password = loginfo["password"]
-    print username
-    print password
-    login_response = packet.Packet("login_response", login="False")
-    connection.out_queue.put(login_response)
+    for users in session.query(User).filter(User.name == username):
+        if password == users.password:
+            login_response = packet.Packet("login_response", login="True")
+        else :
+            login_response = packet.Packet("login_response", login="False")
+        connection.out_queue.put(login_response)
 clientrequests["login"] = login
-host_addr = "130.236.217.83"
+host_addr = "130.236.76.103"
 host_port = 442
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

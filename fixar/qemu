@@ -1,7 +1,24 @@
 PRODUCED BY AGILE GAMES
  " if it's in the scrum, it's in the scrum"
 
-1. skaffa dessa:
+Det finns två sätt det jobbiga eller det enkla:
+
+
+Enkla sättet:
+1. Kopiera över qemu
+sudo cp rad/fixar/qemu-arm-eabi-sb2 /scratchbox/devkits/cputransp/bin/
+
+2. öppna cputrans-method o lägg till en rad
+sudo vim /scratchbox/devkits/cputransp/etc/cputransp-methods
+lägg till: qemu-arm-eabi-sb2
+
+3. öppna configen o ändra en rad
+vim /scratchbox/users/<username>/targets/DIABLO_ARMEL.config
+o ändra raden till: SBOX_CPUTRANSPARENCY_METHOD=/scratchbox/devkits/cputransp/bin/qemu-arm-eabi-sb2
+
+
+Jobbiga sättet:
+1. skaffa dessa:chine/rad.git
 sudo apt-get install pkg-config build-essential gcc-3.4 libsdl1.2-dev zlib1g-dev subversion vim-gnome quilt
 
 2. ställ dig i hemkatalogen ~ o kör:
