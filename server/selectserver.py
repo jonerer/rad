@@ -69,10 +69,8 @@ def login(connection, pack):
     password = loginfo["password"]
     for users in session.query(User).filter(User.name == username):
         if password == users.password:
-            print "granted"
             login_response = packet.Packet("login_response", login="True")
         else :
-            print "denied"
             login_response = packet.Packet("login_response", login="False")
         connection.out_queue.put(login_response)
 clientrequests["login"] = login

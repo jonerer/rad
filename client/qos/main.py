@@ -127,18 +127,14 @@ network_listeners["ping"] = ping_response
 def request_login(pw, user):
     connection.out_queue.put(packet.Packet("login",\
      username=user, password=pw))
-    #connection.add_packet(dumps({"action": "login", 
-    #    "username": username, 
-    #    "password": password}))
 
 
 def login_response(pack):
     login_boolean = parseBoolean(pack.data["login"])
     if login_boolean:
-        print "FUCKYEAHYEAHYEAHYEA"
-        print login_boolean
+        rpc.send("main", "access", bol=login_boolean)
     if not login_boolean:
-        print "accessdenied computer will now explode"
+        rpc.send("main", "access", bol=login_boolean)
 network_listeners["login_response"] = login_response
 
 def parseBoolean(login):

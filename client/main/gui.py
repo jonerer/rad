@@ -292,18 +292,16 @@ class Gui(hildon.Program):
             create_tables()        
             session.bind
             session.query(User).all()
-            user = userText.get_text()
-            pw = passText.get_text()
             user = unicode(userText.get_text())
             pw = unicode(passText.get_text())
             print rpc.send("qos", "request_login", pw=pw, user=user)
-            for users in session.query(User).filter(User.name == user):
-                if password == users.password:
-                    statusLabel.set_label("Access granted")
-                else :
-                    statusLabel.set_label("Access denied")
-            return
-        
+
+        def access(bol):
+            if bol:
+                statusLabel.set_label("Access granted")
+            if not bol:
+                statusLabel.set_label("Access denied")
+
         hboxOUT  = gtk.HBox(homogeneous=False, spacing=1)
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
         hbox1 = gtk.HBox(homogeneous=False, spacing=1)
@@ -337,6 +335,8 @@ class Gui(hildon.Program):
         hbox2.show()
         vbox1.show()
         hboxOUT.show()
+        #Skapar rpc
+        rpc.register("access", access)
         
         return hboxOUT
     #  // LOGIN-View------------ID 2------------------
