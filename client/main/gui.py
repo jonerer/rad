@@ -95,6 +95,11 @@ class Gui(hildon.Program):
             vMenuBox.show()
             vMissionBox.hide()
             return
+        def show_newMission(self, widget, data=None):
+            vMenuBox.hide()
+            vMissionBox.hide()
+            vMissionAddBox.show()
+            return
         # CREATE BUTTONS-FUNKTION
         def create_menuButton(bild,label):
             buttonBox = gtk.HBox(False, spacing=1)
@@ -109,14 +114,14 @@ class Gui(hildon.Program):
             buttonBox.pack_start(label, expand=False, fill=False, padding=5)
             button.add(buttonBox)
             button.show_all()
-            button.set_size_request(250, 70)
+            button.set_size_request(296, 60)
             return button
         
         # CREATE BUTTONS
         mapButton = create_menuButton("static/ikoner/map.png","Karta")
         setButton = create_menuButton("static/ikoner/cog.png","Installningar")
         conButton = create_menuButton("static/ikoner/book_addresses.png","Kontakter")
-        misButton = create_menuButton("static/ikoner/paste_plain.png","Uppdrag")
+        misButton = create_menuButton("static/ikoner/book.png","Uppdrag")
         jonasButton = create_menuButton("static/ikoner/JonasInGlases.png","Jonas")
         misButton.connect("clicked", mission_button_clicked, None)
         
@@ -124,28 +129,50 @@ class Gui(hildon.Program):
         
         # MISSION VIEW
         vMissionBox = gtk.VBox(False,0)
-        newMissionButton = create_menuButton("static/ikoner/map.png","Lagg till")
-        editMissionButton = create_menuButton("static/ikoner/map.png","Redigera")
-        backButton = create_menuButton("static/ikoner/resultset_first.png","Tillbaka")
+        newMissionButton = create_menuButton("static/ikoner/book_add.png","Lagg till")
+        editMissionButton = create_menuButton("static/ikoner/book_edit.png","Redigera")
+        deleteMissionButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
+        backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
         backButton.connect("clicked", show_mainMenu, None)
-        vMissionBox.pack_start(newMissionButton, True, fill=False, padding=0)
-        vMissionBox.pack_start(editMissionButton, True, fill=False, padding=0)
-        vMissionBox.pack_start(backButton, True, fill=False, padding=0)
-        hMainBox.pack_start(vMissionBox, True, True, padding=0)
-        
+        newMissionButton.connect("clicked", show_newMission, None)
+        vMissionBox.pack_start(newMissionButton, False, False, padding=2)
+        vMissionBox.pack_start(editMissionButton, False, False, padding=2)
+        vMissionBox.pack_start(deleteMissionButton, False, False, padding=2)
+        vMissionBox.pack_start(backButton, False, False, padding=2)
+        hMainBox.pack_start(vMissionBox, False, False, padding=2)
+
         vMissionBox.show_all()
         vMissionBox.hide()
-        
-        
+
+        # MISSION ADD
+        vMissionAddBox = gtk.VBox(False,0)
+        unitNameLabel = gtk.Label("Namn på objekt:")
+        unitTypeLabel = gtk.Label("Typ av objekt:")
+        unitName = gtk.Entry()
+        typeBox = gtk.Combo()
+        typeBox.set_size_request(100,100)
+        slist = [ "Brandbil", "Ambulans", "Schnase", "Jonas" ]
+        typeBox.set_popdown_strings(slist)
+
+        #unitName.set_size_request(296, 30)
+        vMissionAddBox.pack_start(unitNameLabel, False,True,2)
+        vMissionAddBox.pack_start(unitName,False,True,2)
+        vMissionAddBox.pack_start(unitTypeLabel, False,True,2)
+        vMissionAddBox.pack_start(typeBox,False,True,2)
+        hMainBox.pack_start(vMissionAddBox,False,True,2)
+      
+        vMissionAddBox.show_all()
+        vMissionAddBox.hide()
+
 
         
         vMenuBox = gtk.VBox(False,0)
-        vMenuBox.pack_start(mapButton, True, fill=False, padding=0)
-        vMenuBox.pack_start(misButton, True, fill=False, padding=0)
-        vMenuBox.pack_start(conButton, True, fill=False, padding=0)
-        vMenuBox.pack_start(setButton, True, fill=False, padding=0)
-        vMenuBox.pack_start(jonasButton, True, fill=False, padding=0)
-        hMainBox.pack_start(vMenuBox, True, True, padding=0)
+        vMenuBox.pack_start(mapButton, False, True, padding=2)
+        vMenuBox.pack_start(misButton, False, True, padding=2)
+        vMenuBox.pack_start(conButton, False, True, padding=2)
+        vMenuBox.pack_start(setButton, False, True, padding=2)
+        vMenuBox.pack_start(jonasButton, False, True, padding=2)
+        hMainBox.pack_start(vMenuBox, False, False, padding=2)
         
         hMainBox.show()
         vMenuBox.show()
@@ -255,7 +282,7 @@ class Gui(hildon.Program):
         
         # MENUBOX-----------------------
         menuBox = gtk.HBox(homogeneous=False, spacing=1)
-        menuBox.pack_start(self.create_menu_view(), True, False, padding=1)
+        menuBox.pack_start(self.create_menu_view(), False, False, padding=1)
         menuBox.set_size_request(300, 300)
         menuBox.show()
         missionBox = gtk.VBox(False,1)
