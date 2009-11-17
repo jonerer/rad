@@ -292,6 +292,8 @@ class Gui(hildon.Program):
             create_tables()        
             session.bind
             session.query(User).all()
+            user = userText.get_text()
+            pw = passText.get_text()
             user = unicode(userText.get_text())
             pw = unicode(passText.get_text())
             print rpc.send("qos", "request_login", pw=pw, user=user)

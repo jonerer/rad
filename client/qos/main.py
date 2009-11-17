@@ -29,7 +29,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.217.83"
+        self.host_addr = "130.236.76.103"
         #self.host_addr = "localhost"
         self.host_port = 442
         
@@ -131,14 +131,15 @@ def request_login(pw, user):
     #    "username": username, 
     #    "password": password}))
 
+
 def login_response(pack):
     print pack.data
     login_boolean = pack.data["login"]
-    if not login_boolean
+    if not login_boolean:
         print "FUCKYEAHYEAHYEAHYEA"
         print login_boolean
 network_listeners["login_response"] = login_response
-    
+
 rpc.register("request_login", request_login)
 rpc.register("add_packet", connection.add_packet)
 threading.Thread(target=connection.reconnect).start()
