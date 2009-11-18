@@ -20,7 +20,7 @@ class Packet(object):
             self.priority = 0.5
 
     @classmethod
-    def from_net(cls, data):
+    def from_str(cls, data):
         #print data
         #print type(data)
         datadict = simplejson.loads(data)

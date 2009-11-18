@@ -10,9 +10,10 @@
 import gtk
 import hildon
 import gui_map
+import time
 from shared.data import get_session, create_tables
 from shared.data.defs import *
-from shared import rpc
+from shared import rpc, packet
 
 def create_menuButton(bild,label):
     buttonBox = gtk.HBox(False, spacing=1)
@@ -45,6 +46,12 @@ class MenuPage(Page):
     def mission_button_clicked(self, widget, data=None):
         self.gui.switch_page("mission")
 
+    def hille_e_tjock(self, widget, data=None):
+        print "tjockade på hille"
+        alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
+        print rpc.send("qos", "add_packet", packet=alarm)
+
+
     def __init__(self, gui):
         super(MenuPage, self).__init__("menu", gui)
         
@@ -56,7 +63,8 @@ class MenuPage(Page):
         jonasButton = create_menuButton("static/ikoner/JonasInGlases.png","Jonas")
         misButton.connect("clicked", self.mission_button_clicked, None)
         setButton.connect("clicked", self.gui.switch_page, "settings")
-
+        conButton.connect("clicked", self.hille_e_tjock, None)
+      
         # MISSION ADD
         vMissionAddBox = gtk.VBox(False,0)
         unitNameLabel = gtk.Label("Namn på objekt:")
@@ -151,7 +159,7 @@ class Gui(hildon.Program):
         elif event.keyval == 65363:
             if (self.view.get_current_page() != 1):
                 self.view.next_page()
-        # Zoom -
+        # Zoom -    
         elif event.keyval == 65477:
             self._map_change_zoom("-")
         # Zoom +
@@ -354,7 +362,8 @@ class Gui(hildon.Program):
             session.query(User).all()
             user = unicode(userText.get_text())
             pw = unicode(passText.get_text())
-            print rpc.send("qos", "request_login", pw=pw, user=user)
+            login = str(packet.Packet("login", username=user, password=pw))
+            print rpc.send("qos", "add_packet", packet=login)
 
         def access(bol):
             if bol:
