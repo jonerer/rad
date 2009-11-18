@@ -35,10 +35,9 @@ class Page(gtk.VBox):
     def __init__(self, name, gui, width="half", spacing=1, homogeneous=False):
         super(gtk.VBox, self).__init__(homogeneous=homogeneous, spacing=spacing)
         if width == "half":
-            self.set_size_request(300,300)
-        # don't works yet
-        #elif width == "full":
-        #    self.set_size_request(600,300)
+            self.size_request = (300,300)
+        elif width == "full":
+            self.size_request = (600,300)
         self.show()
         self.gui = gui
 
@@ -214,6 +213,7 @@ class Gui(hildon.Program):
         if widget is not None:
             page_name = widget
         num = self.rightBook.page_num(self._pages[page_name])
+        self.rightBook.set_size_request(*self._pages[page_name].size_request)
         self.rightBook.set_current_page(num)
     
     # QUICK MENU ------------------------
