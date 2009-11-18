@@ -14,19 +14,117 @@ from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc
 
-class Page(gtk.HBox):
-    def __init__(self, name, width="half", spacing=1, homogeneous=False):
-        super(gtk.HBox, self).__init__(homogeneous=homogeneous, spacing=spacing)
-        self.width = width
-        self.laksjdfname = name
+def create_menuButton(bild,label):
+    buttonBox = gtk.HBox(False, spacing=1)
+    button = gtk.Button()
+    label = gtk.Label(label)
+    buff = gtk.gdk.PixbufAnimation(bild)
+    image = gtk.Image()
+    image.set_from_animation(buff)
+    image.show()
+    label.show()
+    buttonBox.pack_start(image, expand=False, fill=False, padding=5)
+    buttonBox.pack_start(label, expand=False, fill=False, padding=5)
+    button.add(buttonBox)
+    button.show_all()
+    button.set_size_request(296, 60)
+    return button
+
+class Page(gtk.VBox):
+    def __init__(self, name, gui, width="half", spacing=1, homogeneous=False):
+        super(gtk.VBox, self).__init__(homogeneous=homogeneous, spacing=spacing)
+        if width == "half":
+            self.set_size_request(300,300)
+        # don't works yet
+        #elif width == "full":
+        #    self.set_size_request(600,300)
+        self.show()
+        self.gui = gui
 
 class MenuPage(Page):
-    def __init__(self):
-        super(MenuPage, self).__init__("menu")
+    def mission_button_clicked(self, widget, data=None):
+        self.gui.switch_page("mission")
 
+    def __init__(self, gui):
+        super(MenuPage, self).__init__("menu", gui)
+        
+        # CREATE BUTTONS
+        mapButton = create_menuButton("static/ikoner/map.png","Karta")
+        setButton = create_menuButton("static/ikoner/cog.png","Installningar")
+        conButton = create_menuButton("static/ikoner/book_addresses.png","Kontakter")
+        misButton = create_menuButton("static/ikoner/book.png","Uppdrag")
+        jonasButton = create_menuButton("static/ikoner/JonasInGlases.png","Jonas")
+        misButton.connect("clicked", self.mission_button_clicked, None)
+        setButton.connect("clicked", self.gui.switch_page, "settings")
+
+        # MISSION ADD
+        vMissionAddBox = gtk.VBox(False,0)
+        unitNameLabel = gtk.Label("Namn på objekt:")
+        unitTypeLabel = gtk.Label("Typ av objekt:")
+        unitName = gtk.Entry()
+        typeBox = gtk.Combo()
+        typeBox.set_size_request(100,100)
+        slist = [ "Brandbil", "Ambulans", "Schnase", "Jonas" ]
+        typeBox.set_popdown_strings(slist)
+
+        vMissionAddBox.pack_start(unitNameLabel, False,True,2)
+        vMissionAddBox.pack_start(unitName,False,True,2)
+        vMissionAddBox.pack_start(unitTypeLabel, False,True,2)
+        vMissionAddBox.pack_start(typeBox,False,True,2)
+        self.pack_start(vMissionAddBox,False,True,2)
+      
+        vMissionAddBox.show_all()
+        vMissionAddBox.hide()
+
+        vMenuBox = gtk.VBox(False,0)
+        vMenuBox.pack_start(mapButton, False, True, padding=2)
+        vMenuBox.pack_start(misButton, False, True, padding=2)
+        vMenuBox.pack_start(conButton, False, True, padding=2)
+        vMenuBox.pack_start(setButton, False, True, padding=2)
+        vMenuBox.pack_start(jonasButton, False, True, padding=2)
+        self.pack_start(vMenuBox, False, False, padding=2)
+        
+        self.show()
+        vMenuBox.show()
+
+class SettingsPage(Page):
+    def __init__(self, gui):
+        super(SettingsPage, self).__init__("settings", gui, width="full")
+
+        button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
+        button.connect("clicked", self.gui.switch_page, "menu")
+        self.pack_start(button, False, False, padding=2)
+
+        self.show_all()
+        
 class MissionPage(Page):
-    def __init__(self):
-        super(MissionPage, self).__init__("mission")
+    def show_mainMenu(self, widget, data=None):
+        self.gui.switch_page("menu")
+
+    def show_newMission(self, widget, data=None):
+        print "INTE FIXAT ÄN. YOU DO IT! :d"
+        vMenuBox.hide()
+        vMissionBox.hide()
+        vMissionAddBox.show()
+        return
+
+    def __init__(self, gui):
+        super(MissionPage, self).__init__("mission", gui, homogeneous=False,
+                spacing=0)
+        newMissionButton = create_menuButton("static/ikoner/book_add.png",
+                "Lagg till")
+        editMissionButton = create_menuButton("static/ikoner/book_edit.png",
+                "Redigera")
+        deleteMissionButton = create_menuButton("static/ikoner/book_delete.png",                     "Ta bort")
+        backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
+        backButton.connect("clicked", self.show_mainMenu, None)
+        newMissionButton.connect("clicked", self.show_newMission, None)
+        self.pack_start(newMissionButton, False, False, padding=2)
+        self.pack_start(editMissionButton, False, False, padding=2)
+        self.pack_start(deleteMissionButton, False, False, padding=2)
+        self.pack_start(backButton, False, False, padding=2)
+
+        self.show_all()
 
 class Gui(hildon.Program):
     _map = None
@@ -77,8 +175,9 @@ class Gui(hildon.Program):
         self.add_window(self.window)
 
         self._pages = {}
-        self._pages["menu"] = MenuPage()
-        self._pages["mission"] = MissionPage()
+        self._pages["menu"] = MenuPage(self)
+        self._pages["mission"] = MissionPage(self)
+        self._pages["settings"] = SettingsPage(self)
 
 
         # Möjliggör fullscreen-läge
@@ -94,7 +193,6 @@ class Gui(hildon.Program):
         self.view.insert_page(self.create_map_view())
         self.view.insert_page(self.create_settings_view())
         self.view.insert_page(self.create_login_view())
-        #self.view.insert_page(self.create_menu_view())
         self.view.show()
         # Lägger in vyn i fönstret
         self.window.add(self.view)
@@ -103,100 +201,13 @@ class Gui(hildon.Program):
         self.window.set_menu(self.create_menu())
     # // __INIT__-----------------
     
+    def switch_page(self, page_name, widget=None):
+        # if widget is supplied, it actually contains page_name, so swap!
+        if widget is not None:
+            page_name = widget
+        num = self.rightBook.page_num(self._pages[page_name])
+        self.rightBook.set_current_page(num)
     
-    
-    def create_menu_view(self):
-        def mission_button_clicked(self, widget, data=None):
-            vMenuBox.hide()
-            vMissionBox.show()
-            return
-        def show_mainMenu(self, widget, data=None):
-            vMenuBox.show()
-            vMissionBox.hide()
-            return
-        def show_newMission(self, widget, data=None):
-            vMenuBox.hide()
-            vMissionBox.hide()
-            vMissionAddBox.show()
-            return
-        # CREATE BUTTONS-FUNKTION
-        def create_menuButton(bild,label):
-            buttonBox = gtk.HBox(False, spacing=1)
-            button = gtk.Button()
-            label = gtk.Label(label)
-            buff = gtk.gdk.PixbufAnimation(bild)
-            image = gtk.Image()
-            image.set_from_animation(buff)
-            image.show()
-            label.show()
-            buttonBox.pack_start(image, expand=False, fill=False, padding=5)
-            buttonBox.pack_start(label, expand=False, fill=False, padding=5)
-            button.add(buttonBox)
-            button.show_all()
-            button.set_size_request(296, 60)
-            return button
-        
-        # CREATE BUTTONS
-        mapButton = create_menuButton("static/ikoner/map.png","Karta")
-        setButton = create_menuButton("static/ikoner/cog.png","Installningar")
-        conButton = create_menuButton("static/ikoner/book_addresses.png","Kontakter")
-        misButton = create_menuButton("static/ikoner/book.png","Uppdrag")
-        jonasButton = create_menuButton("static/ikoner/JonasInGlases.png","Jonas")
-        misButton.connect("clicked", mission_button_clicked, None)
-        
-        hMainBox = gtk.HBox(True,0)        
-        
-        # MISSION VIEW
-        vMissionBox = gtk.VBox(False,0)
-        newMissionButton = create_menuButton("static/ikoner/book_add.png","Lagg till")
-        editMissionButton = create_menuButton("static/ikoner/book_edit.png","Redigera")
-        deleteMissionButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
-        backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
-        backButton.connect("clicked", show_mainMenu, None)
-        newMissionButton.connect("clicked", show_newMission, None)
-        vMissionBox.pack_start(newMissionButton, False, False, padding=2)
-        vMissionBox.pack_start(editMissionButton, False, False, padding=2)
-        vMissionBox.pack_start(deleteMissionButton, False, False, padding=2)
-        vMissionBox.pack_start(backButton, False, False, padding=2)
-        hMainBox.pack_start(vMissionBox, False, False, padding=2)
-
-        vMissionBox.show_all()
-        vMissionBox.hide()
-
-        # MISSION ADD
-        vMissionAddBox = gtk.VBox(False,0)
-        unitNameLabel = gtk.Label("Namn på objekt:")
-        unitTypeLabel = gtk.Label("Typ av objekt:")
-        unitName = gtk.Entry()
-        typeBox = gtk.Combo()
-        typeBox.set_size_request(100,100)
-        slist = [ "Brandbil", "Ambulans", "Schnase", "Jonas" ]
-        typeBox.set_popdown_strings(slist)
-
-        #unitName.set_size_request(296, 30)
-        vMissionAddBox.pack_start(unitNameLabel, False,True,2)
-        vMissionAddBox.pack_start(unitName,False,True,2)
-        vMissionAddBox.pack_start(unitTypeLabel, False,True,2)
-        vMissionAddBox.pack_start(typeBox,False,True,2)
-        hMainBox.pack_start(vMissionAddBox,False,True,2)
-      
-        vMissionAddBox.show_all()
-        vMissionAddBox.hide()
-
-
-        
-        vMenuBox = gtk.VBox(False,0)
-        vMenuBox.pack_start(mapButton, False, True, padding=2)
-        vMenuBox.pack_start(misButton, False, True, padding=2)
-        vMenuBox.pack_start(conButton, False, True, padding=2)
-        vMenuBox.pack_start(setButton, False, True, padding=2)
-        vMenuBox.pack_start(jonasButton, False, True, padding=2)
-        hMainBox.pack_start(vMenuBox, False, False, padding=2)
-        
-        hMainBox.show()
-        vMenuBox.show()
-        
-        return hMainBox
     # QUICK MENU ------------------------
     #       Description: Creates our quickmenu with the basic four buttons
     def create_quickMenu(self):
@@ -301,17 +312,13 @@ class Gui(hildon.Program):
         
         # MENUBOX-----------------------
         rightBook = gtk.Notebook()
-        menuBox = gtk.HBox(homogeneous=False, spacing=1)
-        #menuBox.pack_start(self._pages["menu"], False, False, padding=1)
-        menuBox.pack_start(self.create_menu_view(), False, False, padding=1)
-        menuBox.set_size_request(300, 300)
-        menuBox.show()
-        # de fyra raderna ovanför här ska inte va me.
         missionBox = gtk.VBox(False,1)
-        rightBook.insert_page(menuBox)
+        for page in self._pages.values():
+            rightBook.insert_page(page)
         rightBook.set_show_tabs(False)
         rightBook.set_show_border(False)
         rightBook.show()
+        self.rightBook = rightBook
         
         # MISSIONBOX-----------------------
         
