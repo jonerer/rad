@@ -14,6 +14,20 @@ from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc
 
+class Page(gtk.HBox):
+    def __init__(self, name, width="half", spacing=1, homogeneous=False):
+        super(gtk.HBox, self).__init__(homogeneous=homogeneous, spacing=spacing)
+        self.width = width
+        self.laksjdfname = name
+
+class MenuPage(Page):
+    def __init__(self):
+        super(MenuPage, self).__init__("menu")
+
+class MissionPage(Page):
+    def __init__(self):
+        super(MissionPage, self).__init__("mission")
+
 class Gui(hildon.Program):
     _map = None
     _map_change_zoom = None
@@ -61,6 +75,11 @@ class Gui(hildon.Program):
         # Funktion som körs när prorammet ska stängas av
         self.window.connect("destroy", self.menu_exit)
         self.add_window(self.window)
+
+        self._pages = {}
+        self._pages["menu"] = MenuPage()
+        self._pages["mission"] = MissionPage()
+
 
         # Möjliggör fullscreen-läge
         self.window.connect("key-press-event", self.on_key_press)
@@ -281,11 +300,18 @@ class Gui(hildon.Program):
         closeArrow.show()
         
         # MENUBOX-----------------------
+        rightBook = gtk.Notebook()
         menuBox = gtk.HBox(homogeneous=False, spacing=1)
+        #menuBox.pack_start(self._pages["menu"], False, False, padding=1)
         menuBox.pack_start(self.create_menu_view(), False, False, padding=1)
         menuBox.set_size_request(300, 300)
         menuBox.show()
+        # de fyra raderna ovanför här ska inte va me.
         missionBox = gtk.VBox(False,1)
+        rightBook.insert_page(menuBox)
+        rightBook.set_show_tabs(False)
+        rightBook.set_show_border(False)
+        rightBook.show()
         
         # MISSIONBOX-----------------------
         
@@ -299,7 +325,7 @@ class Gui(hildon.Program):
         hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
         hbox2.pack_start(vbox1, expand=False, fill=True, padding=0)
         
-        vbox1.pack_start(menuBox, expand=True, fill=True, padding=0)
+        vbox1.pack_start(rightBook, expand=True, fill=True, padding=0)
         
         hbox1.show()
         hbox2.show()
