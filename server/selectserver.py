@@ -10,6 +10,7 @@ print "gör session"
 session = get_session()
 print "gör tables"
 create_tables()     
+
 #Om du behöver fylla på databasen igen gör dessa nedanför
 #skapar olika unittypes
 #a=UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
@@ -53,6 +54,16 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
+host_addr = "130.236.76.135"
+host_port = 442
+
+#ska hämtas från databasen
+id_counter = 0 
+
+def get_id():
+    global id_counter
+    id_counter = id_counter + 1
+    return id_counter
 
 def pong(connection, pack):
     print "Sätter ny timestamp"
@@ -61,21 +72,40 @@ def pong(connection, pack):
 clientrequests["pong"] = pong
 
 def login(connection, pack): 
-    loginaccept = True
+    connection.timestamp = time.time()
+    connection.timepinged = 0
     session.bind
     session.query(User).all()
     loginfo = pack.data
     username = loginfo["username"]
     password = loginfo["password"]
+    login_response = packet.Packet("login_response", login="False")
     for users in session.query(User).filter(User.name == username):
         if password == users.password:
             login_response = packet.Packet("login_response", login="True")
         else :
             login_response = packet.Packet("login_response", login="False")
-        connection.out_queue.put(login_response)
+    connection.out_queue.put(login_response)
 clientrequests["login"] = login
-host_addr = "130.236.76.103"
-host_port = 442
+
+def alarm(connection, pack):
+    connection.timestamp = time.time()
+    connection.timepinged = 0
+    id = pack.data["id"]
+    name = pack.data["name"]
+    timestamp = pack.data["timestamp"]
+    sub_type = pack.data["sub_type"]
+    poi_id = pack.data["poi_id"]
+    contact_person = pack.data["contact_person"]
+    contact_number = pack.data["contact_number"]
+    other = pack.data["other"]
+    if id == "":
+        pack.data["id"]=get_id()
+    alarm_response.type = "alarm_response"
+    alarm_response.data = pack.data
+    for connection in connections:
+        connection.out_queue.put(alarm_response)
+clientrequests["alarm"] = alarm
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
@@ -114,7 +144,7 @@ while True:
                 if can_split is not None:
                     connection.in_buffer = can_split[1]
                     read = can_split[0]
-                    pack = packet.Packet.from_net(read)
+                    pack = packet.Packet.from_str(read)
                     print "laggar till %s=>%s" % (pack.type, str(pack.data))
                     if pack.type in clientrequests:
                         clientrequests[pack.type](connection, pack)

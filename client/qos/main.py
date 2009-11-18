@@ -5,7 +5,8 @@ import socket, sys, time, select
 import Queue
 import threading
 import gtk
-from shared import rpc, buffrify, packet
+from shared import rpc, buffrify
+from shared.packet import Packet
 from simplejson import loads, dumps
 
 rpc.set_name("qos")
@@ -19,7 +20,7 @@ def read_keys():
     global connection
     while connection.connected:
         input = raw_input()
-        connection.out_queue.put(packet.Packet("chat",
+        connection.out_queue.put(Packet("chat",
             message=input))
 
 
@@ -29,7 +30,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.103"
+        self.host_addr = "130.236.76.135"
         #self.host_addr = "localhost"
         self.host_port = 442
         
@@ -68,7 +69,7 @@ class Connection(object):
                     can_split = buffrify.split_buffer(self.in_buffer)
                     if can_split is not None:
                         self.in_buffer = can_split[1]
-                        pack = packet.Packet.from_net(can_split[0])
+                        pack = Packet.from_str(can_split[0])
                         print "> %s, %s" % (pack.type, str(pack.data))
                         if pack.type in network_listeners:
                             network_listeners[pack.type](pack)
@@ -83,7 +84,8 @@ class Connection(object):
 
     def add_packet(self, packet):
         """ receives stuff from dbus and DOO EEETT"""
-        self.out_queue.put(packet)
+        loginpacket = Packet.from_str(packet)
+        self.out_queue.put(loginpacket)
 
     def send(self):
         while self.connected:
@@ -121,16 +123,12 @@ if "--read-keys" in sys.argv or True: # ha true nu iaf
 
 def ping_response(pack):
     connection.timestamp = time.time()
-    connection.out_queue.put(packet.Packet("pong"))
+    connection.out_queue.put(Packet("pong"))
 network_listeners["ping"] = ping_response
-
-def request_login(pw, user):
-    connection.out_queue.put(packet.Packet("login",\
-     username=user, password=pw))
-
 
 def login_response(pack):
     login_boolean = parseBoolean(pack.data["login"])
+    connection.timestamp = time.time()
     if login_boolean:
         rpc.send("main", "access", bol=login_boolean)
     if not login_boolean:
@@ -140,7 +138,11 @@ network_listeners["login_response"] = login_response
 def parseBoolean(login):
     return login == "True"
 
-rpc.register("request_login", request_login)
+def alarm_response(pack):
+    print pack.data
+network_listeners["alarm_response"] = alarm_response
+    
+
 rpc.register("add_packet", connection.add_packet)
 threading.Thread(target=connection.reconnect).start()
 gtk.gdk.threads_init()

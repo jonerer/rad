@@ -10,9 +10,10 @@
 import gtk
 import hildon
 import gui_map
+import time
 from shared.data import get_session, create_tables
 from shared.data.defs import *
-from shared import rpc
+from shared import rpc, packet
 
 class Page(gtk.HBox):
     def __init__(self, name, width="half", spacing=1, homogeneous=False):
@@ -53,7 +54,7 @@ class Gui(hildon.Program):
         elif event.keyval == 65363:
             if (self.view.get_current_page() != 1):
                 self.view.next_page()
-        # Zoom -
+        # Zoom -    
         elif event.keyval == 65477:
             self._map_change_zoom("-")
         # Zoom +
@@ -135,7 +136,11 @@ class Gui(hildon.Program):
             button.show_all()
             button.set_size_request(296, 60)
             return button
-        
+
+        def hille_e_tjock(self, widget, data=None):
+            alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
+            print rpc.send("qos", "add_packet", packet=alarm)
+
         # CREATE BUTTONS
         mapButton = create_menuButton("static/ikoner/map.png","Karta")
         setButton = create_menuButton("static/ikoner/cog.png","Installningar")
@@ -145,7 +150,7 @@ class Gui(hildon.Program):
         misButton.connect("clicked", mission_button_clicked, None)
         
         hMainBox = gtk.HBox(True,0)        
-        
+
         # MISSION VIEW
         vMissionBox = gtk.VBox(False,0)
         newMissionButton = create_menuButton("static/ikoner/book_add.png","Lagg till")
@@ -154,6 +159,7 @@ class Gui(hildon.Program):
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
         backButton.connect("clicked", show_mainMenu, None)
         newMissionButton.connect("clicked", show_newMission, None)
+        conButton.connect("clicked", hille_e_tjock, None)
         vMissionBox.pack_start(newMissionButton, False, False, padding=2)
         vMissionBox.pack_start(editMissionButton, False, False, padding=2)
         vMissionBox.pack_start(deleteMissionButton, False, False, padding=2)
@@ -347,7 +353,8 @@ class Gui(hildon.Program):
             session.query(User).all()
             user = unicode(userText.get_text())
             pw = unicode(passText.get_text())
-            print rpc.send("qos", "request_login", pw=pw, user=user)
+            login = str(packet.Packet("login", username=user, password=pw))
+            print rpc.send("qos", "add_packet", packet=login)
 
         def access(bol):
             if bol:
