@@ -37,6 +37,8 @@ while True:
         acceptor = select.select([s,], [s,], [s,], 0)[0]
         if acceptor:
             newsocket, addr = s.accept()
+            print newsocket
+            print addr
             client_sockets[newsocket.fileno()] = newsocket
             connections[newsocket.fileno()] = Connection(newsocket, addr)
 
