@@ -1,5 +1,0 @@
-
-zipTest.py
-
-pause
-

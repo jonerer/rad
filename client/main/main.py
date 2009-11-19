@@ -12,7 +12,6 @@ from shared import data, rpc
 from shared.data import get_session, create_tables
 from shared.data.defs import *
 import logging
-
 if sys.version_info[1] == 3:
     print "nu glömde du skriva python2.5... trooooooliiiigt"
     sys.exit(0)
