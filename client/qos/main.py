@@ -12,6 +12,9 @@ import subprocess
 subprocess.call('ssh -f jonas@130.236.76.103 -L 442:127.0.0.1:442 -N sleep 1',shell=True)
 
 
+import subprocess^M
+subprocess.call('ssh -f jonas@130.236.76.103 -L 442:127.0.0.1:442 -N sleep 1',shell=True)
+
 rpc.set_name("qos")
 
 if "--no-connect" in sys.argv:
