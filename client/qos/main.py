@@ -8,40 +8,42 @@ import gtk
 from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
-
+#import subprocess
+#subprocess.call('ssh -f hostname@SERVERNSIP -L PORT:'127.0.0.1:PORT -N sleep 1', shell=True)
+ 
 rpc.set_name("qos")
-
+ 
 if "--no-connect" in sys.argv:
     no_connect = True
-
+ 
 network_listeners = {}
-
+ 
 def read_keys():
     global connection
     while connection.connected:
         input = raw_input()
         connection.out_queue.put(Packet("chat",
             message=input))
-
-
+ 
+ 
 class Connection(object):
-
-    #The time the client need to hear from     
+ 
+    #The time the client need to hear from
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.189.23"
+        self.host_addr = "130.236.76.135"
         #self.host_addr = "localhost"
-        self.host_port = 2345
+        self.host_port = 442
         
         self.out_queue = Queue.Queue()
         self.out_buffer = ""
         
         self.in_buffer = ""
-
+ 
         self.KeyboardInterrupt = False
         self.connected = False
-
+ 
     def reconnect(self):
         print "Du kör reconnect"
         while not self.connected and not self.KeyboardInterrupt:
@@ -59,7 +61,7 @@ class Connection(object):
                 threading.Thread(target=self.send).start()
                 self.receive()
                 break
-
+ 
     def receive(self):
         while self.connected:
             try:
@@ -81,12 +83,12 @@ class Connection(object):
                 self.KeyboardInterrupt = True
                 print "fick interrupt i receive"
                 self.connected = False
-
+ 
     def add_packet(self, packet):
         """ receives stuff from dbus and DOO EEETT"""
         loginpacket = Packet.from_str(packet)
         self.out_queue.put(loginpacket)
-
+ 
     def send(self):
         while self.connected:
             if self.out_buffer == "":
@@ -116,16 +118,16 @@ class Connection(object):
             print "Socket är redan stängd"
         if not self.KeyboardInterrupt:
             self.reconnect()
-
+ 
 connection = Connection()
-if "--read-keys" in sys.argv or True: # ha true nu iaf 
+if "--read-keys" in sys.argv or True: # ha true nu iaf
     threading.Thread(target=read_keys).start()
-
+ 
 def ping_response(pack):
     connection.timestamp = time.time()
     connection.out_queue.put(Packet("pong"))
 network_listeners["ping"] = ping_response
-
+ 
 def login_response(pack):
     login_boolean = parseBoolean(pack.data["login"])
     connection.timestamp = time.time()
@@ -134,15 +136,15 @@ def login_response(pack):
     if not login_boolean:
         rpc.send("main", "access", bol=login_boolean)
 network_listeners["login_response"] = login_response
-
+ 
 def parseBoolean(login):
     return login == "True"
-
+ 
 def alarm_response(pack):
-    print pack.data
+    print "Hille du e king"
 network_listeners["alarm_response"] = alarm_response
     
-
+ 
 rpc.register("add_packet", connection.add_packet)
 threading.Thread(target=connection.reconnect).start()
 gtk.gdk.threads_init()
