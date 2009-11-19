@@ -21,8 +21,8 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 
-host_addr = "130.236.217.83"
-host_port = 442
+host_addr = "130.236.189.23"
+host_port = 2345
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
