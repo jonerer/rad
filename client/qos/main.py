@@ -9,7 +9,8 @@ from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
 import subprocess
-subprocess.call('ssh -f jonas@130.236.76.103 -L 442:127.0.0.1:442 -N sleep 1',shell=True)
+
+subprocess.call('ssh -f jonbe759@130.236.189.23 -L 2345:127.0.0.1:2345 -N sleep 1', shell=True)
 
 rpc.set_name("qos")
  
@@ -32,9 +33,9 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.189.23"
         #self.host_addr = "localhost"
-        self.host_port = 442
+        self.host_port = 2345
         
         self.out_queue = Queue.Queue()
         self.out_buffer = ""

@@ -54,8 +54,8 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.135"
-host_port = 442
+host_addr = "130.236.189.23"
+host_port = 2345
  
 #ska hämtas från databasen
 id_counter = 0
