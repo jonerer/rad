@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
         
-        # NOTEBOOK ITEM IDs
-        # ID 0 = Map_view
-        #    1 = Settings_view
-        #    2 = Login_view
-        #    3 = Menu_view
 
-        
 import gtk
 import hildon
 import gui_map
@@ -28,7 +22,7 @@ def create_menuButton(bild,label):
     buttonBox.pack_start(label, expand=False, fill=False, padding=5)
     button.add(buttonBox)
     button.show_all()
-    button.set_size_request(296, 60)
+    button.set_size_request(100, 60)
     return button
 
 class Page(gtk.VBox):
@@ -115,7 +109,8 @@ class MissionPage(Page):
                 "Redigera")
         deleteMissionButton = create_menuButton("static/ikoner/book_delete.png",                     "Ta bort")
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
-        backButton.connect("clicked", self.gui.switch_page, "main")
+        
+        backButton.connect("clicked", self.gui.switch_page, "menu")
         newMissionButton.connect("clicked", self.gui.switch_page, "addMission")
         self.pack_start(newMissionButton, False, False, padding=2)
         self.pack_start(editMissionButton, False, False, padding=2)
@@ -132,24 +127,30 @@ class AddMissionPage(Page):
         
         nameLabel = gtk.Label("Namn:")
         nameEntry = gtk.Entry()
-        infoView = gtk.TextView(None)
-        infoView.set_editable(True)
-        infoTextBuffer = infoView.get_buffer()
-        infoScroll = gtk.ScrolledWindow()
-        infoScroll.set_size_request(294,150)
-        infoScroll.add(infoView)
-        infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-
+        infoLabel = gtk.Label("Info:")
+        infoEntry = gtk.Entry()
+        #infoView = gtk.TextView(None)
+        #infoView.set_editable(True)
+        #infoTextBuffer = infoView.get_buffer()
+        #infoScroll = gtk.ScrolledWindow()
+        #infoScroll.set_size_request(294,150)
+        #infoScroll.add(infoView)
+        #infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+        #infoView.set_wrap_mode(gtk.WRAP_WORD)
+        
         self.pack_start(nameLabel, False, False,0)
         self.pack_start(nameEntry, False, False,0)
-        self.pack_start(infoScroll, False, False,0)
-        infoView.set_wrap_mode(gtk.WRAP_WORD)
-        newMissionButton = create_menuButton("static/ikoner/book_add.png",
-                "Lagg till")
-        backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
-        backButton.connect("clicked", self.gui.switch_page, "main")
-        newMissionButton.connect("clicked", self.gui.switch_page, "menu")
-        self.pack_start(newMissionButton, False, False, padding=2)
+        self.pack_start(infoLabel, False, False,0)
+        self.pack_start(infoEntry, False, False,0)
+        
+        saveButton = create_menuButton("static/ikoner/disk.png","Spara")
+        backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
+        backButton.connect("clicked", self.gui.switch_page, "mission")
+        
+        hbox1 = gtk.HBox()
+        hbox1.pack_start(backButton, True, True, padding=2)
+        hbox1.pack_start(saveButton, True, True, padding=2)
+        self.pack_start(hbox1, False, False, 2)
         
 
         self.show_all()
@@ -352,18 +353,14 @@ class Gui(hildon.Program):
         self.rightBook = rightBook
         
         # MISSIONBOX-----------------------
-        
-        
-        
-        
 
         hbox1.pack_start(map, expand=True, fill=True, padding=0)
         hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
         hbox2.pack_start(openButton, expand=False, fill=False, padding=0)
         hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
-        hbox2.pack_start(vbox1, expand=False, fill=True, padding=0)
+        hbox2.pack_start(vbox1, False, False, 0)
         
-        vbox1.pack_start(rightBook, expand=True, fill=True, padding=0)
+        vbox1.pack_start(rightBook, False, False, padding=0)
         
         hbox1.show()
         hbox2.show()
