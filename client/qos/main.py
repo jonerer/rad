@@ -30,9 +30,9 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.189.23"
         #self.host_addr = "localhost"
-        self.host_port = 442
+        self.host_port = 2345
         
         self.out_queue = Queue.Queue()
         self.out_buffer = ""
