@@ -105,15 +105,6 @@ class SettingsPage(Page):
         self.show_all()
         
 class MissionPage(Page):
-    def show_mainMenu(self, widget, data=None):
-        self.gui.switch_page("menu")
-
-    def show_newMission(self, widget, data=None):
-        print "INTE FIXAT ÄN. YOU DO IT! :d"
-        vMenuBox.hide()
-        vMissionBox.hide()
-        vMissionAddBox.show()
-        return
 
     def __init__(self, gui):
         super(MissionPage, self).__init__("mission", gui, homogeneous=False,
@@ -124,12 +115,42 @@ class MissionPage(Page):
                 "Redigera")
         deleteMissionButton = create_menuButton("static/ikoner/book_delete.png",                     "Ta bort")
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
-        backButton.connect("clicked", self.show_mainMenu, None)
-        newMissionButton.connect("clicked", self.show_newMission, None)
+        backButton.connect("clicked", self.gui.switch_page, "main")
+        newMissionButton.connect("clicked", self.gui.switch_page, "addMission")
         self.pack_start(newMissionButton, False, False, padding=2)
         self.pack_start(editMissionButton, False, False, padding=2)
         self.pack_start(deleteMissionButton, False, False, padding=2)
         self.pack_start(backButton, False, False, padding=2)
+
+        self.show_all()
+
+class AddMissionPage(Page):
+
+    def __init__(self, gui):
+        super(AddMissionPage, self).__init__("addMission", gui, homogeneous=False,
+                spacing=0)
+        
+        nameLabel = gtk.Label("Namn:")
+        nameEntry = gtk.Entry()
+        infoView = gtk.TextView(None)
+        infoView.set_editable(True)
+        infoTextBuffer = infoView.get_buffer()
+        infoScroll = gtk.ScrolledWindow()
+        infoScroll.set_size_request(294,150)
+        infoScroll.add(infoView)
+        infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self.pack_start(nameLabel, False, False,0)
+        self.pack_start(nameEntry, False, False,0)
+        self.pack_start(infoScroll, False, False,0)
+        infoView.set_wrap_mode(gtk.WRAP_WORD)
+        newMissionButton = create_menuButton("static/ikoner/book_add.png",
+                "Lagg till")
+        backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
+        backButton.connect("clicked", self.gui.switch_page, "main")
+        newMissionButton.connect("clicked", self.gui.switch_page, "menu")
+        self.pack_start(newMissionButton, False, False, padding=2)
+        
 
         self.show_all()
 
@@ -185,6 +206,7 @@ class Gui(hildon.Program):
         self._pages["menu"] = MenuPage(self)
         self._pages["mission"] = MissionPage(self)
         self._pages["settings"] = SettingsPage(self)
+        self._pages["addMission"] = AddMissionPage(self)
 
 
         # Möjliggör fullscreen-läge
@@ -276,12 +298,13 @@ class Gui(hildon.Program):
     #       Description: The mapview :P
     def create_map_view(self):
       
-        def openButton_press_callback(self, widget, data=None):
+        def openButton_press_callback(button, widget, data=None):
             openButton.hide()
             closeButton.show()
             vbox1.show()
-            return
-        def closeButton_press_callback(self, widget, data=None):
+            self.switch_page("menu")
+            
+        def closeButton_press_callback(button, widget, data=None):
             openButton.show()
             closeButton.hide()
             vbox1.hide()
