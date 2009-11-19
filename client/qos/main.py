@@ -8,6 +8,9 @@ import gtk
 from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
+import subprocess
+subprocess.call('ssh -f jonas@130.236.76.103 -L 442:127.0.0.1:442 -N sleep 1',shell=True)
+
 
 rpc.set_name("qos")
 

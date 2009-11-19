@@ -11,10 +11,7 @@ from shared import data, rpc
 #from shared import data
 from shared.data import get_session, create_tables
 from shared.data.defs import *
-import loggin
-import subprocess
-subprocess.call('ssh -f jonas@130.236.76.103 -L 442:127.0.0.1:442 -N sleep 1',shell=True)
-
+import logging
 if sys.version_info[1] == 3:
     print "nu glömde du skriva python2.5... trooooooliiiigt"
     sys.exit(0)
