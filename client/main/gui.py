@@ -50,7 +50,7 @@ class MenuPage(Page):
 
     def __init__(self, gui):
         super(MenuPage, self).__init__("menu", gui)
-        
+        self.size_request = (300,300)
         # CREATE BUTTONS
         objButton = create_menuButton("static/ikoner/JonasInGlases.png","Objekt")
         setButton = create_menuButton("static/ikoner/cog.png","Installningar")
@@ -77,7 +77,7 @@ class MenuPage(Page):
 class SettingsPage(Page):
     def __init__(self, gui):
         super(SettingsPage, self).__init__("settings", gui, width="full")
-
+        self.size_request = (300,300)
         button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
         button.connect("clicked", self.gui.switch_page, "menu")
         self.pack_start(button, False, False, padding=2)
@@ -87,7 +87,7 @@ class SettingsPage(Page):
 class ContactPage(Page):
     def __init__(self, gui):
         super(ContactPage, self).__init__("contact", gui, width="full")
-
+        self.size_request = (300,300)
         button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
         button.connect("clicked", self.gui.switch_page, "menu")
         self.pack_start(button, False, False, padding=2)
@@ -95,13 +95,13 @@ class ContactPage(Page):
         self.show_all()
         
 class MissionPage(Page):
+  
 
     def __init__(self, gui):
-        super(MissionPage, self).__init__("mission", gui, homogeneous=False,
-                spacing=0)
-        newMissionButton = create_menuButton("static/ikoner/book_add.png",
-                "Lagg till")
-        deleteMissionButton = create_menuButton("static/ikoner/book_delete.png",                     "Ta bort")
+        self.size_request = (300,300)
+        super(MissionPage, self).__init__("mission", gui, homogeneous=False,spacing=0)
+        newMissionButton = create_menuButton("static/ikoner/book_add.png","Lagg till")
+        deleteMissionButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
         
         backButton.connect("clicked", self.gui.switch_page, "menu")
@@ -118,7 +118,7 @@ class AddMissionPage(Page):
     def __init__(self, gui):
         super(AddMissionPage, self).__init__("addMission", gui, homogeneous=False,
                 spacing=0)
-        
+        self.size_request = (300,300)
         def dbupdate_press_callback(self, widget, data=None):   
             name = unicode(nameEntry.get_text())
             info = unicode(infoEntry.get_text())
@@ -174,7 +174,7 @@ class RemoveMissionPage(Page):
     def __init__(self, gui):
         super(RemoveMissionPage, self).__init__("removeMission", gui, homogeneous=False,
                 spacing=0)
-        
+        self.size_request = (300,300)
         nameLabel = gtk.Label("Uppdrag:")
         selectBox = gtk.Combo()
         testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Sk?ggetorp"]
@@ -202,11 +202,12 @@ class ObjectPage(Page):
     def __init__(self, gui):
         super(ObjectPage, self).__init__("object", gui, homogeneous=False,
                 spacing=0)
+        self.size_request = (300,300)
         newButton = create_menuButton("static/ikoner/JonasInGlases.png",
                 "Lagg till")
         deleteButton = create_menuButton("static/ikoner/JonasInGlases.png","Ta bort")
         backButton = create_menuButton("static/ikoner/JonasInGlases.png","Tillbaka")
-        
+
         backButton.connect("clicked", self.gui.switch_page, "menu")
         newButton.connect("clicked", self.gui.switch_page, "addObject")
         deleteButton.connect("clicked", self.gui.switch_page, "removeObject")
@@ -221,7 +222,10 @@ class AddObjectPage(Page):
     def __init__(self, gui):
         super(AddObjectPage, self).__init__("addObject", gui, homogeneous=False,
                 spacing=0)
-
+        self.size_request = (300,300)
+        hbox1 = gtk.HBox()
+        vbox1 = gtk.VBox()
+        vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
         nameEntry = gtk.Entry()
         objLabel = gtk.Label("Object:")
@@ -231,9 +235,15 @@ class AddObjectPage(Page):
         infoLabel = gtk.Label("Information:")
         infoEntry = gtk.Entry()
         xLabel = gtk.Label("X-koordinat:")
-        xEntry = gtk.Entry()
+        self.xEntry = gtk.Entry()
+        self.xEntry.set_editable(False)
         yLabel = gtk.Label("Y-koordinat:")
-        yEntry = gtk.Entry()
+        self.yEntry = gtk.Entry()
+        self.yEntry.set_editable(False)
+        self.infoView = gtk.TextView(buffer=None)
+        self.infoView.set_wrap_mode(gtk.WRAP_WORD)
+
+        self.infoView.set_size_request(300,200)
         #infoView = gtk.TextView(None)
         #infoView.set_editable(True)
         #infoTextBuffer = infoView.get_buffer()
@@ -243,33 +253,52 @@ class AddObjectPage(Page):
         #infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
         #infoView.set_wrap_mode(gtk.WRAP_WORD)
         
-        self.pack_start(nameLabel, False, False,0)
-        self.pack_start(nameEntry, False, False,0)
-        self.pack_start(objLabel, False, False,0)
-        self.pack_start(objEntry, False, False,0)
-        self.pack_start(typeLabel, False, False,0)
-        self.pack_start(typeEntry, False, False,0)
-        self.pack_start(infoLabel, False, False,0)
-        self.pack_start(infoEntry, False, False,0)
-        self.pack_start(xLabel, False, False,0)
-        self.pack_start(xEntry, False, False,0)
-        self.pack_start(yLabel, False, False,0)
-        self.pack_start(yEntry, False, False,0)
+        vbox1.pack_start(nameLabel, False, False,0)
+        vbox1.pack_start(nameEntry, False, False,0)
+        vbox1.pack_start(objLabel, False, False,0)
+        vbox1.pack_start(objEntry, False, False,0)
+        vbox1.pack_start(typeLabel, False, False,0)
+        vbox1.pack_start(typeEntry, False, False,0)
+        vbox1.pack_start(xLabel, False, False,0)
+        vbox1.pack_start(self.xEntry, False, False,0)
+        vbox1.pack_start(yLabel, False, False,0)
+        vbox1.pack_start(self.yEntry, False, False,0)
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
+        showDetails = create_menuButton("static/ikoner/arrow_left.png","Visa Detaljer")
+        hideDetails = create_menuButton("static/ikoner/arrow_right.png","Göm Detaljer")
         backButton.connect("clicked", self.gui.switch_page, "object")
 
-        #HÃ„R SKA ALLT MAN TA IN OBJECTS
+        showDetails.connect("clicked", self.details, "show")
+        hideDetails.connect("clicked", self.details, "hide")
         
-        hbox1 = gtk.HBox()
-        hbox1.pack_start(backButton, True, True, padding=2)
-        hbox1.pack_start(saveButton, True, True, padding=2)
-        self.pack_start(hbox1, False, False, 2)
+        hbox2 = gtk.HBox()
+        hbox2.pack_start(backButton, True, True, padding=2)
+        hbox2.pack_start(saveButton, True, True, padding=2)
         
-
+        vbox1.pack_start(hbox2, False, False, 2)
+        vbox1.pack_start(showDetails,False,False,2)
+        hbox1.pack_start(vbox1,False,False,2)
+        vbox2.pack_start(self.infoView,False,False,0)
+        hbox1.pack_start(vbox2,False,False,0)
+        self.pack_start(hbox1,False,False,0)
         self.show_all()
+        self.infoView.hide()
+    
+    def map_dblclick(self, coordx, coordy):
+        print "Jon bajsar!"
+        self.xEntry.set_text(str(coordx))
+        self.yEntry.set_text(str(coordy))
 
+        
+    def details(self, button, state, widget=None):
+        if state == "show":
+            self.gui.rightBook.set_size_request(600,300)
+            self.infoView.show()
+        
+    
+    
 class Gui(hildon.Program):
     _map = None
     _map_change_zoom = None
