@@ -125,7 +125,7 @@ class AddMissionPage(Page):
             yEntry = unicode(yEntry.get_text())
             mission_save = str(packet.Packet("mission_save", name=name,\
                                 info=info, xEntry=xEntry, yEntry=yEntry))
-            print rpc.send("qos", "mission_save", packet=mission_save)
+            print rpc.send("qos", "add_packet", packet=mission_save)
         
         nameLabel = gtk.Label("Namn:")
         nameEntry = gtk.Entry()

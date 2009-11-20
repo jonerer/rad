@@ -8,7 +8,7 @@ from sqlalchemy.orm import relation, backref
 Base = declarative_base()
 
 # lägg allt som ska synas utåt här: (dessa får man från from shared.data.defs import *
-__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm', 'Poi']
+__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm', 'POI', 'POIType']
 
 class UnitType(Base):
     __tablename__ = "unit_types"
@@ -40,7 +40,7 @@ class POIType(Base):
         self.name = name
         self.image = image
 
-class Poi(Base):
+class POI(Base):
     __tablename__ = "poi"
     coordx = Column(Float)
     coordy = Column(Float)
@@ -51,6 +51,7 @@ class Poi(Base):
     timestamp = Column(DateTime)
     type_id = Column(Integer, ForeignKey("poi_types.id"))
     type = relation(POIType, backref=backref("pois", order_by=id)) 
+
     
     def __init__(self, coordx, coordy, id, name, sub_type, timestamp):
         self.coordx = coordx

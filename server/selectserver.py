@@ -36,6 +36,9 @@ if "exempeldata" in sys.argv and len(units) == 0:
     session.add(User(u"resman", u"superprogrammer"))
     session.add(User(u"Filho", u"jonas"))
     session.commit()
+    #skapar en POI-type
+    session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
+    session.commit()
 else:
     # kolla att man har nått i databasen
     num_types = len(units)
@@ -64,7 +67,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.135"
+host_addr = "130.236.76.103"
 host_port = 2345
  
 #ska hämtas från databasen
@@ -93,7 +96,7 @@ def mission(connection, pack):
     coordy = loginfo["yEntry"]
     
 
-clientrequests["mission_save"] = mission_save
+clientrequests["mission_save"] = mission
 
 def login(connection, pack):
     connection.timestamp = time.time()
@@ -136,6 +139,19 @@ def poi(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
     print "hej du har fått en poi"
+    #lägg i databas
+    id = pack.data["id"]
+    name = pack.data["name"]
+    timestamp = pack.data["timestamp"]
+    sub_type = pack.data["sub_type"]
+    coordx = pack.data["coordx"]
+    coordy = pack.data["coordy"]
+    session.bind
+    session.query(POI).all()
+    loginfo = pack.data
+    session.add(POI(coordx, coordy, id, name, sub_type, timestamp))
+    session.commit()    
+    
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data
     for connection in connections.values():

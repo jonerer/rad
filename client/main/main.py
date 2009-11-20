@@ -49,6 +49,9 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(Unit(u"go", c, 15.5629, 58.4093))
     session.add(Unit(u"III", d, 15.5829, 58.4093, True))
     session.commit()
+    #skapar en POI-type
+    session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
+    session.commit()
 else:
     # kolla att man har nått i databasen
     num_types = len(types)
