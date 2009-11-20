@@ -58,11 +58,13 @@ class MenuPage(Page):
         misButton.connect("clicked", self.gui.switch_page, "mission")
         setButton.connect("clicked", self.gui.switch_page, "settings")
         conButton.connect("clicked", self.gui.switch_page, "contact")
+        jonasButton.connect("clicked", self.hille_e_tjock)
 
         vMenuBox = gtk.VBox(False,0)
         vMenuBox.pack_start(misButton, False, True, padding=2)
         vMenuBox.pack_start(conButton, False, True, padding=2)
         vMenuBox.pack_start(setButton, False, True, padding=2)
+        vMenuBox.pack_start(jonasButton, False, True, padding=2)
         self.pack_start(vMenuBox, False, False, padding=2)
         
         self.show()
@@ -130,6 +132,7 @@ class AddMissionPage(Page):
         xEntry = gtk.Entry()
         yLabel = gtk.Label("Y-koordinat:")
         yEntry = gtk.Entry()
+        okButton = gtk.Button("ok")
         #infoView = gtk.TextView(None)
         #infoView.set_editable(True)
         #infoTextBuffer = infoView.get_buffer()
@@ -147,6 +150,7 @@ class AddMissionPage(Page):
         self.pack_start(xEntry, False, False,0)
         self.pack_start(yLabel, False, False,0)
         self.pack_start(yEntry, False, False,0)
+        self.pack_start(okButton, False, False,0)
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
@@ -169,9 +173,9 @@ class RemoveMissionPage(Page):
         
         nameLabel = gtk.Label("Uppdrag:")
         selectBox = gtk.Combo()
-        testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Skäggetorp"]
+        testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Sk?ggetorp"]
         selectBox.set_popdown_strings(testList)
-        # TESTLIST SKA ERSÄTTAS MED DATABAS-DATA
+        # TESTLIST SKA ERS?TTAS MED DATABAS-DATA
 
         
         self.pack_start(nameLabel, False, False,0)
@@ -274,13 +278,10 @@ class Gui(hildon.Program):
         self.rightBook.set_size_request(*self._pages[page_name].size_request)
         self.rightBook.set_current_page(num)
 
-<<<<<<< Updated upstream:client/main/gui.py
     def map_dblclick(self, coordx, coordy):
         active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
         active_page.map_dblclick(coordx, coordy)
 
-
->>>>>>> Stashed changes:client/main/gui.py
     def create_map_view(self):
 
         def openButton_press_callback(button, widget, data=None):
