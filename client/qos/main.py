@@ -9,6 +9,8 @@ from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
 import subprocess
+from shared.data.serverdb import get_session, create_tables
+from shared.data.serverdb.defs import *
 
 #subprocess.call('ssh -f jonbe759@130.236.189.23 -L 2345:127.0.0.1:2345 -N sleep 1', shell=True)
 
@@ -33,7 +35,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.76.103"
         #self.host_addr = "localhost"
         self.host_port = 2345
         
@@ -149,9 +151,19 @@ network_listeners["alarm_response"] = alarm_response
 def poi_response(pack):
     print "Hille du e king på poi_response"
     connection.timestamp = time.time()
+    id = pack.data["id"]
+    name = pack.data["name"]
+    timestamp = pack.data["timestamp"]
+    sub_type = pack.data["sub_type"]
+    coordx = pack.data["coordx"]
+    coordy = pack.data["coordy"]
+    session.bind
+    session.query(Poi).all()
+    loginfo = pack.data
+    session.add(Poi(coordx, coordy, id, name, sub_type, timestamp))
+    session.commit()
 network_listeners["poi_response"] = poi_response
     
-rpc.register("mission_save",connection.add_packet) 
 rpc.register("add_packet", connection.add_packet)
 threading.Thread(target=connection.reconnect).start()
 gtk.gdk.threads_init()
