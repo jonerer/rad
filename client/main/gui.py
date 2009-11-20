@@ -42,7 +42,10 @@ class MenuPage(Page):
 
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
-        poi = str(packet.Packet("poi",id = "", sub_type = "skogsbrand", name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
+        for poi in session.query(POI).filter(POI.name == u"brand"):
+            print poi.name
+            a = poi
+        poi = str(packet.Packet("poi",id = "", sub_type = poi, name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
         rpc.send("qos", "add_packet", packet=poi)
         #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)

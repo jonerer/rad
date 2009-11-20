@@ -58,7 +58,7 @@ class POI(Base):
         self.coordy = coordy
         self.id = id
         self.name = name
-        self.sub_type = sub_type
+        self.type = sub_type
         self.timestamp = timestamp
 
 class Alarm(Base):
