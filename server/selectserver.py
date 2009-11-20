@@ -142,7 +142,7 @@ def poi(connection, pack):
     #lägg i databas
     id = pack.data["id"]
     name = pack.data["name"]
-    timestamp = pack.data["timestamp"]
+    timestamp = pack.timestamp
     sub_type = pack.data["sub_type"]
     coordx = pack.data["coordx"]
     coordy = pack.data["coordy"]

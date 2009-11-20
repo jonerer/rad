@@ -42,10 +42,10 @@ if __name__ == "__main__":
     a = Packet("login", username="lolboll", password="boll_lol")
     print str(a)
     #print a.timestamp
-    assert str(a) == str(Packet.from_net(str(a)))
+    assert str(a) == str(Packet.from_str(str(a)))
     #print b
     c = Packet("ping") #works with None-data?
-    assert str(c) == str(Packet.from_net(str(c)))
+    assert str(c) == str(Packet.from_str(str(c)))
     #print Packet.from_net(str(c)).data
     print "shit works!"
 

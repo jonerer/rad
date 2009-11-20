@@ -50,7 +50,7 @@ class POI(Base):
     sub_type = Column(Unicode) 
     timestamp = Column(DateTime)
     type_id = Column(Integer, ForeignKey("poi_types.id"))
-    type = relation(POIType, backref=backref("pois", order_by=id)) 
+    type = relation(POIType, backref=backref("poi", order_by=id)) 
 
     
     def __init__(self, coordx, coordy, id, name, sub_type, timestamp):

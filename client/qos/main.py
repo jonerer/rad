@@ -9,8 +9,8 @@ from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
 import subprocess
-from shared.data.serverdb import get_session, create_tables
-from shared.data.serverdb.defs import *
+from shared.data import get_session, create_tables
+from shared.data.defs import *
 
 #subprocess.call('ssh -f jonbe759@130.236.189.23 -L 2345:127.0.0.1:2345 -N sleep 1', shell=True)
 
@@ -30,7 +30,7 @@ def read_keys():
  
  
 class Connection(object):
- 
+
     #The time the client need to hear from
     
     def __init__(self):
@@ -150,17 +150,19 @@ network_listeners["alarm_response"] = alarm_response
 
 def poi_response(pack):
     print "Hille du e king på poi_response"
+    session = get_session()
     connection.timestamp = time.time()
+    loginfo = pack.data
     id = pack.data["id"]
     name = pack.data["name"]
-    timestamp = pack.data["timestamp"]
+    timestamp = pack.timestamp
     sub_type = pack.data["sub_type"]
     coordx = pack.data["coordx"]
     coordy = pack.data["coordy"]
-    session.bind
-    session.query(Poi).all()
-    loginfo = pack.data
-    session.add(Poi(coordx, coordy, id, name, sub_type, timestamp))
+    print id
+    print coordx
+    print timestamp
+    print session.add(POI(coordx, coordy, id, name, sub_type, timestamp))
     session.commit()
 network_listeners["poi_response"] = poi_response
     

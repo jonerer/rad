@@ -33,25 +33,26 @@ types = session.query(UnitType).all()
 if "exempeldata" in sys.argv and len(types) == 0:
     #Om du behöver fylla på databasen igen gör dessa nedanför
     #skapar olika unittypes
-    a=UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
-    b=UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
-    c=UnitType(u"sjukhus1", "static/ikoner/sjukhus.png")
-    d=UnitType(u"jonas","static/ikoner/JonasInGlases.png")
+    a=POIType(u"Ambulans1", "static/ikoner/ambulans.png")
+    b=POIType(u"Brandbild1", "static/ikoner/brandbil.png")
+    c=POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
+    d=POIType(u"jonas","static/ikoner/JonasInGlases.png")
+    e=session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
     session.add(b)
     session.add(c)
     session.add(d)
     session.add(a)
+    session.add(e)
     session.commit()
     #skapar användarna
-    session.add(Unit(u"hej", a, 15.57796, 58.40479))
-    session.add(Unit(u"ho", a, 15.57806, 58.40579))
-    session.add(Unit(u"lets", b, 15.5729, 58.40193))
-    session.add(Unit(u"go", c, 15.5629, 58.4093))
-    session.add(Unit(u"III", d, 15.5829, 58.4093, True))
+    session.add(POI(u"hej", a, 15.57796, 58.40479))
+    session.add(POI(u"ho", a, 15.57806, 58.40579))
+    session.add(POI(u"lets", b, 15.5729, 58.40193))
+    session.add(POI(u"go", c, 15.5629, 58.4093))
+    session.add(POI(u"III", d, 15.5829, 58.4093, True))
     session.commit()
     #skapar en POI-type
-    session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
-    session.commit()
+
 else:
     # kolla att man har nått i databasen
     num_types = len(types)
@@ -63,10 +64,10 @@ else:
                 "databasen. ta bort den först för att tömma.")
 
 #Ritar ut alla objekt i databasen
-for units in session.query(Unit).all():
-    map.add_object(units.name, data_storage.MapObject(
-        {"longitude":units.coordx,"latitude":units.coordy},
-        units.type.image))
+for poi in session.query(POI).all():
+    map.add_object(poi.name, data_storage.MapObject(
+        {"longitude":poi.coordx,"latitude":poi.coordy},
+        poi.type.image))
 
 # Skapar grafiska interfacet.
 print "Skapar programmets GUI"

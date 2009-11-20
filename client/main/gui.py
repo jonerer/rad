@@ -6,6 +6,7 @@ import time
 from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc, packet
+from datetime import datetime
 
 def create_menuButton(bild,label):
     buttonBox = gtk.HBox(False, spacing=1)
@@ -41,7 +42,7 @@ class MenuPage(Page):
 
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
-        poi = str(packet.Packet("poi",id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), coordx = "15.57796", coordy = "58.40479"))
+        poi = str(packet.Packet("poi",id = "", sub_type = "skogsbrand", name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
         rpc.send("qos", "add_packet", packet=poi)
         #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
