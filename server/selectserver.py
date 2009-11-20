@@ -14,7 +14,6 @@ create_tables()
 units = session.query(Unit).all()
 if "exempeldata" in sys.argv and len(units) == 0:
     #Om du behöver fylla på databasen igen gör dessa nedanför
-    #skapar olika unittypes
     a=UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
     b=UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
     c=UnitType(u"sjukhus1", "static/ikoner/sjukhus.png")
@@ -81,7 +80,21 @@ def pong(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
 clientrequests["pong"] = pong
- 
+
+def mission(connection, pack):
+    connection.timestamp = time.time()
+    connection.timepinged = 0
+    session.bind
+    session.query(Mission).all()
+    loginfo = pack.data
+    name = loginfo["name"]
+    info = loginfo["info"]
+    coordx = loginfo["xEntry"]
+    coordy = loginfo["yEntry"]
+    
+
+clientrequests["mission_save"] = mission_save
+
 def login(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0

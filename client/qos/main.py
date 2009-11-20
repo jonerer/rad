@@ -149,7 +149,7 @@ def poi_response(pack):
     print "Hille du e king"
 network_listeners["poi_response"] = poi_response
     
- 
+rpc.register("mission_save",connection.add_packet) 
 rpc.register("add_packet", connection.add_packet)
 threading.Thread(target=connection.reconnect).start()
 gtk.gdk.threads_init()
