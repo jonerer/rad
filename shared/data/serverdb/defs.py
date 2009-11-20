@@ -76,7 +76,7 @@ class User(Base):
 #Jonas Leker
 #SKA HA EN USER
 class Mission(Base):
-    __tablename__ = "mission"
+    __tablename__ = "missions"
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
     coordx = Column(Float)

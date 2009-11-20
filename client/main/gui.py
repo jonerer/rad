@@ -113,6 +113,15 @@ class AddMissionPage(Page):
         super(AddMissionPage, self).__init__("addMission", gui, homogeneous=False,
                 spacing=0)
         
+        def dbupdate_press_callback(self, widget, data=None):   
+            name = unicode(nameEntry.get_text())
+            info = unicode(infoEntry.get_text())
+            xEntry = unicode(xEntry.get_text())
+            yEntry = unicode(yEntry.get_text())
+            mission_save = str(packet.Packet("mission_save", name=name,\
+                                info=info, xEntry=xEntry, yEntry=yEntry))
+            print rpc.send("qos", "mission_save", packet=mission_save)
+        
         nameLabel = gtk.Label("Namn:")
         nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
@@ -142,6 +151,7 @@ class AddMissionPage(Page):
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         backButton.connect("clicked", self.gui.switch_page, "mission")
+        okButton.connect("clicked", dbupdate_press_callback, None)
         
         hbox1 = gtk.HBox()
         hbox1.pack_start(backButton, True, True, padding=2)
@@ -347,10 +357,11 @@ class Gui(hildon.Program):
 
     def create_login_view(self):
         def dbcheck_press_callback(self, widget, data=None):   
-            session = get_session()
-            create_tables()        
-            session.bind
-            session.query(User).all()
+            #Detta behövs inte här, men kanske inte fungerar på andra stället
+            #session = get_session()
+            #create_tables()        
+            #session.bind
+            #session.query(User).all()
             user = unicode(userText.get_text())
             pw = unicode(passText.get_text())
             login = str(packet.Packet("login", username=user, password=pw))
