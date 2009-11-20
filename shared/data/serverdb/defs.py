@@ -8,7 +8,7 @@ from sqlalchemy.orm import relation, backref
 Base = declarative_base()
 
 # lägg allt som ska synas utåt här: (dessa får man från from shared.data.defs import *
-__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm']
+__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm', 'Poi']
 
 class UnitType(Base):
     __tablename__ = "unit_types"
@@ -24,6 +24,41 @@ class AlarmType(Base):
     __tablename__ = "alarm_types"
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
+    image = Column(String)
+
+    def __init__(self, name, image):
+        self.name = name
+        self.image = image
+
+class POIType(Base):
+    __tablename__ = "poi_types"
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    image = Column(String)
+
+    def __init__(self, name, image):
+        self.name = name
+        self.image = image
+
+class Poi(Base):
+    __tablename__ = "poi"
+    coordx = Column(Float)
+    coordy = Column(Float)
+    db_id = Column(Integer, primary_key=True)
+    id = Column(Integer)
+    name = Column(Unicode)
+    sub_type = Column(Unicode) 
+    timestamp = Column(DateTime)
+    type_id = Column(Integer, ForeignKey("poi_types.id"))
+    type = relation(POIType, backref=backref("pois", order_by=id)) 
+    
+    def __init__(self, coordx, coordy, id, name, sub_type, timestamp):
+        self.coordx = coordx
+        self.coordy = coordy
+        self.id = id
+        self.name = name
+        self.sub_type = sub_type
+        self.timestamp = timestamp
 
 class Alarm(Base):
     __tablename__ = "alarm"
@@ -35,6 +70,14 @@ class Alarm(Base):
     coordx = Column(Float)
     coordy = Column(Float)
     timestamp = Column(DateTime)
+    
+    def __init__(self, coordx, coordy, id, name, sub_type, timestamp):
+        self.coordx = coordx
+        self.coordy = coordy
+        self.id = id
+        self.name = name
+        self.sub_type = sub_type
+        self.timestamp = timestamp
 
 
 class Unit(Base):
@@ -76,7 +119,7 @@ class User(Base):
 #Jonas Leker
 #SKA HA EN USER
 class Mission(Base):
-    __tablename__ = "missions"
+    __tablename__ = "mission"
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
     coordx = Column(Float)
@@ -96,4 +139,3 @@ class Document(Base):
     
     def __repr__(self):
         return "Entity '%s' of type %s" % (self.name, self.type)    
-
