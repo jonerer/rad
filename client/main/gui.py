@@ -201,6 +201,9 @@ class RemoveMissionPage(Page):
         self.show_all()
 
 class ObjectPage(Page):
+    def checkNew(self, button, widget=None):
+        self.gui._pages["addObject"].details(None, None, "show")
+        self.gui.switch_page("addObject")
 
     def __init__(self, gui):
         super(ObjectPage, self).__init__("object", gui, homogeneous=False,
@@ -212,7 +215,7 @@ class ObjectPage(Page):
         backButton = create_menuButton("static/ikoner/JonasInGlases.png","Tillbaka")
 
         backButton.connect("clicked", self.gui.switch_page, "menu")
-        newButton.connect("clicked", self.gui.switch_page, "addObject")
+        newButton.connect("clicked", self.checkNew, None)
         deleteButton.connect("clicked", self.gui.switch_page, "removeObject")
         self.pack_start(newButton, False, False, padding=2)
         self.pack_start(deleteButton, False, False, padding=2)
@@ -228,24 +231,23 @@ class AddObjectPage(Page):
         self.size_request = (300,300)
         hbox1 = gtk.HBox()
         vbox1 = gtk.VBox()
-        vbox2 = gtk.VBox()
+        self.vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
         nameEntry = gtk.Entry()
         objLabel = gtk.Label("Object:")
         objEntry = gtk.Entry()
         typeLabel = gtk.Label("Typ:")
         typeEntry = gtk.Entry()
-        infoLabel = gtk.Label("Information:")
-        infoEntry = gtk.Entry()
         xLabel = gtk.Label("X-koordinat:")
         self.xEntry = gtk.Entry()
         self.xEntry.set_editable(False)
         yLabel = gtk.Label("Y-koordinat:")
         self.yEntry = gtk.Entry()
         self.yEntry.set_editable(False)
+        
         self.infoView = gtk.TextView(buffer=None)
         self.infoView.set_wrap_mode(gtk.WRAP_WORD)
-
+        infoLabel = gtk.Label("Info:")
         self.infoView.set_size_request(300,200)
         #infoView = gtk.TextView(None)
         #infoView.set_editable(True)
@@ -269,25 +271,30 @@ class AddObjectPage(Page):
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
-        showDetails = create_menuButton("static/ikoner/arrow_left.png","Visa Detaljer")
-        hideDetails = create_menuButton("static/ikoner/arrow_right.png","G�m Detaljer")
+
+        self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
+        self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","Goem Detaljer")
+
         backButton.connect("clicked", self.gui.switch_page, "object")
 
-        showDetails.connect("clicked", self.details, "show")
-        hideDetails.connect("clicked", self.details, "hide")
+        self.showDetails.connect("clicked", self.details, "show")
+        self.hideDetails.connect("clicked", self.details, "hide")
         
         hbox2 = gtk.HBox()
         hbox2.pack_start(backButton, True, True, padding=2)
         hbox2.pack_start(saveButton, True, True, padding=2)
         
         vbox1.pack_start(hbox2, False, False, 2)
-        vbox1.pack_start(showDetails,False,False,2)
-        hbox1.pack_start(vbox1,False,False,2)
-        vbox2.pack_start(self.infoView,False,False,0)
-        hbox1.pack_start(vbox2,False,False,0)
+        vbox1.pack_start(self.showDetails,False,False,2)
+        vbox1.pack_start(self.hideDetails,False,False,2)
+        hbox1.pack_start(vbox1,True,True,2)
+        self.vbox2.pack_start(infoLabel,False,False,0)
+        self.vbox2.pack_start(self.infoView,False,False,0)
+        hbox1.pack_start(self.vbox2,False,False,0)
         self.pack_start(hbox1,False,False,0)
         self.show_all()
-        self.infoView.hide()
+        self.vbox2.hide()
+        self.hideDetails.hide()
     
     def map_dblclick(self, coordx, coordy):
         print "Jon bajsar!"
@@ -298,10 +305,15 @@ class AddObjectPage(Page):
     def details(self, button, state, widget=None):
         if state == "show":
             self.gui.rightBook.set_size_request(600,300)
-            self.infoView.show()
-        
-    
-    
+            self.vbox2.show()
+            self.showDetails.hide()
+            self.hideDetails.show()
+        elif state == "hide":
+            self.gui.rightBook.set_size_request(300,300)
+            self.vbox2.hide()
+            self.showDetails.show()
+            self.hideDetails()
+
 class Gui(hildon.Program):
     _map = None
     _map_change_zoom = None
