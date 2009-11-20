@@ -117,6 +117,10 @@ def alarm(connection, pack):
     for connection in connections.values():
         connection.out_queue.put(alarm_response)
 clientrequests["alarm"] = alarm
+
+def poi(connection, pack):
+    print "hej du har fått en poi"
+clientrequests["poi"] = alarm
  
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))

@@ -41,8 +41,10 @@ class MenuPage(Page):
 
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
-        alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
-        print rpc.send("qos", "add_packet", packet=alarm)
+        poi = str(packet.Packet("poi",id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), coordx = "15.57796", coordy = "58.40479"))
+        rpc.send("qos", "add_packet", packet=poi)
+        #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
+        #print rpc.send("qos", "add_packet", packet=alarm)
 
 
     def __init__(self, gui):
