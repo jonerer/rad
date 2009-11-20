@@ -51,22 +51,25 @@ class MenuPage(Page):
         super(MenuPage, self).__init__("menu", gui)
         
         # CREATE BUTTONS
+        objButton = create_menuButton("static/ikoner/JonasInGlases.png","Objekt")
         setButton = create_menuButton("static/ikoner/cog.png","Installningar")
         conButton = create_menuButton("static/ikoner/book_addresses.png","Kontakter")
         misButton = create_menuButton("static/ikoner/book.png","Uppdrag")
         jonasButton = create_menuButton("static/ikoner/JonasInGlases.png","Jonas")
+        objButton.connect("clicked", self.gui.switch_page, "object")
         misButton.connect("clicked", self.gui.switch_page, "mission")
         setButton.connect("clicked", self.gui.switch_page, "settings")
         conButton.connect("clicked", self.gui.switch_page, "contact")
         jonasButton.connect("clicked", self.hille_e_tjock)
 
         vMenuBox = gtk.VBox(False,0)
+        vMenuBox.pack_start(objButton, False, True, padding=2)
         vMenuBox.pack_start(misButton, False, True, padding=2)
         vMenuBox.pack_start(conButton, False, True, padding=2)
         vMenuBox.pack_start(setButton, False, True, padding=2)
         vMenuBox.pack_start(jonasButton, False, True, padding=2)
         self.pack_start(vMenuBox, False, False, padding=2)
-        
+
         self.show()
         vMenuBox.show()
 
@@ -193,6 +196,77 @@ class RemoveMissionPage(Page):
 
         self.show_all()
 
+class ObjectPage(Page):
+
+    def __init__(self, gui):
+        super(ObjectPage, self).__init__("object", gui, homogeneous=False,
+                spacing=0)
+        newButton = create_menuButton("static/ikoner/JonasInGlases.png",
+                "Lagg till")
+        deleteButton = create_menuButton("static/ikoner/JonasInGlases.png","Ta bort")
+        backButton = create_menuButton("static/ikoner/JonasInGlases.png","Tillbaka")
+        
+        backButton.connect("clicked", self.gui.switch_page, "menu")
+        newButton.connect("clicked", self.gui.switch_page, "addObject")
+        deleteButton.connect("clicked", self.gui.switch_page, "removeObject")
+        self.pack_start(newButton, False, False, padding=2)
+        self.pack_start(deleteButton, False, False, padding=2)
+        self.pack_start(backButton, False, False, padding=2)
+
+        self.show_all()
+        
+class AddObjectPage(Page):
+
+    def __init__(self, gui):
+        super(AddObjectPage, self).__init__("addObject", gui, homogeneous=False,
+                spacing=0)
+
+        nameLabel = gtk.Label("Namn:")
+        nameEntry = gtk.Entry()
+        objLabel = gtk.Label("Object:")
+        objEntry = gtk.Entry()
+        typeLabel = gtk.Label("Typ:")
+        typeEntry = gtk.Entry()
+        infoLabel = gtk.Label("Information:")
+        infoEntry = gtk.Entry()
+        xLabel = gtk.Label("X-koordinat:")
+        xEntry = gtk.Entry()
+        yLabel = gtk.Label("Y-koordinat:")
+        yEntry = gtk.Entry()
+        #infoView = gtk.TextView(None)
+        #infoView.set_editable(True)
+        #infoTextBuffer = infoView.get_buffer()
+        #infoScroll = gtk.ScrolledWindow()
+        #infoScroll.set_size_request(294,150)
+        #infoScroll.add(infoView)
+        #infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+        #infoView.set_wrap_mode(gtk.WRAP_WORD)
+        
+        self.pack_start(nameLabel, False, False,0)
+        self.pack_start(nameEntry, False, False,0)
+        self.pack_start(objLabel, False, False,0)
+        self.pack_start(objEntry, False, False,0)
+        self.pack_start(typeLabel, False, False,0)
+        self.pack_start(typeEntry, False, False,0)
+        self.pack_start(infoLabel, False, False,0)
+        self.pack_start(infoEntry, False, False,0)
+        self.pack_start(xLabel, False, False,0)
+        self.pack_start(xEntry, False, False,0)
+        self.pack_start(yLabel, False, False,0)
+        self.pack_start(yEntry, False, False,0)
+        
+        saveButton = create_menuButton("static/ikoner/disk.png","Spara")
+        backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
+        backButton.connect("clicked", self.gui.switch_page, "object")
+        
+        hbox1 = gtk.HBox()
+        hbox1.pack_start(backButton, True, True, padding=2)
+        hbox1.pack_start(saveButton, True, True, padding=2)
+        self.pack_start(hbox1, False, False, 2)
+        
+
+        self.show_all()
+
 class Gui(hildon.Program):
     _map = None
     _map_change_zoom = None
@@ -248,7 +322,8 @@ class Gui(hildon.Program):
         self._pages["contact"] = SettingsPage(self)
         self._pages["addMission"] = AddMissionPage(self)
         self._pages["removeMission"] = RemoveMissionPage(self)
-
+        self._pages["object"] = ObjectPage(self)
+        self._pages["addObject"] = AddObjectPage(self)
 
         # Möjliggör fullscreen-läge
         self.window.connect("key-press-event", self.on_key_press)
