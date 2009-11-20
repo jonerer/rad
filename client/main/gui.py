@@ -42,11 +42,11 @@ class MenuPage(Page):
 
     def hille_e_tjock(self, widget, data=None):
         print "tjockade pÃ¥ hille"
-        for poi in session.query(POI).filter(POI.name == u"brand"):
-            print poi.name
-            a = poi
-        poi = str(packet.Packet("poi",id = "", sub_type = poi, name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
-        rpc.send("qos", "add_packet", packet=poi)
+        session = get_session()
+        type = session.query(POIType).get(POIType.name == u"brand")
+        #a= session.query(POI).filter(POI.name == u"brand")
+        poiPacket = str(packet.Packet("poi",id = "", sub_type = a, name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
+        rpc.send("qos", "add_packet", packet=poiPacket)
         #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
@@ -270,7 +270,7 @@ class AddObjectPage(Page):
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         showDetails = create_menuButton("static/ikoner/arrow_left.png","Visa Detaljer")
-        hideDetails = create_menuButton("static/ikoner/arrow_right.png","Göm Detaljer")
+        hideDetails = create_menuButton("static/ikoner/arrow_right.png","Gï¿½m Detaljer")
         backButton.connect("clicked", self.gui.switch_page, "object")
 
         showDetails.connect("clicked", self.details, "show")
