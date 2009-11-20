@@ -65,7 +65,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.189.23"
+host_addr = "130.236.76.135"
 host_port = 2345
  
 #ska hämtas från databasen
@@ -120,7 +120,11 @@ clientrequests["alarm"] = alarm
 
 def poi(connection, pack):
     print "hej du har fått en poi"
-clientrequests["poi"] = alarm
+    poi_response = packet.Packet("poi_response")
+    poi_response.data = pack.data
+    for connection in connections.values():
+        connection.out_queue.put(poi_response)
+clientrequests["poi"] = poi 
  
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))

@@ -10,7 +10,6 @@ Base = declarative_base()
 # lägg allt som ska synas utåt här: (dessa får man från from shared.data.defs import *
 __all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm', 'Poi']
 
-
 class UnitType(Base):
     __tablename__ = "unit_types"
     id = Column(Integer, primary_key=True)
@@ -31,6 +30,16 @@ class AlarmType(Base):
         self.name = name
         self.image = image
 
+class POIType(Base):
+    __tablename__ = "poi_types"
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    image = Column(String)
+
+    def __init__(self, name, image):
+        self.name = name
+        self.image = image
+
 class Poi(Base):
     __tablename__ = "poi"
     coordx = Column(Float)
@@ -38,14 +47,10 @@ class Poi(Base):
     db_id = Column(Integer, primary_key=True)
     id = Column(Integer)
     name = Column(Unicode)
-    #other =
-    #sub_type = 
-    #timestamp = Column(DateTime)
-    #type = relation(AlarmType, backref=backref("poi", order_by=id)) 
-
-    def __init__(self, name):
-        self.name = name
-        self.image 
+    sub_type = Column(Unicode) 
+    timestamp = Column(DateTime)
+    type_id = Column(Integer, ForeignKey("poi_types.id"))
+    type = relation(POIType, backref=backref("pois", order_by=id)) 
 
 class Alarm(Base):
     __tablename__ = "alarm"
