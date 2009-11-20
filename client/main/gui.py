@@ -259,6 +259,8 @@ class AddObjectPage(Page):
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         backButton.connect("clicked", self.gui.switch_page, "object")
+
+        #HÄR SKA ALLT MAN TA IN OBJECTS
         
         hbox1 = gtk.HBox()
         hbox1.pack_start(backButton, True, True, padding=2)

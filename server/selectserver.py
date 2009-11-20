@@ -67,7 +67,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.103"
+host_addr = "130.236.76.135"
 host_port = 2345
  
 #ska hämtas från databasen
@@ -150,8 +150,9 @@ def poi(connection, pack):
     session.query(POI).all()
     loginfo = pack.data
     session.add(POI(coordx, coordy, id, name, sub_type, timestamp))
-    session.commit()    
-    
+    session.commit()
+    for points in session.query(POI).all():
+        print points
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data
     for connection in connections.values():
