@@ -112,6 +112,7 @@ def login(connection, pack):
     connection.out_queue.put(login_response)
 clientrequests["login"] = login
  
+#DETTA ÄR HELT JÄVLA KASST! GRUPP 2 SUGER DASE
 def alarm(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
@@ -132,13 +133,15 @@ def alarm(connection, pack):
 clientrequests["alarm"] = alarm
 
 def poi(connection, pack):
+    connection.timestamp = time.time()
+    connection.timepinged = 0
     print "hej du har fått en poi"
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data
     for connection in connections.values():
         connection.out_queue.put(poi_response)
-clientrequests["poi"] = poi 
- 
+clientrequests["poi"] = poi
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
 s.bind((host_addr, host_port))

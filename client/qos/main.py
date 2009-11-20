@@ -143,10 +143,12 @@ def parseBoolean(login):
  
 def alarm_response(pack):
     print "Hille du e king"
+    connection.timestamp = time.time()
 network_listeners["alarm_response"] = alarm_response
 
 def poi_response(pack):
-    print "Hille du e king"
+    print "Hille du e king på poi_response"
+    connection.timestamp = time.time()
 network_listeners["poi_response"] = poi_response
     
 rpc.register("mission_save",connection.add_packet) 

@@ -123,4 +123,3 @@ class Document(Base):
     
     def __repr__(self):
         return "Entity '%s' of type %s" % (self.name, self.type)    
-
