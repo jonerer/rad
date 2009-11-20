@@ -20,7 +20,7 @@ def create_menuButton(bild,label):
     buttonBox.pack_start(label, expand=False, fill=False, padding=5)
     button.add(buttonBox)
     button.show_all()
-    button.set_size_request(296, 60)
+    button.set_size_request(100, 60)
     return button
 
 class Page(gtk.VBox):
@@ -43,8 +43,10 @@ class MenuPage(Page):
 
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
-        alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
-        print rpc.send("qos", "add_packet", packet=alarm)
+        poi = str(packet.Packet("poi",id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), coordx = "15.57796", coordy = "58.40479"))
+        rpc.send("qos", "add_packet", packet=poi)
+        #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
+        #print rpc.send("qos", "add_packet", packet=alarm)
 
 
     def __init__(self, gui):
@@ -101,15 +103,6 @@ class SettingsPage(Page):
         self.show_all()
         
 class MissionPage(Page):
-    def show_mainMenu(self, widget, data=None):
-        self.gui.switch_page("menu")
-
-    def show_newMission(self, widget, data=None):
-        print "INTE FIXAT ÄN. YOU DO IT! :d"
-        vMenuBox.hide()
-        vMissionBox.hide()
-        vMissionAddBox.show()
-        return
 
     def __init__(self, gui):
         super(MissionPage, self).__init__("mission", gui, homogeneous=False,
@@ -120,12 +113,57 @@ class MissionPage(Page):
                 "Redigera")
         deleteMissionButton = create_menuButton("static/ikoner/book_delete.png",                     "Ta bort")
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
-        backButton.connect("clicked", self.show_mainMenu, None)
-        newMissionButton.connect("clicked", self.show_newMission, None)
+        
+        backButton.connect("clicked", self.gui.switch_page, "menu")
+        newMissionButton.connect("clicked", self.gui.switch_page, "addMission")
         self.pack_start(newMissionButton, False, False, padding=2)
         self.pack_start(editMissionButton, False, False, padding=2)
         self.pack_start(deleteMissionButton, False, False, padding=2)
         self.pack_start(backButton, False, False, padding=2)
+
+        self.show_all()
+
+class AddMissionPage(Page):
+
+    def __init__(self, gui):
+        super(AddMissionPage, self).__init__("addMission", gui, homogeneous=False,
+                spacing=0)
+        
+        nameLabel = gtk.Label("Namn:")
+        nameEntry = gtk.Entry()
+        infoLabel = gtk.Label("Info:")
+        infoEntry = gtk.Entry()
+        xLabel = gtk.Label("X-koordinat:")
+        xEntry = gtk.Entry()
+        yLabel = gtk.Label("Y-koordinat:")
+        yEntry = gtk.Entry()
+        #infoView = gtk.TextView(None)
+        #infoView.set_editable(True)
+        #infoTextBuffer = infoView.get_buffer()
+        #infoScroll = gtk.ScrolledWindow()
+        #infoScroll.set_size_request(294,150)
+        #infoScroll.add(infoView)
+        #infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+        #infoView.set_wrap_mode(gtk.WRAP_WORD)
+        
+        self.pack_start(nameLabel, False, False,0)
+        self.pack_start(nameEntry, False, False,0)
+        self.pack_start(infoLabel, False, False,0)
+        self.pack_start(infoEntry, False, False,0)
+        self.pack_start(xLabel, False, False,0)
+        self.pack_start(xEntry, False, False,0)
+        self.pack_start(yLabel, False, False,0)
+        self.pack_start(yEntry, False, False,0)
+        
+        saveButton = create_menuButton("static/ikoner/disk.png","Spara")
+        backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
+        backButton.connect("clicked", self.gui.switch_page, "mission")
+        
+        hbox1 = gtk.HBox()
+        hbox1.pack_start(backButton, True, True, padding=2)
+        hbox1.pack_start(saveButton, True, True, padding=2)
+        self.pack_start(hbox1, False, False, 2)
+        
 
         self.show_all()
 
@@ -181,6 +219,7 @@ class Gui(hildon.Program):
         self._pages["menu"] = MenuPage(self)
         self._pages["mission"] = MissionPage(self)
         self._pages["settings"] = SettingsPage(self)
+        self._pages["addMission"] = AddMissionPage(self)
 
 
         # Möjliggör fullscreen-läge
@@ -276,12 +315,13 @@ class Gui(hildon.Program):
     #       Description: The mapview :P
     def create_map_view(self):
       
-        def openButton_press_callback(self, widget, data=None):
+        def openButton_press_callback(button, widget, data=None):
             openButton.hide()
             closeButton.show()
             vbox1.show()
-            return
-        def closeButton_press_callback(self, widget, data=None):
+            self.switch_page("menu")
+            
+        def closeButton_press_callback(button, widget, data=None):
             openButton.show()
             closeButton.hide()
             vbox1.hide()
@@ -329,18 +369,14 @@ class Gui(hildon.Program):
         self.rightBook = rightBook
         
         # MISSIONBOX-----------------------
-        
-        
-        
-        
 
         hbox1.pack_start(map, expand=True, fill=True, padding=0)
         hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
         hbox2.pack_start(openButton, expand=False, fill=False, padding=0)
         hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
-        hbox2.pack_start(vbox1, expand=False, fill=True, padding=0)
+        hbox2.pack_start(vbox1, False, False, 0)
         
-        vbox1.pack_start(rightBook, expand=True, fill=True, padding=0)
+        vbox1.pack_start(rightBook, False, False, padding=0)
         
         hbox1.show()
         hbox2.show()
