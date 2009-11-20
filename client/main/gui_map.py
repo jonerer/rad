@@ -3,6 +3,7 @@ import gtk
 import math
 import time
 from shared import rpc
+from datetime import datetime
 #from tester.osso import rpc
 
 class Map(gtk.DrawingArea):
@@ -11,7 +12,7 @@ class Map(gtk.DrawingArea):
                 "min_longitude":0,
                 "max_longitude":0}
 
-    def __init__(self, map):
+    def __init__(self, map, gui):
         gtk.DrawingArea.__init__(self)
         
         # Variabler
@@ -29,6 +30,8 @@ class Map(gtk.DrawingArea):
         self._last_tiles = None
         self._last_focus_pixel = 0,0
         self._focus_pixel = 0,0
+        self._last_click = datetime.now()
+        self._gui = gui
         
         rpc.register("update_map", self.force_draw)
         # queue_draw() ärvs från klassen gtk.DrawingArea
@@ -38,6 +41,7 @@ class Map(gtk.DrawingArea):
         self.connect("button_press_event", self.handle_button_press_event)
         self.connect("button_release_event", self.handle_button_release_event)
         self.connect("motion_notify_event", self.handle_motion_notify_event)
+        self.connect("key_press_event", self.doubleclick_event)
         self.set_events(gtk.gdk.BUTTON_PRESS_MASK |
                         gtk.gdk.BUTTON_RELEASE_MASK |
                         gtk.gdk.EXPOSURE_MASK |
@@ -62,6 +66,10 @@ class Map(gtk.DrawingArea):
         self._is_dirty = True
         self.queue_draw()
 
+    def doubleclick_event(self, widget, event):
+        print "dblisch"
+        return True
+
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
         self._movement_from["x"] = event.x
@@ -69,6 +77,16 @@ class Map(gtk.DrawingArea):
         self._origin_position = self._map.get_focus()
         self._last_movement_timestamp = time.time()
         self._allow_movement = True
+
+        if event.type == gtk.gdk._2BUTTON_PRESS:
+            #event.xcoord, event.ycoord = self.pixel_to_gps(event.x, event.y)
+            # STÄMMERT?
+            lon, lat = self.pixel_to_gps(event.x, event.y)
+            lon = self._origin_position["longitude"] + lon
+            lat = self._origin_position["latitude"] - lat
+
+            self._gui.map_dblclick(lon, lat)
+            #self._gui.map_dblclick(widget, event)
 
         return True
 

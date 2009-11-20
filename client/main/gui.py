@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-        
-        # NOTEBOOK ITEM IDs
-        # ID 0 = Map_view
-        #    1 = Settings_view
-        #    2 = Login_view
-        #    3 = Menu_view
-
-        
 import gtk
 import hildon
 import gui_map
@@ -40,6 +32,10 @@ class Page(gtk.VBox):
             self.size_request = (600,300)
         self.show()
         self.gui = gui
+
+    def map_dblclick(self, coordx, coordy):
+        pass
+        #print "got dblclick i Page! coords: %s, %s" % (coordx,coordy)
 
 class MenuPage(Page):
     def mission_button_clicked(self, widget, data=None):
@@ -215,6 +211,10 @@ class Gui(hildon.Program):
         num = self.rightBook.page_num(self._pages[page_name])
         self.rightBook.set_size_request(*self._pages[page_name].size_request)
         self.rightBook.set_current_page(num)
+
+    def map_dblclick(self, coordx, coordy):
+        active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
+        active_page.map_dblclick(coordx, coordy)
     
     # QUICK MENU ------------------------
     #       Description: Creates our quickmenu with the basic four buttons
@@ -294,7 +294,7 @@ class Gui(hildon.Program):
         hbox1 = gtk.HBox(homogeneous=False, spacing=1)
         hbox2 = gtk.HBox(homogeneous=False, spacing=1)
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
-        map = gui_map.Map(self._map)
+        map = gui_map.Map(self._map, self)
         
         #SHOW / HIDE buttons----------------------
         openButton = gtk.Button()
