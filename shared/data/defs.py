@@ -51,6 +51,14 @@ class Poi(Base):
     timestamp = Column(DateTime)
     type_id = Column(Integer, ForeignKey("poi_types.id"))
     type = relation(POIType, backref=backref("pois", order_by=id)) 
+    
+    def __init__(self, coordx, coordy, id, name, sub_type, timestamp):
+        self.coordx = coordx
+        self.coordy = coordy
+        self.id = id
+        self.name = name
+        self.sub_type = sub_type
+        self.timestamp = timestamp
 
 class Alarm(Base):
     __tablename__ = "alarm"
@@ -62,6 +70,14 @@ class Alarm(Base):
     coordx = Column(Float)
     coordy = Column(Float)
     timestamp = Column(DateTime)
+
+    def __init__(self, coordx, coordy, id, name, sub_type, timestamp):
+        self.coordx = coordx
+        self.coordy = coordy
+        self.id = id
+        self.name = name
+        self.sub_type = sub_type
+        self.timestamp = timestamp
 
 
 class Unit(Base):
