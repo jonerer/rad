@@ -8,6 +8,7 @@ from shared.data.defs import *
 from shared import rpc, packet
 from datetime import datetime
 
+
 def create_menuButton(bild,label):
     buttonBox = gtk.HBox(False, spacing=1)
     button = gtk.Button()
@@ -39,17 +40,34 @@ class Page(gtk.VBox):
         #print "got dblclick i Page! coords: %s, %s" % (coordx,coordy)
 
 class MenuPage(Page):
-
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
         session = get_session()
-        type = session.query(POIType).get(POIType.name == u"brand")
-        #a= session.query(POI).filter(POI.name == u"brand")
-        poiPacket = str(packet.Packet("poi",id = "", sub_type = a, name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
+        poiPacket = str(packet.Packet("poi",id = "", sub_type = u"brand", name = "Vallarondellen", coordx = "15.5680", coordy = "58.4100"))
         rpc.send("qos", "add_packet", packet=poiPacket)
         #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
+        
+    def add_hille(self, pack):
+        pack = packet.Packet.from_str(str(pack))
+        session = get_session()
+        connection.timestamp = time.time()
+        loginfo = pack.data
+        id = pack.data["id"]
+        name = pack.data["name"]
+        timestamp = pack.timestamp
+        sub_type = pack.data["sub_type"]
+        coordx = pack.data["coordx"]
+        coordy = pack.data["coordy"]
+        for poi_types in session.query(POIType).filter(POIType.name==sub_type):
+            type = poi_types
+        print session.add(POI(coordx, coordy, id, name, type, timestamp))
+        session.commit()
+        for poi in session.query(POI).filter(poi.name == name):
+            map.add_object(poi.name, data_storage.MapObject(
+                {"longitude":poi.coordx,"latitude":poi.coordy},
+                poi.type.image))
 
     def __init__(self, gui):
         super(MenuPage, self).__init__("menu", gui)
@@ -76,6 +94,7 @@ class MenuPage(Page):
 
         self.show()
         vMenuBox.show()
+        rpc.register("add_hille", self.add_hille)
 
 class SettingsPage(Page):
     def __init__(self, gui):

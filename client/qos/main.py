@@ -150,20 +150,7 @@ network_listeners["alarm_response"] = alarm_response
 
 def poi_response(pack):
     print "Hille du e king på poi_response"
-    session = get_session()
-    connection.timestamp = time.time()
-    loginfo = pack.data
-    id = pack.data["id"]
-    name = pack.data["name"]
-    timestamp = pack.timestamp
-    sub_type = pack.data["sub_type"]
-    coordx = pack.data["coordx"]
-    coordy = pack.data["coordy"]
-    print id
-    print coordx
-    print timestamp
-    print session.add(POI(coordx, coordy, id, name, sub_type, timestamp))
-    session.commit()
+    rpc.send("main", "add_hille", pack=str(pack))
 network_listeners["poi_response"] = poi_response
     
 rpc.register("add_packet", connection.add_packet)
