@@ -74,6 +74,7 @@ class MenuPage(Page):
             self.gui._map.add_object(poi.name, data_storage.MapObject(
                 {"longitude":poi.coordx,"latitude":poi.coordy},
                 poi.poi_type.image))
+        self.gui._map.redraw()
 
     def __init__(self, gui):
         super(MenuPage, self).__init__("menu", gui)
@@ -347,14 +348,9 @@ class AddObjectPage(Page):
         poi_type_index = 0
         default_poi_type_index = 0
         for poi_type in session.query(POIType).order_by(POIType.name):
-            print poi_type.name
-            print type(poi_type.name)
             if poi_type.name == u"övrigt":
                 default_poi_type_index = poi_type_index
-                print "bajsa lagom"
             poi_type_index = poi_type_index + 1
-            print poi_type_index
-            print default_poi_type_index
             self.poi_type_selector.append_text(poi_type.name)
             
         self.poi_type_selector.set_active(default_poi_type_index)
