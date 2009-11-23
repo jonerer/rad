@@ -35,7 +35,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.103"
+        self.host_addr = "130.236.76.135"
         #self.host_addr = "localhost"
         self.host_port = 2345
         
@@ -88,7 +88,7 @@ class Connection(object):
                 self.connected = False
  
     def add_packet(self, packet):
-        print "add_packet"
+        print "add_packet: %s" % packet.type
         """ receives stuff from dbus and DOO EEETT"""
         packet = Packet.from_str(packet)
         self.out_queue.put(packet)

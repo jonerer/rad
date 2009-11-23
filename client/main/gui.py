@@ -33,12 +33,17 @@ class Page(gtk.VBox):
             self.size_request = (300,300)
         elif width == "full":
             self.size_request = (600,300)
+        self.page_name = name
         self.show()
         self.gui = gui
 
     def map_dblclick(self, coordx, coordy):
         pass
         #print "got dblclick i Page! coords: %s, %s" % (coordx,coordy)
+
+    def on_show(self):
+        pass
+        #print "visar sida %s" % self.page_name
 
 class MenuPage(Page):
     def hille_e_tjock(self, widget, data=None):
@@ -342,6 +347,10 @@ class AddObjectPage(Page):
         print "Jon bajsar!"
         self.xEntry.set_text(str(coordx))
         self.yEntry.set_text(str(coordy))
+
+    def on_show(self):
+        # simulera en "göm detaljer"
+        self.details(None, "hide")
         
     def details(self, button, state, widget=None):
         if state == "show":
@@ -353,7 +362,7 @@ class AddObjectPage(Page):
             self.gui.rightBook.set_size_request(300,300)
             self.vbox2.hide()
             self.showDetails.show()
-            self.hideDetails()
+            self.hideDetails.hide()
 
 class Gui(hildon.Program):
     _map = None
@@ -437,6 +446,8 @@ class Gui(hildon.Program):
         # if widget is supplied, it actually contains page_name, so swap!
         if widget is not None:
             page_name = widget
+        # kör "on_show" på sidan som ska visas
+        self._pages[page_name].on_show()
         num = self.rightBook.page_num(self._pages[page_name])
         self.rightBook.set_size_request(*self._pages[page_name].size_request)
         self.rightBook.set_current_page(num)
