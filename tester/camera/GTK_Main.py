@@ -30,8 +30,14 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
-		options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink"
+		options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! hantro4200enc ! udpsink host=130.236.218.251 port=5435"
 		self.player = gst.parse_launch ( options )
+
+		options2 = "udpsrc port=5435
+caps=application/x-rtp,clock-rate=90000 ! hantro4100dec !
+xvimagesink"
+
+		self.player1 = gst.parse_launch( options2 )
 
 		bus = self.player.get_bus()
 		bus.add_signal_watch()
