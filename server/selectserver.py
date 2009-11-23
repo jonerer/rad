@@ -142,15 +142,15 @@ def poi(connection, pack):
         id = start_id
     name = pack.data["name"]
     timestamp = pack.timestamp
-    sub_type = pack.data["sub_type"]
+    poi_type = pack.data["poi_type"]
     coordx = pack.data["coordx"]
     coordy = pack.data["coordy"]
     session.bind
     session.query(POI).all()
     loginfo = pack.data
-    for poi_types in session.query(POIType).filter(POIType.name==sub_type):
-        type = poi_types
-    session.add(POI(coordx, coordy, id, name, type, timestamp))
+    for poi_types in session.query(POIType).filter(POIType.name==poi_type):
+        poi_type = poi_types
+    session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
     session.commit()
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data

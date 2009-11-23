@@ -44,9 +44,9 @@ class MenuPage(Page):
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
         session = get_session()
-        poiPacket = str(packet.Packet("poi",id = "", sub_type = u"brand", name = "Vallarondellen", coordx = "15.5680", coordy = "58.4100"))
+        poiPacket = str(packet.Packet("poi",id = "", poi_type = u"brand", name = "Vallarondellen", coordx = "15.5680", coordy = "58.4100"))
         rpc.send("qos", "add_packet", packet=poiPacket)
-        #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
+        #alarm = str(packet.Packet("alarm", id = "", type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
         
@@ -58,17 +58,17 @@ class MenuPage(Page):
         id = pack.data["id"]
         name = pack.data["name"]
         timestamp = pack.timestamp
-        sub_type = pack.data["sub_type"]
+        poi_type = pack.data["poi_type"]
         coordx = pack.data["coordx"]
         coordy = pack.data["coordy"]
-        for poi_types in session.query(POIType).filter(POIType.name==sub_type):
-            type = poi_types
-        print session.add(POI(coordx, coordy, id, name, type, timestamp))
+        for poi_name in session.query(POIType).filter(POIType.name==poi_type):
+            poi_type = poi_name
+        print session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
         session.commit()
         for poi in session.query(POI).filter(POI.name == name):
             self.gui._map.add_object(poi.name, data_storage.MapObject(
                 {"longitude":poi.coordx,"latitude":poi.coordy},
-                poi.type.image))
+                poi.poi_type.image))
 
     def __init__(self, gui):
         super(MenuPage, self).__init__("menu", gui)
@@ -320,8 +320,8 @@ class AddObjectPage(Page):
         self.infoView.hide()
 
     def send_object(self, button):
-        #lägg till så man kan fixa in sub_type
-        poi = str(packet.Packet("poi",id = "", sub_type = "", name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
+        #lägg till så man kan fixa in type
+        poi = str(packet.Packet("poi",id = "", poi_type = u"brand", name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
         rpc.send("qos", "add_packet", packet=poi)
     
     def map_dblclick(self, coordx, coordy):
