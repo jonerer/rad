@@ -145,9 +145,14 @@ def parseBoolean(login):
     return login == "True"
  
 def alarm_response(pack):
-    print "Hille du e king"
+    print "Hille du e king på alarm_response"
     connection.timestamp = time.time()
 network_listeners["alarm_response"] = alarm_response
+
+def contact_response(pack):
+    print "Hille du e king på contact_response"
+    print pack.data
+network_listeners["contact_resp"] = contact_response
 
 def poi_response(pack):
     print "Hille du e king på poi_response"

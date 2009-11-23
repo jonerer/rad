@@ -78,6 +78,18 @@ def pong(connection, pack):
     connection.timepinged = 0
 clientrequests["pong"] = pong
 
+def contact_send(connection, pack):
+    print "du e fan king på contact_send i servern"
+    responsepacket = packet.Packet("contact_resp")
+    responsepacket.data["users"] = []
+    for connection in connections.values():
+        user = connection.user
+        ip = connection.addr
+        id = connection.id
+        responsepacket.data["users"].append((user, ip, id))
+    connection.out_queue.put(responsepacket)
+clientrequests["contact_req"] = contact_send
+
 def mission(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
@@ -88,7 +100,6 @@ def mission(connection, pack):
     info = loginfo["info"]
     coordx = loginfo["xEntry"]
     coordy = loginfo["yEntry"]
-    
 
 clientrequests["mission_save"] = mission
 
@@ -108,10 +119,12 @@ def login(connection, pack):
             login_response = packet.Packet("login_response", login="True")
             # kolla om usern redan var inloggad
             # ta isf bort den "gamla"
+            print "loggade in som %s" % username
             for old_conn in connections.values():
                 if old_conn.user == username and \
                         old_conn.id != connection.id:
                     to_be_removed.append(old_conn)
+                    print "redan inloggad på annan connection. tar bort."
             connection.user = username
         else:
             login_response = packet.Packet("login_response", login="False")

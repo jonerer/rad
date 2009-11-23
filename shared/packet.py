@@ -8,10 +8,7 @@ type_priority["login"] = 1.
 class Packet(object):
     def __init__(self, type, **data):
         self.type = type # a string
-        if data != {}:
-            self.data = data
-        else:
-            self.data = None
+        self.data = data
         self.timestamp = datetime.now()
 
         if type in type_priority:

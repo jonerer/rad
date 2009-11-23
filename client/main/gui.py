@@ -98,6 +98,7 @@ class MenuPage(Page):
         rpc.register("add_poi", self.add_poi)
 
 class SettingsPage(Page):
+
     def __init__(self, gui):
         super(SettingsPage, self).__init__("settings", gui, width="full")
         self.size_request = (300,300)
@@ -109,17 +110,30 @@ class SettingsPage(Page):
         
 class ContactPage(Page):
     def __init__(self, gui):
+        print "DU KÖRDE NU INIT MOTHERFUCKER"
+        #super(ContactPage, self).__init__("contact", gui, width="full")
         super(ContactPage, self).__init__("contact", gui, width="full")
         self.size_request = (300,300)
         button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
-        button.connect("clicked", self.gui.switch_page, "menu")
-        self.pack_start(button, False, False, padding=2)
+        tryButton = create_menuButton("static/ikoner/JonasInGlases.png", "Test")
 
-        self.show_all()
+        button.connect("clicked", self.gui.switch_page, "menu")
+        tryButton.connect("clicked", self.req_contact)
+
+        vMenuBox = gtk.VBox(False,0)
+        vMenuBox.pack_start(tryButton, False, True, padding=2)
+        vMenuBox.pack_start(button, False, True, padding=2)
+        self.pack_start(vMenuBox, False, False, padding=2)
+ 
+        self.show()
+        vMenuBox.show()
+
+    def req_contact(self, widget):
+        contact_send = str(packet.Packet("contact_req"))
+        rpc.send("qos", "add_packet", packet=contact_send)
         
 class MissionPage(Page):
   
-
     def __init__(self, gui):
         self.size_request = (300,300)
         super(MissionPage, self).__init__("mission", gui, homogeneous=False,spacing=0)
@@ -393,7 +407,7 @@ class Gui(hildon.Program):
         self._pages["menu"] = MenuPage(self)
         self._pages["mission"] = MissionPage(self)
         self._pages["settings"] = SettingsPage(self)
-        self._pages["contact"] = SettingsPage(self)
+        self._pages["contact"] = ContactPage(self)
         self._pages["addMission"] = AddMissionPage(self)
         self._pages["removeMission"] = RemoveMissionPage(self)
         self._pages["object"] = ObjectPage(self)
