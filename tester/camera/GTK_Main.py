@@ -1,3 +1,6 @@
+#!/usr/bin/python2.5
+# -*- coding: utf-8 -*
+
 import sys, os
 import pygtk, gtk, gobject
 import pygst
