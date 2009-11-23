@@ -1,4 +1,4 @@
-mport sys, os
+import sys, os
 import pygtk, gtk, gobject
 import pygst
 pygst.require("0.10")
