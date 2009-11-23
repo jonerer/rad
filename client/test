@@ -1,0 +1,75 @@
+BEGIN TRANSACTION;
+CREATE TABLE alarm (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	type_id INTEGER, 
+	extrainfo VARCHAR, 
+	coordx FLOAT, 
+	coordy FLOAT, 
+	timestamp DATETIME, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(type_id) REFERENCES alarm_types (id)
+);
+CREATE TABLE alarm_types (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	image VARCHAR, 
+	PRIMARY KEY (id)
+);
+CREATE TABLE documents (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	"ownerId" INTEGER, 
+	path VARCHAR, 
+	PRIMARY KEY (id)
+);
+CREATE TABLE mission (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	coordx FLOAT, 
+	coordy FLOAT, 
+	info VARCHAR, 
+	prio INTEGER, 
+	PRIMARY KEY (id)
+);
+CREATE TABLE poi (
+	coordx FLOAT, 
+	coordy FLOAT, 
+	db_id INTEGER NOT NULL, 
+	id INTEGER, 
+	name VARCHAR, 
+	PRIMARY KEY (db_id)
+);
+CREATE TABLE unit_types (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	image VARCHAR, 
+	PRIMARY KEY (id), 
+	 UNIQUE (name)
+);
+INSERT INTO unit_types VALUES(1,'Brandbild1','static/ikoner/brandbil.png');
+INSERT INTO unit_types VALUES(2,'sjukhus1','static/ikoner/sjukhus.png');
+INSERT INTO unit_types VALUES(3,'jonas','static/ikoner/JonasInGlases.png');
+INSERT INTO unit_types VALUES(4,'Ambulans1','static/ikoner/ambulans.png');
+CREATE TABLE units (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	coordx FLOAT, 
+	coordy FLOAT, 
+	type_id INTEGER, 
+	is_self BOOLEAN, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(type_id) REFERENCES unit_types (id)
+);
+INSERT INTO units VALUES(1,'hej',15.57796,58.40479,4,0);
+INSERT INTO units VALUES(2,'ho',15.57806,58.40579,4,0);
+INSERT INTO units VALUES(3,'lets',15.5729,58.40193,1,0);
+INSERT INTO units VALUES(4,'go',15.5629,58.4093,2,0);
+INSERT INTO units VALUES(5,'III',15.5829,58.4093,3,1);
+CREATE TABLE users (
+	id INTEGER NOT NULL, 
+	name VARCHAR, 
+	password VARCHAR, 
+	PRIMARY KEY (id)
+);
+COMMIT;
