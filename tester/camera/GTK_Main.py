@@ -27,8 +27,7 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
-		options = "v4l2src ! video/x-raw-yuv, width=320, height=240,
-framerate=8/1 ! autovideosink"
+		options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink"
 		self.player = gst.parse_launch ( options )
 
 		bus = self.player.get_bus()
