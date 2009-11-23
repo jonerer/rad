@@ -32,6 +32,8 @@ class Map(gtk.DrawingArea):
         self._focus_pixel = 0,0
         self._last_click = datetime.now()
         self._gui = gui
+        self._width = None
+        self._height = None
         
         rpc.register("update_map", self.force_draw)
         # queue_draw() ärvs från klassen gtk.DrawingArea
@@ -72,6 +74,7 @@ class Map(gtk.DrawingArea):
 
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
+        import data_storage
         self._movement_from["x"] = event.x
         self._movement_from["y"] = event.y
         self._origin_position = self._map.get_focus()
@@ -81,11 +84,16 @@ class Map(gtk.DrawingArea):
         if event.type == gtk.gdk._2BUTTON_PRESS:
             #event.xcoord, event.ycoord = self.pixel_to_gps(event.x, event.y)
             # STÄMMERT?
-            lon, lat = self.pixel_to_gps(event.x, event.y)
+            lon, lat = self.pixel_to_gps(event.x-self._width/2, event.y-self._height/2)
             lon = self._origin_position["longitude"] + lon
             lat = self._origin_position["latitude"] - lat
 
             self._gui.map_dblclick(lon, lat)
+            print "coords lon,lat: %s,%s" % (lon, lat)
+            #session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
+            #self._map.add_object("skonaste", data_storage.MapObject(
+            #    {"longitude":lon,"latitude":lat},
+            #    "static/ikoner/brandbil.png"))    
             #self._gui.map_dblclick(widget, event)
 
         return True
@@ -138,6 +146,8 @@ class Map(gtk.DrawingArea):
                                event.area.y,
                                event.area.width,
                                event.area.height)
+        self._width = event.area.width
+        self._height = event.area.height
         self.context.clip()
     
         self.draw()
