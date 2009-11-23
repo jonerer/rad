@@ -38,6 +38,7 @@ if "exempeldata" in sys.argv and len(units) == 0:
     session.commit()
     #skapar en POI-type
     session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
+    session.add(POIType(u"övrigt","static/ikoner/information.png"))
     session.commit()
 else:
     # kolla att man har nått i databasen
@@ -167,13 +168,19 @@ def poi(connection, pack):
         id = start_id
     name = pack.data["name"]
     timestamp = pack.timestamp
-    poi_type = pack.data["poi_type"]
+    poi_type_name = pack.data["poi_type"]
     coordx = pack.data["coordx"]
     coordy = pack.data["coordy"]
     session.bind
     session.query(POI).all()
     loginfo = pack.data
-    for poi_types in session.query(POIType).filter(POIType.name==poi_type):
+    hej = u"Hej"
+    print hej
+    print poi_type_name
+    print "Innan foren"
+    poi_type = session.query(POIType).get_by(POIType.name==u"default")
+    for poi_types in session.query(POIType).filter(POIType.name==poi_type_name):
+        print "Kom in i foren"
         poi_type = poi_types
     session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
     session.commit()
