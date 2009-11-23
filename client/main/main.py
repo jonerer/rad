@@ -73,7 +73,7 @@ for units in session.query(Unit).all():
 for poi in session.query(POI).all():
     map.add_object(poi.name, data_storage.MapObject(
         {"longitude":poi.coordx,"latitude":poi.coordy},
-        poi.type.image))
+        poi.poi_type.image))
 
 # Skapar grafiska interfacet.
 print "Skapar programmets GUI"

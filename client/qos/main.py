@@ -35,7 +35,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.76.103"
         #self.host_addr = "localhost"
         self.host_port = 2345
         
@@ -88,6 +88,7 @@ class Connection(object):
                 self.connected = False
  
     def add_packet(self, packet):
+        print "add_packet"
         """ receives stuff from dbus and DOO EEETT"""
         packet = Packet.from_str(packet)
         self.out_queue.put(packet)
@@ -150,20 +151,7 @@ network_listeners["alarm_response"] = alarm_response
 
 def poi_response(pack):
     print "Hille du e king på poi_response"
-    session = get_session()
-    connection.timestamp = time.time()
-    loginfo = pack.data
-    id = pack.data["id"]
-    name = pack.data["name"]
-    timestamp = pack.timestamp
-    sub_type = pack.data["sub_type"]
-    coordx = pack.data["coordx"]
-    coordy = pack.data["coordy"]
-    print id
-    print coordx
-    print timestamp
-    print session.add(POI(coordx, coordy, id, name, sub_type, timestamp))
-    session.commit()
+    rpc.send("main", "add_poi", pack=str(pack))
 network_listeners["poi_response"] = poi_response
     
 rpc.register("add_packet", connection.add_packet)

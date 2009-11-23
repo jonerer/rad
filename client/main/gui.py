@@ -7,6 +7,8 @@ from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc, packet
 from datetime import datetime
+import data_storage
+
 
 def create_menuButton(bild,label):
     buttonBox = gtk.HBox(False, spacing=1)
@@ -39,17 +41,34 @@ class Page(gtk.VBox):
         #print "got dblclick i Page! coords: %s, %s" % (coordx,coordy)
 
 class MenuPage(Page):
-
     def hille_e_tjock(self, widget, data=None):
         print "tjockade på hille"
         session = get_session()
-        type = session.query(POIType).get(POIType.name == u"brand")
-        #a= session.query(POI).filter(POI.name == u"brand")
-        poiPacket = str(packet.Packet("poi",id = "", sub_type = a, name = "Vallarondellen", coordx = "15.57796", coordy = "58.40479"))
+        poiPacket = str(packet.Packet("poi",id = "", poi_type = u"brand", name = "Vallarondellen", coordx = "15.5680", coordy = "58.4100"))
         rpc.send("qos", "add_packet", packet=poiPacket)
-        #alarm = str(packet.Packet("alarm", id = "", sub_type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
+        #alarm = str(packet.Packet("alarm", id = "", type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
+        
+    def add_poi(self, pack):
+        print "hihi add_poi"
+        pack = packet.Packet.from_str(str(pack))
+        session = get_session()
+        loginfo = pack.data
+        id = pack.data["id"]
+        name = pack.data["name"]
+        timestamp = pack.timestamp
+        poi_type = pack.data["poi_type"]
+        coordx = pack.data["coordx"]
+        coordy = pack.data["coordy"]
+        for poi_name in session.query(POIType).filter(POIType.name==poi_type):
+            poi_type = poi_name
+        print session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
+        session.commit()
+        for poi in session.query(POI).filter(POI.name == name):
+            self.gui._map.add_object(poi.name, data_storage.MapObject(
+                {"longitude":poi.coordx,"latitude":poi.coordy},
+                poi.poi_type.image))
 
     def __init__(self, gui):
         super(MenuPage, self).__init__("menu", gui)
@@ -76,6 +95,7 @@ class MenuPage(Page):
 
         self.show()
         vMenuBox.show()
+        rpc.register("add_poi", self.add_poi)
 
 class SettingsPage(Page):
     def __init__(self, gui):
@@ -300,8 +320,8 @@ class AddObjectPage(Page):
         self.infoView.hide()
 
     def send_object(self, button):
-        #lägg till så man kan fixa in sub_type
-        poi = str(packet.Packet("poi",id = "", sub_type = "", name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
+        #lägg till så man kan fixa in type
+        poi = str(packet.Packet("poi",id = "", poi_type = u"brand", name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
         rpc.send("qos", "add_packet", packet=poi)
     
     def map_dblclick(self, coordx, coordy):
