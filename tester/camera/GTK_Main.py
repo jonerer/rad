@@ -67,7 +67,7 @@ class GTK_Main:
 			imagesink = message.src
 			imagesink.set_property("force-aspect-ratio", True)
 		imagesink.set_xwindow_id(self.movie_window.window.xid)
-	GTK_Main()
-	gtk.gdk.threads_init()
-	gtk.main()
+GTK_Main()
+gtk.gdk.threads_init()
+gtk.main()
 
