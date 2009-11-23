@@ -1,7 +1,7 @@
 #!/usr/bin/python2.5
 #coding: utf-8
 
-import osso, simplejson
+import osso, simplejson, logging
 name = None
 osso_context = None
 osso_rpc = None
@@ -52,7 +52,10 @@ def send(target_name, method, **kwargs):
             method,
             rpc_args,
             wait_reply=True)
-        val = simplejson.loads(val)
+        try:
+            val = simplejson.loads(val)
+        except simplejson.JSONDecodeError, e:
+            logging.error("fick ett fel i RPC till %s: %s" % (target_name,val))
     return val
 
 def register(cb_name, callback):

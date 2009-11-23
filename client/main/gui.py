@@ -7,6 +7,7 @@ from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc, packet
 from datetime import datetime
+import data_storage
 
 
 def create_menuButton(bild,label):
@@ -49,10 +50,10 @@ class MenuPage(Page):
         #print rpc.send("qos", "add_packet", packet=alarm)
 
         
-    def add_hille(self, pack):
+    def add_poi(self, pack):
+        print "hihi add_poi"
         pack = packet.Packet.from_str(str(pack))
         session = get_session()
-        connection.timestamp = time.time()
         loginfo = pack.data
         id = pack.data["id"]
         name = pack.data["name"]
@@ -64,8 +65,8 @@ class MenuPage(Page):
             type = poi_types
         print session.add(POI(coordx, coordy, id, name, type, timestamp))
         session.commit()
-        for poi in session.query(POI).filter(poi.name == name):
-            map.add_object(poi.name, data_storage.MapObject(
+        for poi in session.query(POI).filter(POI.name == name):
+            self.gui._map.add_object(poi.name, data_storage.MapObject(
                 {"longitude":poi.coordx,"latitude":poi.coordy},
                 poi.type.image))
 
@@ -94,7 +95,7 @@ class MenuPage(Page):
 
         self.show()
         vMenuBox.show()
-        rpc.register("add_hille", self.add_hille)
+        rpc.register("add_poi", self.add_poi)
 
 class SettingsPage(Page):
     def __init__(self, gui):
