@@ -118,30 +118,26 @@ class ContactPage(Page):
         print "DU KÖRDE NU INIT MOTHERFUCKER"
         #super(ContactPage, self).__init__("contact", gui, width="full")
         super(ContactPage, self).__init__("contact", gui, width="full")
-        self.size_request = (600,300)
-        hbox1 = gtk.HBox()
-        button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
+        self.size_request = (300,300)
+        vbox1 = gtk.VBox()
+        
+        backButton = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
         tryButton = create_menuButton("static/ikoner/JonasInGlases.png", "Test")
+        newButton = create_menuButton("static/ikoner/phone.png", "Ring")
+        xxxButton = create_menuButton("static/ikoner/JonasInGlases.png", "Video")
         tryButton.connect("clicked", self.req_contact)
-        button.connect("clicked", self.gui.switch_page, "menu")
+        backButton.connect("clicked", self.gui.switch_page, "menu")
 
-
-        vMenuBox = gtk.VBox(False,0)
-        vMenuBox.pack_start(tryButton, False, True, padding=2)
-        vMenuBox.pack_start(button, False, True, padding=2)
-        hbox1.pack_start(vMenuBox, False, False, padding=2)
-        
-        vMenuBox.show()
-
-
-
-        hbox1.pack_start(button, False, True, padding=2)
-        
         combo = gtk.combo_box_new_text()
         for x in range(20):
             combo.append_text("Snopp1")
-
-        self.pack_start(hbox1,False,True,0)
+            
+        vbox1.pack_start(combo,False,False,0)
+        vbox1.pack_start(tryButton, False, True, padding=2)
+        vbox1.pack_start(newButton, False, True, padding=2)
+        vbox1.pack_start(xxxButton, False, True, padding=2)
+        vbox1.pack_start(backButton, False, True, padding=2)
+        self.pack_start(vbox1,False,True,0)
         self.show_all()
         
 
