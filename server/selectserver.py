@@ -68,7 +68,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.103"
+host_addr = "130.236.76.135"
 host_port = 2345
 start_id = 1
  
@@ -80,13 +80,15 @@ clientrequests["pong"] = pong
 
 def contact_send(connection, pack):
     print "du e fan king på contact_send i servern"
+    connection.timestamp = time.time()
+    connection.timepinged = 0
     responsepacket = packet.Packet("contact_resp")
     responsepacket.data["users"] = []
-    for connection in connections.values():
-        user = connection.user
-        ip = connection.addr
-        id = connection.id
-        responsepacket.data["users"].append((user, ip, id))
+    for conn in connections.values():
+        user = conn.user
+        ip = conn.addr
+        if user is not None:
+            responsepacket.data["users"].append((user, ip))
     connection.out_queue.put(responsepacket)
 clientrequests["contact_req"] = contact_send
 
@@ -225,10 +227,6 @@ while True:
                     print "laggar till %s=>%s" % (pack.type, str(pack.data))
                     if pack.type in clientrequests:
                         clientrequests[pack.type](connection, pack)
-                    for fileno, connection in connections.iteritems():
-                        if sock.fileno() != fileno:
-                            connection.out_queue.put("%s hälsar: %s" % \
-                                    (sock.fileno(), read))
             else:
                 to_be_removed.append(sock.fileno())
  
@@ -238,7 +236,10 @@ while True:
  
             if connection.out_buffer == "" and \
                 not connection.out_queue.empty():
-                connection.out_buffer = buffrify.create_pack(str(connection.out_queue.get()))
+                print connection.id
+                abba = connection.out_queue.get()
+                print "Du smakar fisk: " , abba
+                connection.out_buffer = buffrify.create_pack(str(abba))
  
             if connection.out_buffer != "":
                 sent = sock.send(connection.out_buffer)

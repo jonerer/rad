@@ -114,10 +114,11 @@ class SettingsPage(Page):
         self.show_all()
         
 class ContactPage(Page):
+        
     def __init__(self, gui):
-        print "DU KÖRDE NU INIT MOTHERFUCKER"
         #super(ContactPage, self).__init__("contact", gui, width="full")
         super(ContactPage, self).__init__("contact", gui, width="full")
+        self.contactlist = {}
         self.size_request = (300,300)
         vbox1 = gtk.VBox()
         
@@ -140,10 +141,18 @@ class ContactPage(Page):
         self.pack_start(vbox1,False,True,0)
         self.show_all()
         
+        rpc.register("add_contactlist", self.add_contactlist)
 
     def req_contact(self, widget):
         contact_send = str(packet.Packet("contact_req"))
         rpc.send("qos", "add_packet", packet=contact_send)
+
+    def add_contactlist(self, pack):
+        pack = packet.Packet.from_str(pack)
+        for user in pack.data["users"]:
+            self.contactlist[user[0]] = user[1]
+        print self.contactlist
+
         
 class MissionPage(Page):
   
