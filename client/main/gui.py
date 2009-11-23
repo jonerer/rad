@@ -23,7 +23,7 @@ def create_menuButton(bild,label):
     buttonBox.pack_start(label, expand=False, fill=False, padding=5)
     button.add(buttonBox)
     button.show_all()
-    button.set_size_request(100, 60)
+    button.set_size_request(296, 60)
     return button
 
 class Page(gtk.VBox):
@@ -54,7 +54,7 @@ class MenuPage(Page):
         #alarm = str(packet.Packet("alarm", id = "", type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
-        
+    #Kanske behövs flyttas till ett mer logiskt ställe!
     def add_poi(self, pack):
         print "hihi add_poi"
         pack = packet.Packet.from_str(str(pack))
@@ -114,28 +114,45 @@ class SettingsPage(Page):
         self.show_all()
         
 class ContactPage(Page):
+        
     def __init__(self, gui):
-        print "DU KÖRDE NU INIT MOTHERFUCKER"
         #super(ContactPage, self).__init__("contact", gui, width="full")
         super(ContactPage, self).__init__("contact", gui, width="full")
+        self.contactlist = {}
         self.size_request = (300,300)
-        button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
+        vbox1 = gtk.VBox()
+        
+        backButton = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
         tryButton = create_menuButton("static/ikoner/JonasInGlases.png", "Test")
-
-        button.connect("clicked", self.gui.switch_page, "menu")
+        newButton = create_menuButton("static/ikoner/phone.png", "Ring")
+        xxxButton = create_menuButton("static/ikoner/JonasInGlases.png", "Video")
         tryButton.connect("clicked", self.req_contact)
+        backButton.connect("clicked", self.gui.switch_page, "menu")
 
-        vMenuBox = gtk.VBox(False,0)
-        vMenuBox.pack_start(tryButton, False, True, padding=2)
-        vMenuBox.pack_start(button, False, True, padding=2)
-        self.pack_start(vMenuBox, False, False, padding=2)
- 
-        self.show()
-        vMenuBox.show()
+        combo = gtk.combo_box_new_text()
+        for x in range(20):
+            combo.append_text("Snopp1")
+            
+        vbox1.pack_start(combo,False,False,0)
+        vbox1.pack_start(tryButton, False, True, padding=2)
+        vbox1.pack_start(newButton, False, True, padding=2)
+        vbox1.pack_start(xxxButton, False, True, padding=2)
+        vbox1.pack_start(backButton, False, True, padding=2)
+        self.pack_start(vbox1,False,True,0)
+        self.show_all()
+        
+        rpc.register("add_contactlist", self.add_contactlist)
 
     def req_contact(self, widget):
         contact_send = str(packet.Packet("contact_req"))
         rpc.send("qos", "add_packet", packet=contact_send)
+
+    def add_contactlist(self, pack):
+        pack = packet.Packet.from_str(pack)
+        for user in pack.data["users"]:
+            self.contactlist[user[0]] = user[1]
+        print self.contactlist
+
         
 class MissionPage(Page):
   
@@ -268,6 +285,8 @@ class AddObjectPage(Page):
         super(AddObjectPage, self).__init__("addObject", gui, homogeneous=False,
                 spacing=0)
         self.size_request = (300,300)
+
+        
         hbox1 = gtk.HBox()
         vbox1 = gtk.VBox()
         self.vbox2 = gtk.VBox()
@@ -276,7 +295,9 @@ class AddObjectPage(Page):
         objLabel = gtk.Label("Object:")
         self.objEntry = gtk.Entry()
         typeLabel = gtk.Label("Typ:")
-        self.typeEntry = gtk.Entry()
+        self.poi_type_selector = gtk.combo_box_new_text()
+        #typeLabel = gtk.Label("Typ:")
+        #self.typeEntry = gtk.Entry()
         infoLabel = gtk.Label("Information:")
         infoEntry = gtk.Entry()
         xLabel = gtk.Label("X-koordinat:")
@@ -304,7 +325,7 @@ class AddObjectPage(Page):
         vbox1.pack_start(objLabel, False, False,0)
         vbox1.pack_start(self.objEntry, False, False,0)
         vbox1.pack_start(typeLabel, False, False,0)
-        vbox1.pack_start(self.typeEntry, False, False,0)
+        vbox1.pack_start(self.poi_type_selector, False, False,0)
         vbox1.pack_start(xLabel, False, False,0)
         vbox1.pack_start(self.xEntry, False, False,0)
         vbox1.pack_start(yLabel, False, False,0)
@@ -320,6 +341,23 @@ class AddObjectPage(Page):
         self.showDetails.connect("clicked", self.details, "show")
         self.hideDetails.connect("clicked", self.details, "hide")
         saveButton.connect("clicked", self.send_object)
+        
+        session = get_session()
+        
+        poi_type_index = 0
+        default_poi_type_index = 0
+        for poi_type in session.query(POIType).order_by(POIType.name):
+            print poi_type.name
+            print type(poi_type.name)
+            if poi_type.name == u"övrigt":
+                default_poi_type_index = poi_type_index
+                print "bajsa lagom"
+            poi_type_index = poi_type_index + 1
+            print poi_type_index
+            print default_poi_type_index
+            self.poi_type_selector.append_text(poi_type.name)
+            
+        self.poi_type_selector.set_active(default_poi_type_index)
         
         hbox2 = gtk.HBox()
         hbox2.pack_start(backButton, True, True, padding=2)
@@ -340,7 +378,8 @@ class AddObjectPage(Page):
 
     def send_object(self, button):
         #lägg till så man kan fixa in type
-        poi = str(packet.Packet("poi",id = "", poi_type = u"brand", name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
+        print self.poi_type_selector.get_active_text()
+        poi = str(packet.Packet("poi",id = "", poi_type = unicode(self.poi_type_selector.get_active_text()), name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
         rpc.send("qos", "add_packet", packet=poi)
     
     def map_dblclick(self, coordx, coordy):
@@ -360,6 +399,7 @@ class AddObjectPage(Page):
             self.hideDetails.show()
         elif state == "hide":
             self.gui.rightBook.set_size_request(300,300)
+
             self.vbox2.hide()
             self.showDetails.show()
             self.hideDetails.hide()

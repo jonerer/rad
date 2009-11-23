@@ -39,11 +39,13 @@ if "exempeldata" in sys.argv and len(types) == 0:
     c=POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
     d=UnitType(u"jonas","static/ikoner/JonasInGlases.png")
     e=POIType(u"brand", "static/ikoner/rainbow.png")
+    f=POIType(u"övrigt","static/ikoner/information.png")
     session.add(b)
     session.add(c)
     session.add(d)
     session.add(a)
     session.add(e)
+    session.add(f)
     session.commit()
     #skapar användarna
     session.add(POI(15.57796, 58.40479, 1, u"hej", a, datetime.now()))

@@ -150,8 +150,7 @@ def alarm_response(pack):
 network_listeners["alarm_response"] = alarm_response
 
 def contact_response(pack):
-    print "Hille du e king på contact_response"
-    print pack.data
+    rpc.send("main", "add_contactlist", pack = str(pack))
 network_listeners["contact_resp"] = contact_response
 
 def poi_response(pack):
