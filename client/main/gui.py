@@ -23,7 +23,7 @@ def create_menuButton(bild,label):
     buttonBox.pack_start(label, expand=False, fill=False, padding=5)
     button.add(buttonBox)
     button.show_all()
-    button.set_size_request(100, 60)
+    button.set_size_request(296, 60)
     return button
 
 class Page(gtk.VBox):
@@ -118,20 +118,32 @@ class ContactPage(Page):
         print "DU KÖRDE NU INIT MOTHERFUCKER"
         #super(ContactPage, self).__init__("contact", gui, width="full")
         super(ContactPage, self).__init__("contact", gui, width="full")
-        self.size_request = (300,300)
+        self.size_request = (600,300)
+        hbox1 = gtk.HBox()
         button = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
         tryButton = create_menuButton("static/ikoner/JonasInGlases.png", "Test")
-
-        button.connect("clicked", self.gui.switch_page, "menu")
         tryButton.connect("clicked", self.req_contact)
+        button.connect("clicked", self.gui.switch_page, "menu")
+
 
         vMenuBox = gtk.VBox(False,0)
         vMenuBox.pack_start(tryButton, False, True, padding=2)
         vMenuBox.pack_start(button, False, True, padding=2)
-        self.pack_start(vMenuBox, False, False, padding=2)
- 
-        self.show()
+        hbox1.pack_start(vMenuBox, False, False, padding=2)
+        
         vMenuBox.show()
+
+
+
+        hbox1.pack_start(button, False, True, padding=2)
+        
+        combo = gtk.combo_box_new_text()
+        for x in range(20):
+            combo.append_text("Snopp1")
+
+        self.pack_start(hbox1,False,True,0)
+        self.show_all()
+        
 
     def req_contact(self, widget):
         contact_send = str(packet.Packet("contact_req"))
@@ -268,6 +280,8 @@ class AddObjectPage(Page):
         super(AddObjectPage, self).__init__("addObject", gui, homogeneous=False,
                 spacing=0)
         self.size_request = (300,300)
+
+        
         hbox1 = gtk.HBox()
         vbox1 = gtk.VBox()
         self.vbox2 = gtk.VBox()
@@ -360,6 +374,7 @@ class AddObjectPage(Page):
             self.hideDetails.show()
         elif state == "hide":
             self.gui.rightBook.set_size_request(300,300)
+
             self.vbox2.hide()
             self.showDetails.show()
             self.hideDetails.hide()
