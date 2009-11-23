@@ -233,11 +233,13 @@ class AddObjectPage(Page):
         vbox1 = gtk.VBox()
         self.vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
-        nameEntry = gtk.Entry()
+        self.nameEntry = gtk.Entry()
         objLabel = gtk.Label("Object:")
-        objEntry = gtk.Entry()
+        self.objEntry = gtk.Entry()
         typeLabel = gtk.Label("Typ:")
-        typeEntry = gtk.Entry()
+        self.typeEntry = gtk.Entry()
+        infoLabel = gtk.Label("Information:")
+        infoEntry = gtk.Entry()
         xLabel = gtk.Label("X-koordinat:")
         self.xEntry = gtk.Entry()
         self.xEntry.set_editable(False)
@@ -259,11 +261,11 @@ class AddObjectPage(Page):
         #infoView.set_wrap_mode(gtk.WRAP_WORD)
         
         vbox1.pack_start(nameLabel, False, False,0)
-        vbox1.pack_start(nameEntry, False, False,0)
+        vbox1.pack_start(self.nameEntry, False, False,0)
         vbox1.pack_start(objLabel, False, False,0)
-        vbox1.pack_start(objEntry, False, False,0)
+        vbox1.pack_start(self.objEntry, False, False,0)
         vbox1.pack_start(typeLabel, False, False,0)
-        vbox1.pack_start(typeEntry, False, False,0)
+        vbox1.pack_start(self.typeEntry, False, False,0)
         vbox1.pack_start(xLabel, False, False,0)
         vbox1.pack_start(self.xEntry, False, False,0)
         vbox1.pack_start(yLabel, False, False,0)
@@ -271,7 +273,6 @@ class AddObjectPage(Page):
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
-
         self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
         self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","Goem Detaljer")
 
@@ -279,6 +280,7 @@ class AddObjectPage(Page):
 
         self.showDetails.connect("clicked", self.details, "show")
         self.hideDetails.connect("clicked", self.details, "hide")
+        saveButton.connect("clicked", self.send_object)
         
         hbox2 = gtk.HBox()
         hbox2.pack_start(backButton, True, True, padding=2)
@@ -295,12 +297,17 @@ class AddObjectPage(Page):
         self.show_all()
         self.vbox2.hide()
         self.hideDetails.hide()
+        self.infoView.hide()
+
+    def send_object(self, button):
+        #lägg till så man kan fixa in sub_type
+        poi = str(packet.Packet("poi",id = "", sub_type = "", name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
+        rpc.send("qos", "add_packet", packet=poi)
     
     def map_dblclick(self, coordx, coordy):
         print "Jon bajsar!"
         self.xEntry.set_text(str(coordx))
         self.yEntry.set_text(str(coordy))
-
         
     def details(self, button, state, widget=None):
         if state == "show":

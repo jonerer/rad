@@ -67,16 +67,9 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.103"
+host_addr = "130.236.76.135"
 host_port = 2345
- 
-#ska hämtas från databasen
-id_counter = 0
- 
-def get_id():
-    global id_counter
-    id_counter = id_counter + 1
-    return id_counter
+start_id = 1
  
 def pong(connection, pack):
     print "Sätter ny timestamp"
@@ -138,9 +131,14 @@ clientrequests["alarm"] = alarm
 def poi(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
+    global start_id
     print "hej du har fått en poi"
     #lägg i databas
+    for points in session.query(POI).order_by(POI.id.desc()).limit(1):
+        start_id = points.id + 1
     id = pack.data["id"]
+    if not id:
+        id = start_id
     name = pack.data["name"]
     timestamp = pack.timestamp
     sub_type = pack.data["sub_type"]
@@ -151,8 +149,6 @@ def poi(connection, pack):
     loginfo = pack.data
     session.add(POI(coordx, coordy, id, name, sub_type, timestamp))
     session.commit()
-    for points in session.query(POI).all():
-        print points
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data
     for connection in connections.values():
