@@ -63,6 +63,7 @@ class Connection(object):
         self.in_buffer = ""
         self.timestamp = time.time()
         self.timepinged = 0
+        self.user = None
  
 client_sockets = {}
 connections = {}
@@ -92,6 +93,8 @@ def mission(connection, pack):
 clientrequests["mission_save"] = mission
 
 def login(connection, pack):
+    global to_be_removed
+
     connection.timestamp = time.time()
     connection.timepinged = 0
     session.bind
@@ -103,7 +106,14 @@ def login(connection, pack):
     for users in session.query(User).filter(User.name == username):
         if password == users.password:
             login_response = packet.Packet("login_response", login="True")
-        else :
+            # kolla om usern redan var inloggad
+            # ta isf bort den "gamla"
+            for old_conn in connections.values():
+                if old_conn.user == username and \
+                        old_conn.id != connection.id:
+                    to_be_removed.append(old_conn)
+            connection.user = username
+        else:
             login_response = packet.Packet("login_response", login="False")
     connection.out_queue.put(login_response)
 clientrequests["login"] = login
@@ -161,6 +171,8 @@ s.bind((host_addr, host_port))
 s.setblocking(0)
 s.settimeout(0)
 s.listen(5)
+
+to_be_removed = []
  
 print "Server igång på %s:%s" % (host_addr, host_port)
 while True:
@@ -178,6 +190,7 @@ while True:
             client_sockets.values(),
             client_sockets.values(),
             client_sockets.values(), 0)
+
         to_be_removed = []
  
         for sock in read_list:
