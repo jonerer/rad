@@ -20,8 +20,7 @@ def main():
             time.sleep(1)  
         lon, lat = gpsdevice.get_position()
         session = get_session()
-        for units in session.query(Unit).get_by(Unit.is_self==True):
-            print units
+        for unit in session.query(Unit).filter(Unit.is_self==True):
             units.coordx=lon
             units.coordy=lat
         print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
