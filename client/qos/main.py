@@ -36,7 +36,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.114"
+        self.host_addr = "130.236.76.135"
         #self.host_addr = "localhost"
         self.host_port = 2345
         
@@ -155,9 +155,11 @@ network_listeners["alarm_response"] = alarm_response
 
 def contact_response(pack):
     rpc.send("main", "add_contactlist", pack = str(pack))
+    connection.timestamp = time.time()
 network_listeners["contact_resp"] = contact_response
 
 def poi_response(pack):
+    connection.timestamp = time.time()
     print "Hille du e king på poi_response"
     rpc.send("main", "add_poi", pack=str(pack))
 network_listeners["poi_response"] = poi_response

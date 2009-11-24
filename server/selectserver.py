@@ -72,7 +72,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.114"
+host_addr = "130.236.76.135"
 host_port = 2345
 start_id = 1
  
@@ -112,7 +112,7 @@ clientrequests["mission_save"] = mission
 
 def login(connection, pack):
     global to_be_removed
-
+    print "Du är inne i login acceptor"
     connection.timestamp = time.time()
     connection.timepinged = 0
     session.bind
@@ -131,7 +131,7 @@ def login(connection, pack):
                 if old_conn.user == username and \
                         old_conn.id != connection.id:
                     to_be_removed.append(old_conn)
-                    print "redan inloggad på annan connection. tar bort."
+                    print "redan inloggad på annan connection tar bort."
             connection.user = username
         else:
             login_response = packet.Packet("login_response", login="False")
@@ -249,7 +249,6 @@ while True:
                 not connection.out_queue.empty():
                 print connection.id
                 abba = connection.out_queue.get()
-                print "Du smakar fisk: " , abba
                 connection.out_buffer = buffrify.create_pack(str(abba))
  
             if connection.out_buffer != "":
