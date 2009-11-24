@@ -403,6 +403,11 @@ class AddObjectPage(Page):
 class Gui(hildon.Program):
     _map = None
     _map_change_zoom = None
+    def require_login(self):
+        # TODO: snyggare:
+        # den här räknar me att login e på sista sidan
+        last_page = self.view.get_n_pages()
+        self.view.set_current_page(last_page-1)
 
     def on_window_state_change(self, widget, event, *args):
         if event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN:
@@ -471,11 +476,14 @@ class Gui(hildon.Program):
         self.view.insert_page(self.create_settings_view())
         self.view.insert_page(self.create_login_view())
         self.view.show()
+        
         # Lägger in vyn i fönstret
         self.window.add(self.view)
 
         # Skapar menyn
         self.window.set_menu(self.create_menu())
+
+        rpc.register("require_login", self.require_login)
 
     
     def switch_page(self, page_name, widget=None):

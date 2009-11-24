@@ -16,6 +16,7 @@ def set_name(new_name):
     osso_rpc = osso.Rpc(osso_c)
 
 def receive(interface, method, arguments, user_data):
+    global name
     try:
         if method not in callbacks:
             return "ERROR: no such callback registered"
@@ -55,7 +56,7 @@ def send(target_name, method, **kwargs):
         try:
             val = simplejson.loads(val)
         except simplejson.JSONDecodeError, e:
-            logging.error("fick ett fel i RPC till %s: %s" % (target_name,val))
+            logging.error("fick ett fel i RPC till %s, %s: %s" % (target_name,method,val))
     return val
 
 def register(cb_name, callback):

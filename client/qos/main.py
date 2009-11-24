@@ -32,10 +32,11 @@ def read_keys():
 class Connection(object):
 
     #The time the client need to hear from
+    # ahah WHAT? :D ^^^^
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.103"
+        self.host_addr = "130.236.76.114"
         #self.host_addr = "localhost"
         self.host_port = 2345
         
@@ -88,7 +89,6 @@ class Connection(object):
                 self.connected = False
  
     def add_packet(self, packet):
-        #print "add_packet: %s" % packet.type
         """ receives stuff from dbus and DOO EEETT"""
         packet = Packet.from_str(packet)
         self.out_queue.put(packet)
@@ -126,6 +126,10 @@ class Connection(object):
 connection = Connection()
 if "--read-keys" in sys.argv or True: # ha true nu iaf
     threading.Thread(target=read_keys).start()
+
+def login_required(pack):
+    rpc.send("main", "require_login")
+network_listeners["login_required"] = login_required
  
 def ping_response(pack):
     connection.timestamp = time.time()

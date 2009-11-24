@@ -6,6 +6,9 @@ from shared import buffrify, packet
 from shared.data.serverdb import get_session, create_tables
 from shared.data.serverdb.defs import *
 import logging 
+from util import require_login
+
+
  
 print "gör session"
 session = get_session()
@@ -69,7 +72,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.103"
+host_addr = "130.236.76.114"
 host_port = 2345
 start_id = 1
  
@@ -79,6 +82,7 @@ def pong(connection, pack):
     connection.timepinged = 0
 clientrequests["pong"] = pong
 
+@require_login
 def contact_send(connection, pack):
     print "du e fan king på contact_send i servern"
     connection.timestamp = time.time()
