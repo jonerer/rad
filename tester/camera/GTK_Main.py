@@ -33,9 +33,7 @@ class GTK_Main:
 		options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! hantro4200enc ! udpsink host=130.236.218.251 port=5435"
 		self.player = gst.parse_launch ( options )
 
-		options2 = "udpsrc port=5435
-caps=application/x-rtp,clock-rate=90000 ! hantro4100dec !
-xvimagesink"
+		options2 = "udpsrc port=5435 caps=application/x-rtp,clock-rate=90000 ! hantro4100dec ! xvimagesink"
 
 		self.player1 = gst.parse_launch( options2 )
 
