@@ -115,45 +115,48 @@ class SettingsPage(Page):
         self.show_all()
         
 class ContactPage(Page):
+
+    def add_contactlist(self, pack):
+        pack = packet.Packet.from_str(pack)
+        self.contacts = {}
+        for user in pack.data["users"]:
+            self.contacts[user[0]] = user[1]
+        self.combo.get_model().clear()
+        for user in self.contacts:
+            self.combo.append_text(user)
+    def on_show(self): 
+        contact_send = str(packet.Packet("contact_req"))
+        rpc.send("qos", "add_packet", packet=contact_send)
         
     def __init__(self, gui):
         #super(ContactPage, self).__init__("contact", gui, width="full")
         super(ContactPage, self).__init__("contact", gui, width="full")
-        self.contactlist = {}
+        self.contacts = {}
         self.size_request = (300,300)
-        vbox1 = gtk.VBox()
+        self.vbox1 = gtk.VBox()
+
+        #self.combo innehåller alla kontakter som finns i self.contacts {(user,ip)} 
+        self.combo = gtk.combo_box_new_text()
         
         backButton = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
-        tryButton = create_menuButton("static/ikoner/JonasInGlases.png", "Test")
         newButton = create_menuButton("static/ikoner/phone.png", "Ring")
-        xxxButton = create_menuButton("static/ikoner/JonasInGlases.png", "Video")
-        tryButton.connect("clicked", self.req_contact)
+        videoButton = create_menuButton("static/ikoner/JonasInGlases.png", "Video")
         backButton.connect("clicked", self.gui.switch_page, "menu")
-
-        combo = gtk.combo_box_new_text()
-        for x in range(20):
-            combo.append_text("Snopp1")
+        videoButton.connect("clicked", self.videoCall)
             
-        vbox1.pack_start(combo,False,False,0)
-        vbox1.pack_start(tryButton, False, True, padding=2)
-        vbox1.pack_start(newButton, False, True, padding=2)
-        vbox1.pack_start(xxxButton, False, True, padding=2)
-        vbox1.pack_start(backButton, False, True, padding=2)
-        self.pack_start(vbox1,False,True,0)
+        self.vbox1.pack_start(self.combo,False,False,0)
+        self.vbox1.pack_start(newButton, False, True, padding=2)
+        self.vbox1.pack_start(videoButton, False, True, padding=2)
+        self.vbox1.pack_start(backButton, False, True, padding=2)
+        self.pack_start(self.vbox1,False,True,0)
         self.show_all()
-        
         rpc.register("add_contactlist", self.add_contactlist)
 
-    def req_contact(self, widget):
-        contact_send = str(packet.Packet("contact_req"))
-        rpc.send("qos", "add_packet", packet=contact_send)
-
-    def add_contactlist(self, pack):
-        pack = packet.Packet.from_str(pack)
-        for user in pack.data["users"]:
-            self.contactlist[user[0]] = user[1]
-        print self.contactlist
-
+    def videoCall(self, widget, data=None):
+        user = self.combo.get_active_text()
+        ip = self.contacts[user]
+        print "user ip: ", ip
+        #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
 class MissionPage(Page):
   
