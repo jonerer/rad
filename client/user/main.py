@@ -21,8 +21,8 @@ def main():
         lon, lat = gpsdevice.get_position()
         session = get_session()
         for unit in session.query(Unit).filter(Unit.is_self==True):
-            units.coordx=lon
-            units.coordy=lat
+            unit.coordx=lon
+            unit.coordy=lat
         print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
         print rpc.send("main", "update_map")
     #stop gps devices
