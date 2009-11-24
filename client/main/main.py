@@ -71,7 +71,7 @@ else:
 for units in session.query(Unit).all():
     map.add_object(units.name, data_storage.MapObject(
         {"longitude":units.coordx,"latitude":units.coordy},
-        units.type.image))    
+        units.type.image))
 for poi in session.query(POI).all():
     map.add_object(poi.name, data_storage.MapObject(
         {"longitude":poi.coordx,"latitude":poi.coordy},
