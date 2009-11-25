@@ -4,6 +4,8 @@ import math
 import time
 from shared import rpc
 from datetime import datetime
+from shared.data import get_session, create_tables
+from shared.data.defs import *
 #from tester.osso import rpc
 
 class Map(gtk.DrawingArea):
@@ -76,28 +78,28 @@ class Map(gtk.DrawingArea):
         self._last_movement_timestamp = time.time()
         self._allow_movement = True
 
-        #if event.type == gtk.gdk._2BUTTON_PRESS:
-        if True:
-            #event.xcoord, event.ycoord = self.pixel_to_gps(event.x, event.y)
-            # STÄMMERT?
-            lon, lat = self.pixel_to_gps(event.x-self._width/2, event.y-self._height/2)
-            lon = self._origin_position["longitude"] + lon
-            lat = self._origin_position["latitude"] - lat
-
-            self._gui.map_dblclick(lon, lat)
-            print "coords lon,lat: %s,%s" % (lon, lat)
-            #session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
-            #self._map.add_object("skonaste", data_storage.MapObject(
-            #    {"longitude":lon,"latitude":lat},
-            #    "static/ikoner/brandbil.png"))    
-            #self._gui.map_dblclick(widget, event)
-
         return True
 
     def handle_button_release_event(self, widget, event):
         self._allow_movement = False
         self._is_dirty = True
         self.queue_draw()
+
+        if time.time() < self._last_movement_timestamp + 0.1:
+            #event.xcoord, event.ycoord = self.pixel_to_gps(event.x, event.y)
+            lon, lat = self.pixel_to_gps(event.x-self._width/2, event.y-self._height/2)
+            lon = self._origin_position["longitude"] + lon
+            lat = self._origin_position["latitude"] - lat
+            
+
+            self._gui.map_dblclick(lon, lat)
+            self.red_dot(lon,lat)
+            print "coords lon,lat: %s,%s" % (lon, lat)
+            #session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
+            #self._map.add_object("skonaste", data_storage.MapObject(
+            #    {"longitude":lon,"latitude":lat},
+            #    "static/ikoner/brandbil.png"))    
+            #self._gui.map_dblclick(widget, event)
         return True
 
     def handle_motion_notify_event(self, widget, event):
@@ -241,3 +243,17 @@ class Map(gtk.DrawingArea):
         # överensstämmer.
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
+
+    def red_dot(self, dotx, doty):
+        session = get_session()
+        print dotx
+        print doty
+        for poi in session.query(POI).filter(POI.name==u"dot"):
+            print poi.name
+        
+            poi.coordx = dotx
+            poi.coordy = doty
+            session.commit()
+        self.queue_draw()
+        x = self._map.get_object(1)
+        print x
