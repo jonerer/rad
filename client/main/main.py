@@ -8,7 +8,6 @@ import gui
 import data_storage
 import map_xml_reader
 from shared import data, rpc
-#from shared import data
 from shared.data import get_session, create_tables
 from shared.data.defs import *
 import logging
@@ -68,14 +67,15 @@ else:
                 "databasen. ta bort den först för att tömma.")
 
 #Ritar ut alla objekt i databasen
-for units in session.query(Unit).all():
-    map.add_object(units.name, data_storage.MapObject(
-        {"longitude":units.coordx,"latitude":units.coordy},
-        units.type.image))    
+for unit in session.query(Unit).all():
+    #map.add_object(unit.id, unit)
+    map.add_object(unit.name, data_storage.MapObject(
+        {"longitude":unit.coordx,"latitude":unit.coordy},
+        unit.type.image))    
 for poi in session.query(POI).all():
     map.add_object(poi.name, data_storage.MapObject(
         {"longitude":poi.coordx,"latitude":poi.coordy},
-        poi.poi_type.image))
+        poi.type.image))
 
 # Skapar grafiska interfacet.
 print "Skapar programmets GUI"

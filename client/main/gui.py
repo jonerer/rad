@@ -124,6 +124,7 @@ class ContactPage(Page):
         self.combo.get_model().clear()
         for user in self.contacts:
             self.combo.append_text(user)
+
     def on_show(self): 
         contact_send = str(packet.Packet("contact_req"))
         rpc.send("qos", "add_packet", packet=contact_send)

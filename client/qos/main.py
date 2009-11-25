@@ -11,6 +11,7 @@ from simplejson import loads, dumps
 import subprocess
 from shared.data import get_session, create_tables
 from shared.data.defs import *
+import logging
 
 #subprocess.call('ssh -f jonbe759@130.236.189.23 -L 2345:127.0.0.1:2345 -N sleep 1', shell=True)
 
@@ -36,7 +37,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.76.114"
         #self.host_addr = "localhost"
         self.host_port = 2345
         

@@ -9,7 +9,8 @@ from sqlalchemy.orm import relation, backref
 Base = declarative_base()
 
 # lägg allt som ska synas utåt här: (dessa får man från from shared.data.defs import *
-__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 'AlarmType', 'Alarm', 'POI', 'POIType']
+__all__ = ['UnitType', 'Unit', 'User', 'Mission', 'Document', 
+        'AlarmType', 'Alarm', 'POI', 'POIType']
 
 class UnitType(Base):
     __tablename__ = "unit_types"
@@ -51,15 +52,15 @@ class POI(Base):
     sub_type = Column(Unicode) 
     timestamp = Column(DateTime)
     type_id = Column(Integer, ForeignKey("poi_types.id"))
-    poi_type = relation(POIType, backref=backref("poi", order_by=id)) 
+    type = relation(POIType, backref=backref("poi", order_by=id)) 
     
-    def __init__(self, coordx, coordy, id, name, poi_type, timestamp):
+    def __init__(self, coordx, coordy, id, name, type, timestamp):
         from shared.data import get_session, create_tables
         session = get_session()
         self.coordx = coordx
         self.coordy = coordy
         self.id = id
-        self.poi_type = poi_type
+        self.type = type
         self.name = name
         self.timestamp = timestamp
 

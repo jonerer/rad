@@ -43,7 +43,6 @@ class Map(gtk.DrawingArea):
         self.connect("button_press_event", self.handle_button_press_event)
         self.connect("button_release_event", self.handle_button_release_event)
         self.connect("motion_notify_event", self.handle_motion_notify_event)
-        self.connect("key_press_event", self.doubleclick_event)
         self.set_events(gtk.gdk.BUTTON_PRESS_MASK |
                         gtk.gdk.BUTTON_RELEASE_MASK |
                         gtk.gdk.EXPOSURE_MASK |
@@ -68,10 +67,6 @@ class Map(gtk.DrawingArea):
         self._is_dirty = True
         self.queue_draw()
 
-    def doubleclick_event(self, widget, event):
-        print "dblisch"
-        return True
-
     # Hanterar rörelse av kartbilden
     def handle_button_press_event(self, widget, event):
         import data_storage
@@ -81,7 +76,8 @@ class Map(gtk.DrawingArea):
         self._last_movement_timestamp = time.time()
         self._allow_movement = True
 
-        if event.type == gtk.gdk._2BUTTON_PRESS:
+        #if event.type == gtk.gdk._2BUTTON_PRESS:
+        if True:
             #event.xcoord, event.ycoord = self.pixel_to_gps(event.x, event.y)
             # STÄMMERT?
             lon, lat = self.pixel_to_gps(event.x-self._width/2, event.y-self._height/2)
