@@ -68,7 +68,7 @@ class MenuPage(Page):
         coordy = pack.data["coordy"]
         for poi_name in session.query(POIType).filter(POIType.name==poi_type):
             poi_type = poi_name
-        print session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
+        session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
         session.commit()
         for poi in session.query(POI).filter(POI.name == name):
             self.gui._map.add_object(poi.name, data_storage.MapObject(
@@ -578,29 +578,31 @@ class Gui(hildon.Program):
 
 
     def create_login_view(self):
-        def dbcheck_press_callback(self, widget, data=None):   
+        def dbcheck_press_callback(button, widget, data=None):   
             #Detta behövs inte här, men kanske inte fungerar på andra stället
             #session = get_session()
             #create_tables()        
             #session.bind
             #session.query(User).all()
-            user = unicode(userText.get_text())
-            pw = unicode(passText.get_text())
-            login = str(packet.Packet("login", username=user, password=pw))
+            self.user = unicode(userText.get_text())
+            self.pw = unicode(passText.get_text())
+            login = str(packet.Packet("login", username=self.user, password=self.pw))
             print rpc.send("qos", "add_packet", packet=login)
-
-        def access(bol):
-            if bol:
-                statusLabel.set_label("Access granted")
-            if not bol:
-                statusLabel.set_label("Access denied")
 
         hboxOUT  = gtk.HBox(homogeneous=False, spacing=1)
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
         hbox1 = gtk.HBox(homogeneous=False, spacing=1)
         hbox2 = gtk.HBox(homogeneous=False, spacing=1)
-        combo = gtk.combo_box_new_text()
+        self.combo = gtk.combo_box_new_text()
+        
+        session = get_session()
+        
+        ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
 
+        for unit in session.query(Unit).order_by(Unit.name):
+            self.combo.append_text(unit.name)
+            print "Det du har är: ", unit.name
+ 
         userText = gtk.Entry(max=0)
         userLabel = gtk.Label("Användare")
         passText = gtk.Entry(max=0)
@@ -609,7 +611,8 @@ class Gui(hildon.Program):
         okButton.set_size_request(70, 50)
         okButton.connect("clicked", dbcheck_press_callback, None)
         statusLabel = gtk.Label("No status")
-
+        unittypeLabel = gtk.Label("Context")
+        
         vbox1.pack_start(hbox1, expand=False, fill=False, padding=1)
         vbox1.pack_start(hbox2, expand=False, fill=False, padding=1)
         vbox1.pack_start(okButton, expand=False, fill=False, padding=1)
@@ -618,11 +621,13 @@ class Gui(hildon.Program):
         hbox2.pack_start(passText, expand=False, fill=False, padding=1)
         hbox2.pack_start(passLabel, expand=False, fill=False, padding=1)
         vbox1.pack_start(statusLabel, expand=False, fill=False, padding=1)
-        vbox1.pack_start(combo, expand=False, fill=False, padding=1)
+        vbox1.pack_start(unittypeLabel, expand=False, fill=False, padding=1)
+        vbox1.pack_start(self.combo, expand=False, fill=False, padding=1)
         hboxOUT.pack_start(vbox1, expand=True, fill=False, padding=1)
         
         userText.show()
         userLabel.show()
+        unittypeLabel.show()
         passText.show()
         passLabel.show()
         okButton.show()
@@ -631,10 +636,34 @@ class Gui(hildon.Program):
         hbox2.show()
         vbox1.show()
         hboxOUT.show()
-        combo.show()
+        self.combo.show()
         #Skapar rpc
-        rpc.register("access", access)
         
+        def access(bol):
+            if bol:
+                statusLabel.set_label("Access granted")
+                for user in session.query(User):
+                    for unit in session.query(Unit).filter_by(type_id=user.type_id):
+                        unit.is_self = False
+                    user.type_id
+                    session.delete(user)
+                for unit in session.query(Unit).order_by(Unit.name):
+                    if unit.name == self.combo.get_active_text():
+                        unit.is_self = True
+                        currentuser = User(self.user, self.pw)
+                        currentuser.type = unit
+                        session.add(currentuser)
+                        print "Du matchade unit knäppis"
+                session.commit()
+            if not bol:
+                statusLabel.set_label("Access denied")
+                for user in session.query(User):
+                    for unit in session.query(Unit).filter_by(type_id=user.type_id):
+                        unit.is_self = False
+                    session.delete(user)
+                session.commit()
+       
+        rpc.register("access", access)
         return hboxOUT
 
 

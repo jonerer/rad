@@ -33,6 +33,7 @@ types = session.query(UnitType).all()
 if "exempeldata" in sys.argv and len(types) == 0:
     #Om du behöver fylla på databasen igen gör dessa nedanför
     #skapar olika unittypes
+
     a=POIType(u"Ambulans1", "static/ikoner/ambulans.png")
     b=POIType(u"Brandbild1", "static/ikoner/brandbil.png")
     c=POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
@@ -55,6 +56,28 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(POI(15.5629, 58.4093, 4, u"go", c, datetime.now()))
     session.add(POI(15.5635, 58.4035, 4, u"dot", g, datetime.now()))
     session.add(Unit(u"III", d, 15.5829, 58.4093, True))
+#=======
+    
+    ##POIType
+    #sjukhus = POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
+    #session.add(sjukhus)
+
+    ##Lägger till alla poi's
+    #session.add(POI(15.6001709, 58.40533172, 4, u"Sjukhus", sjukhus, datetime.now()))
+
+    ##UnitTypes
+    #ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
+    #brandbil = UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
+    #jonas = UnitType(u"jonas","static/ikoner/JonasInGlases.png")
+    #session.add(ambulans)
+    #session.add(brandbil)
+    #session.add(jonas)
+
+    ##skapar units
+    #session.add(Unit(u"Ambulans ett", ambulans, 15.5829, 58.4093, False))
+    #session.add(Unit(u"Ambulans två", ambulans, 15.57806, 58.40579, False))
+    #session.add(Unit(u"Brandbil", brandbil, 15.5729, 58.40193, False))
+#>>>>>>> 98e4ff540861dd07e24457389f672d52cf5c24f9:client/main/main.py
     session.commit()
     #skapar en POI-type
     #self, coordx, coordy, id, name, sub_type, timestamp

@@ -46,20 +46,20 @@ class POI(Base):
     __tablename__ = "poi"
     coordx = Column(Float)
     coordy = Column(Float)
-    db_id = Column(Integer, primary_key=True)
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
+    uid = Column(Integer)
     name = Column(Unicode)
     sub_type = Column(Unicode) 
     timestamp = Column(DateTime)
     type_id = Column(Integer, ForeignKey("poi_types.id"))
     type = relation(POIType, backref=backref("poi", order_by=id)) 
     
-    def __init__(self, coordx, coordy, id, name, type, timestamp):
+    def __init__(self, coordx, coordy, uid, name, type, timestamp):
         from shared.data import get_session, create_tables
         session = get_session()
         self.coordx = coordx
         self.coordy = coordy
-        self.id = id
+        self.uid = uid
         self.type = type
         self.name = name
         self.timestamp = timestamp
@@ -115,6 +115,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
     password = Column(Unicode)
+    type_id = Column(Integer, ForeignKey("units.id"))
+    type = relation(Unit, backref=backref("users", order_by=id))
 
     def __init__(self, name, password):
         self.name = name
