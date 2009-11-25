@@ -37,7 +37,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
+        self.host_addr = "130.236.76.56"
         #self.host_addr = "localhost"
         self.host_port = 2345
         
@@ -140,10 +140,7 @@ network_listeners["ping"] = ping_response
 def login_response(pack):
     login_boolean = parseBoolean(pack.data["login"])
     connection.timestamp = time.time()
-    if login_boolean:
-        rpc.send("main", "access", bol=login_boolean)
-    if not login_boolean:
-        rpc.send("main", "access", bol=login_boolean)
+    rpc.send("main", "access", bol=login_boolean)
 network_listeners["login_response"] = login_response
  
 def parseBoolean(login):

@@ -3,6 +3,7 @@ import gtk
 import hildon
 import gui_map
 import time
+import sys
 from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc, packet
@@ -665,6 +666,52 @@ class Gui(hildon.Program):
        
         rpc.register("access", access)
         return hboxOUT
+
+    def create_login_dialog(self):
+        def dbcheck_press_callback(self, widget, data=None):   
+            #Detta behövs inte här, men kanske inte fungerar på andra stället
+            #session = get_session()
+            #create_tables()        
+            #session.bind
+            #session.query(User).all()
+            user = unicode(user_text.get_text())
+            pw = unicode(pass_text.get_text())
+            login = str(packet.Packet("login", username=user, password=pw))
+            print rpc.send("qos", "add_packet", packet=login)
+
+        def access(bool):
+            global access_granted
+            access_granted = bool
+
+        access_granted = False
+        dialog = gtk.Dialog("Logga in",
+                            self.window, 
+                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                            ("Logga in", gtk.RESPONSE_ACCEPT,
+                            "Jag skiter i allt", gtk.RESPONSE_REJECT)
+
+        user_text = gtk.Entry(max=0)
+        user_label = gtk.Label("Användare")
+        user_box = gtk.HBox(spacing=1)
+        user_box.pack_start(user_label, expand=False, fill=False, padding=1)
+        user_box.pack_start(user_text, expand=False, fill=False, padding=1)
+
+        pass_text = gtk.Entry(max=0)
+        pass_label = gtk.Label("Lösenord")
+        pass_box = gtk.HBox(spacing=0)
+        pass_box.pack_start(pass_label, expand=False, fill=False, padding=1)
+        pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
+
+        dialog.vbox.pack_start(user_box)
+        dialog.vbox.pack_start(pass_box)
+        dialog.vbox.show_all()
+
+        while not access_granted
+        response = dialog.run()
+        if response == gtk.RESPONSE_ACCEPT:
+            dbcheck_press_callback()
+        else:
+            sys.exit()
 
 
     def create_settings_view(self):
