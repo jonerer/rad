@@ -49,8 +49,10 @@ class GTK_Main:
 		if self.button.get_label() == "Start":
 			self.button.set_label("Stop")
 			self.player.set_state(gst.STATE_PLAYING)
+			self.player1.set_state(gst.STATE_PLAYING)
 		else:
 			self.player.set_state(gst.STATE_NULL)
+			self.player1.set_state(gst.STATE_NULL)
 			self.button.set_label("Start")
 	def exit(self, widget, data=None):
 		gtk.main_quit()
@@ -58,11 +60,13 @@ class GTK_Main:
 		t = message.type
 		if t == gst.MESSAGE_EOS:
 			self.player.set_state(gst.STATE_NULL)
+			self.player1.set_state(gst.STATE_NULL)
 			self.button.set_label("Start")
 		elif t == gst.MESSAGE_ERROR:
 			err, debug = message.parse_error()
 			print "Error: %s" % err, debug
 			self.player.set_state(gst.STATE_NULL)
+			self.player1.set_state(gst.STATE_NULL)
 			self.button.set_label("Start")
 	def on_sync_message(self, bus, message):
 		if message.structure is None:
