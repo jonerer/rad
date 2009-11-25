@@ -4,6 +4,8 @@ import math
 import time
 from shared import rpc
 from datetime import datetime
+from shared.data import get_session, create_tables
+from shared.data.defs import *
 #from tester.osso import rpc
 
 class Map(gtk.DrawingArea):
@@ -88,8 +90,10 @@ class Map(gtk.DrawingArea):
             lon, lat = self.pixel_to_gps(event.x-self._width/2, event.y-self._height/2)
             lon = self._origin_position["longitude"] + lon
             lat = self._origin_position["latitude"] - lat
+            
 
             self._gui.map_dblclick(lon, lat)
+            self.red_dot(lon,lat)
             print "coords lon,lat: %s,%s" % (lon, lat)
             #session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
             #self._map.add_object("skonaste", data_storage.MapObject(
@@ -241,3 +245,17 @@ class Map(gtk.DrawingArea):
         # överensstämmer.
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
+
+    def red_dot(self, dotx, doty):
+        session = get_session()
+        print dotx
+        print doty
+        for poi in session.query(POI).filter(POI.name==u"dot"):
+            print poi.name
+        
+            poi.coordx = dotx
+            poi.coordy = doty
+            session.commit()
+        self.queue_draw()
+        x = self._map.get_object(1)
+        print x
