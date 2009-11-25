@@ -26,8 +26,8 @@ def main():
         print rpc.send("main", "ping_with_coordinates", lon=lat, lat=lon)
         print "skickat koord, updaterar map"
         print rpc.send("main", "update_map")
-        lon = lon + 5
-        lat = lat + 5
+        lon = lon + 0.002
+        lat = lat + 0.002
     #stop gps devices
     gpsbt.stop(context)
 
