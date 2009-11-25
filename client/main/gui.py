@@ -248,7 +248,7 @@ class RemoveMissionPage(Page):
         self.size_request = (300,300)
         nameLabel = gtk.Label("Uppdrag:")
         selectBox = gtk.Combo()
-        testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Sk?ggetorp"]
+        testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Skäggetorp"]
         selectBox.set_popdown_strings(testList)
         # TESTLIST SKA ERS?TTAS MED DATABAS-DATA
 
@@ -339,7 +339,7 @@ class AddObjectPage(Page):
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
-        self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","Goem Detaljer")
+        self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","Göm Detaljer")
 
         backButton.connect("clicked", self.gui.switch_page, "object")
 

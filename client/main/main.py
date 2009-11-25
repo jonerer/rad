@@ -39,7 +39,7 @@ if "exempeldata" in sys.argv and len(types) == 0:
     d=UnitType(u"jonas","static/ikoner/JonasInGlases.png")
     e=POIType(u"brand", "static/ikoner/rainbow.png")
     f=POIType(u"övrigt","static/ikoner/information.png")
-    g=POIType(u"dot","static/ikoner/information.png")
+    g=POIType(u"dot","static/ikoner/JonasInGlases.png")
     session.add(b)
     session.add(c)
     session.add(d)

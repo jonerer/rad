@@ -2,6 +2,8 @@
 import gtk
 import math
 import time
+import data_storage
+
 from shared import rpc
 from datetime import datetime
 from shared.data import get_session, create_tables
@@ -255,5 +257,4 @@ class Map(gtk.DrawingArea):
             poi.coordy = doty
             session.commit()
         self.queue_draw()
-        x = self._map.get_object(1)
-        print x
+        self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
