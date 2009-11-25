@@ -67,11 +67,10 @@ else:
                 "databasen. ta bort den först för att tömma.")
 
 #Ritar ut alla objekt i databasen
-for unit in session.query(Unit).all():
-    #map.add_object(unit.id, unit)
-    map.add_object(unit.name, data_storage.MapObject(
-        {"longitude":unit.coordx,"latitude":unit.coordy},
-        unit.type.image))    
+for units in session.query(Unit).all():
+    map.add_object(units.name, data_storage.MapObject(
+        {"longitude":units.coordx,"latitude":units.coordy},
+        units.type.image, units.is_self))
 for poi in session.query(POI).all():
     map.add_object(poi.name, data_storage.MapObject(
         {"longitude":poi.coordx,"latitude":poi.coordy},
