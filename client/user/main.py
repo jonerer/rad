@@ -5,6 +5,8 @@ from shared import rpc
  
 def main():
     rpc.set_name("rpcsender")
+    lon = 15.5629
+    lat = 58.4093
     #context = gpsbt.start()
     # ensure that GPS device is ready to connect and to receive commands
     #time.sleep(2)
@@ -18,8 +20,6 @@ def main():
             #time.sleep(1)  
         #lon, lat = gpsdevice.get_position()
         time.sleep(5)
-        lon = 15.5629
-        lat = 58.4093
         print lon
         print lat
         print "Nu skickar jag koordinater"

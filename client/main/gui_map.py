@@ -193,8 +193,6 @@ class Map(gtk.DrawingArea):
         for item in objects:
             x, y = self.gps_to_pixel(item["object"].get_coordinate()["longitude"],
                          item["object"].get_coordinate()["latitude"])
-            print item["object"].get_coordinate()["longitude"]
-            print item["object"].get_coordinate()["latitude"]
             if x != 0 and y != 0:
                 item["object"].draw(self.context, x, y)
    
