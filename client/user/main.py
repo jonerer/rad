@@ -25,6 +25,7 @@ def main():
         for unit in session.query(Unit).filter(Unit.is_self==True):
             unit.coordx=lon
             unit.coordy=lat
+        session.commit()
         print unit.coordx
         print unit.coordy
         print "Nu skickar jag koordinater"
