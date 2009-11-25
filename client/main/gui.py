@@ -146,12 +146,10 @@ class ContactPage(Page):
         videoButton.connect("clicked", self.videoCall)
         label = gtk.Label("Välj Kontakt:")
 
-        combo = gtk.combo_box_new_text()
-        for x in range(20):
-            combo.append_text("Snopp1")
-            
+        self.combo = gtk.combo_box_new_text()
+
         self.vbox1.pack_start(label, False, True, padding=2)
-        self.vbox1.pack_start(combo,False,False,10)
+        self.vbox1.pack_start(self.combo,False,False,10)
 
         self.vbox1.pack_start(newButton, False, True, padding=2)
         self.vbox1.pack_start(videoButton, False, True, padding=2)
