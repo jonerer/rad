@@ -23,11 +23,11 @@ def main():
         print lon
         print lat
         print "Nu skickar jag koordinater"
-        print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
+        print rpc.send("main", "ping_with_coordinates", lon=lat, lat=lon)
         print "skickat koord, updaterar map"
         print rpc.send("main", "update_map")
-        lon = lon + 00.0010
-        lat = lat + 00.0010
+        lon = lon + 5
+        lat = lat + 5
     #stop gps devices
     gpsbt.stop(context)
 
