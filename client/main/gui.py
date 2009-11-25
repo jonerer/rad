@@ -135,9 +135,9 @@ class ContactPage(Page):
         self.contacts = {}
         self.size_request = (300,300)
         self.vbox1 = gtk.VBox()
+        self.combo = gtk.combo_box_new_text()
 
         #self.combo innehåller alla kontakter som finns i self.contacts {(user,ip)} 
-        self.combo = gtk.combo_box_new_text()
         
         backButton = create_menuButton("static/ikoner/arrow_left.png", "Tillbaka")
         newButton = create_menuButton("static/ikoner/phone.png", "Ring")
@@ -146,12 +146,9 @@ class ContactPage(Page):
         videoButton.connect("clicked", self.videoCall)
         label = gtk.Label("Välj Kontakt:")
 
-        combo = gtk.combo_box_new_text()
-        for x in range(20):
-            combo.append_text("Snopp1")
-            
+
         self.vbox1.pack_start(label, False, True, padding=2)
-        self.vbox1.pack_start(combo,False,False,10)
+        self.vbox1.pack_start(self.combo,False,False,10)
 
         self.vbox1.pack_start(newButton, False, True, padding=2)
         self.vbox1.pack_start(videoButton, False, True, padding=2)
@@ -602,6 +599,8 @@ class Gui(hildon.Program):
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
         hbox1 = gtk.HBox(homogeneous=False, spacing=1)
         hbox2 = gtk.HBox(homogeneous=False, spacing=1)
+        combo = gtk.combo_box_new_text()
+
         userText = gtk.Entry(max=0)
         userLabel = gtk.Label("Användare")
         passText = gtk.Entry(max=0)
@@ -619,6 +618,7 @@ class Gui(hildon.Program):
         hbox2.pack_start(passText, expand=False, fill=False, padding=1)
         hbox2.pack_start(passLabel, expand=False, fill=False, padding=1)
         vbox1.pack_start(statusLabel, expand=False, fill=False, padding=1)
+        vbox1.pack_start(combo, expand=False, fill=False, padding=1)
         hboxOUT.pack_start(vbox1, expand=True, fill=False, padding=1)
         
         userText.show()
@@ -631,6 +631,7 @@ class Gui(hildon.Program):
         hbox2.show()
         vbox1.show()
         hboxOUT.show()
+        combo.show()
         #Skapar rpc
         rpc.register("access", access)
         
