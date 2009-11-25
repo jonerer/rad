@@ -4,6 +4,8 @@ import gtk
 import struct
 import math
 from shared import rpc
+from shared.data import get_session, create_tables
+from shared.data.defs import *
 
 # Tar reda på en PNG-bilds storlek
 def png_size(path):
@@ -341,6 +343,13 @@ class MapObject(Picture):
         dict = {"longitude":lon,"latitude":lat}
         #dict = {"longitude":lat,"latitude":lon}
         print "ditt dict: ", dict
+        session = get_session()
+        for unit in session.query(Unit).filter(Unit.is_self==True):
+            unit.coordx=lon
+            unit.coordy=lat
+        session.commit()
+        print unit.coordx
+        print unit.coordy
         self.set_coordinate(dict)
         
     def set_coordinate(self, coordinate):
