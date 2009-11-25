@@ -339,6 +339,7 @@ class MapObject(Picture):
     #Make dict to sen to set_coordinate
     def make_dict(self, lon, lat):
         dict = {"longitude":lon,"latitude":lat}
+        print dict
         self.set_coordinate(dict)
         
     def set_coordinate(self, coordinate):

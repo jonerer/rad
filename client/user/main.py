@@ -19,11 +19,17 @@ def main():
         while gpsdevice.get_position() == (0,0):
             time.sleep(1)  
         lon, lat = gpsdevice.get_position()
+        print lon
+        print lat
         session = get_session()
         for unit in session.query(Unit).filter(Unit.is_self==True):
             unit.coordx=lon
             unit.coordy=lat
+        print unit.coordx
+        print unit.coordy
+        print "Nu skickar jag koordinater"
         print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
+        print "skickat koord, updaterar map"
         print rpc.send("main", "update_map")
     #stop gps devices
     gpsbt.stop(context)
