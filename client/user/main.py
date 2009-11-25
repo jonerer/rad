@@ -21,7 +21,7 @@ def main():
         print lat
         time.sleep(5)
         print "Nu skickar jag koordinater"
-        print rpc.send("main", "ping_with_coordinates", lon=lat, lat=lon)
+        print rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
         print "skickat koord, updaterar map"
         print rpc.send("main", "update_map")
     #stop gps devices
