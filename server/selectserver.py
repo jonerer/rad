@@ -159,11 +159,9 @@ def alarm(connection, pack):
 clientrequests["alarm"] = alarm
 
 def poi(connection, pack):
-    print "Hej POI"
     connection.timestamp = time.time()
     connection.timepinged = 0
     global start_id
-    print "hej du har fått en poi"
     #lägg i databas
     for row in session.query(POI).order_by(POI.id.desc()).limit(1):
         start_id = row.id + 1

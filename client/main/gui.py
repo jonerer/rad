@@ -68,7 +68,7 @@ class MenuPage(Page):
         coordy = pack.data["coordy"]
         for poi_name in session.query(POIType).filter(POIType.name==poi_type):
             poi_type = poi_name
-        print session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
+        session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
         session.commit()
         for poi in session.query(POI).filter(POI.name == name):
             self.gui._map.add_object(poi.name, data_storage.MapObject(

@@ -331,7 +331,6 @@ class MapObject(Picture):
         #call set_coordinate to update self pos
         #if self=true makes u update the object position
         if is_self:
-            print "skapar ping with coordinates"
             rpc.register("ping_with_coordinates", self.make_dict)
 
 #        if len(path) == 1:
@@ -343,18 +342,14 @@ class MapObject(Picture):
     def make_dict(self, lon, lat):
         #dict = {"longitude":lon,"latitude":lat}
         dict = {"longitude":lat,"latitude":lon}
-        print "ditt dict: ", dict
         session = get_session()
         for unit in session.query(Unit).filter(Unit.is_self==True):
             unit.coordx=lon
             unit.coordy=lat
         session.commit()
-        print unit.coordx
-        print unit.coordy
         self.set_coordinate(dict)
         
     def set_coordinate(self, coordinate):
-        print "sätter coordinater"
         self._coordinate = coordinate
 
     def get_coordinate(self):
