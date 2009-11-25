@@ -27,8 +27,10 @@ if "exempeldata" in sys.argv and len(units) == 0:
     session.add(a)
     session.commit()
     #skapar units
-    session.add(Unit(u"hej", a, 15.57796, 58.40479))
-    session.add(Unit(u"ho", a, 15.57806, 58.40579))
+    ambulans = Unit(u"hej", a, 15.57796, 58.40479)
+    session.add(ambulans)
+    ambulans2 = (Unit(u"ho", a, 15.57806, 58.40579))
+    session.add(ambulans2)
     session.add(Unit(u"lets", b, 15.5729, 58.40193))
     session.add(Unit(u"go", c, 15.5629, 58.4093))
     session.add(Unit(u"III", d, 15.5829, 58.4093, True))
@@ -43,6 +45,7 @@ if "exempeldata" in sys.argv and len(units) == 0:
     session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
     session.add(POIType(u"övrigt","static/ikoner/information.png"))
     session.commit()
+
 else:
     # kolla att man har nått i databasen
     num_types = len(units)
@@ -72,7 +75,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.114"
+host_addr = "130.236.76.135"
 host_port = 2345
 start_id = 1
  
