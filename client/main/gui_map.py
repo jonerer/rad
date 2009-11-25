@@ -76,10 +76,15 @@ class Map(gtk.DrawingArea):
         self._last_movement_timestamp = time.time()
         self._allow_movement = True
 
-        #if event.type == gtk.gdk._2BUTTON_PRESS:
-        if True:
+        return True
+
+    def handle_button_release_event(self, widget, event):
+        self._allow_movement = False
+        self._is_dirty = True
+        self.queue_draw()
+
+        if time.time() < self._last_movement_timestamp + 0.1:
             #event.xcoord, event.ycoord = self.pixel_to_gps(event.x, event.y)
-            # STÄMMERT?
             lon, lat = self.pixel_to_gps(event.x-self._width/2, event.y-self._height/2)
             lon = self._origin_position["longitude"] + lon
             lat = self._origin_position["latitude"] - lat
@@ -91,13 +96,6 @@ class Map(gtk.DrawingArea):
             #    {"longitude":lon,"latitude":lat},
             #    "static/ikoner/brandbil.png"))    
             #self._gui.map_dblclick(widget, event)
-
-        return True
-
-    def handle_button_release_event(self, widget, event):
-        self._allow_movement = False
-        self._is_dirty = True
-        self.queue_draw()
         return True
 
     def handle_motion_notify_event(self, widget, event):
