@@ -3,6 +3,7 @@ import gtk
 import math
 import time
 import data_storage
+import gui
 
 from shared import rpc
 from datetime import datetime
@@ -250,9 +251,10 @@ class Map(gtk.DrawingArea):
         session = get_session()
         objList = self._map.get_objects()
         hit = False
+        list = self.pixel_to_gps(32,32)
+        unit = None
         for obj in objList:
             print obj
-            list = self.pixel_to_gps(32,32)
             value = obj["object"]
             valueTwo = value.get_coordinate()
             sideTop = valueTwo["latitude"]
@@ -262,14 +264,19 @@ class Map(gtk.DrawingArea):
             if doty > sideBottom and doty < sideTop and dotx < sideRight and dotx > sideLeft:
                 print "hit! " + obj["id"]
                 hit = True
+                unit = obj["id"]
+                self._gui.show_object(obj)
+                self._map.set_focus(dotx,doty)
+                
         self._map.delete_object(u"dot")
+        
         if hit == False:
-            for poi in session.query(POI).filter(POI.name==u"dot"):
-                poi.coordx = dotx
-                poi.coordy = doty
-                session.commit()
+            
+                #poi.coordx = dotx
+                #poi.coordy = doty
+                #session.commit()
             self.queue_draw()
         
-            self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-0.0012,"latitude":doty+0.00060},"static/ikoner/add.png"))
+            self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
         
 

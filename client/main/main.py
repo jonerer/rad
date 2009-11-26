@@ -32,34 +32,7 @@ units = session.query(Unit).all()
 types = session.query(UnitType).all()
 
 if "exempeldata" in sys.argv and len(types) == 0:
-    '''
-    #Om du behöver fylla på databasen igen gör dessa nedanför
-    #skapar olika unittypes
 
-    a=POIType(u"Ambulans1", "static/ikoner/ambulans.png")
-    b=POIType(u"Brandbild1", "static/ikoner/brandbil.png")
-    c=POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
-    d=UnitType(u"jonas","static/ikoner/JonasInGlases.png")
-    e=POIType(u"brand", "static/ikoner/rainbow.png")
-    f=POIType(u"övrigt","static/ikoner/information.png")
-    g=POIType(u"dot","static/ikoner/JonasInGlases.png")
-    session.add(b)
-    session.add(c)
-    session.add(d)
-    session.add(a)
-    session.add(e)
-    session.add(f)
-    session.add(g)
-    session.commit()
-    #skapar användarna
-    session.add(POI(15.57796, 58.40479, 1, u"hej", a, datetime.now()))
-    session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
-    session.add(POI(15.5729, 58.40193, 3, u"lets", b, datetime.now()))
-    session.add(POI(15.5629, 58.4093, 4, u"go", c, datetime.now()))
-    session.add(POI(15.5635, 58.4035, 4, u"dot", g, datetime.now()))
-    session.add(Unit(u"III", d, 15.5829, 58.4093, True))
-    '''
-    #POIType
     sjukhus = POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
     session.add(sjukhus)
 

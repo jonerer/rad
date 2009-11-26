@@ -404,6 +404,28 @@ class AddObjectPage(Page):
             self.showDetails.show()
             self.hideDetails.hide()
 
+class ShowObjectPage(Page):
+    def checkNew(self, button, widget=None):
+        self.gui._pages["showObject"].details(None, None, "show")
+        self.gui.switch_page("addObject")
+
+    def __init__(self, gui):
+      
+        super(ShowObjectPage, self).__init__("object", gui, homogeneous=False,
+                spacing=0)
+        self.size_request = (300,300)
+        #for poi in session.query(POI).filter(POI.name==unit):
+        hbox1 = gtk.HBox()
+        vbox1 = gtk.VBox()
+        newButton = create_menuButton("static/ikoner/map_add.png",
+                "Lagg till")
+        self.label = gtk.Label("Brandbil")
+        self.pack_start(self.label, False, False, padding=2)
+        self.show_all()
+    def update(self,unit):
+        self.label.set_text(str(unit["id"]))
+
+        
 class Gui(hildon.Program):
     _map = None
     _map_change_zoom = None
@@ -466,6 +488,7 @@ class Gui(hildon.Program):
         self._pages["removeMission"] = RemoveMissionPage(self)
         self._pages["object"] = ObjectPage(self)
         self._pages["addObject"] = AddObjectPage(self)
+        self._pages["showObject"] = ShowObjectPage(self)
 
         # Möjliggör fullscreen-läge
         self.window.connect("key-press-event", self.on_key_press)
@@ -508,18 +531,28 @@ class Gui(hildon.Program):
         active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
         active_page.map_dblclick(coordx, coordy)
 
+    def show_object(self, unit):
+        self.switch_page("showObject")
+        self.openButton.hide()
+        self.closeButton.show()
+        self.vbox1.show()
+        active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
+        active_page.update(unit)
+
+        
     def create_map_view(self):
 
+            
         def openButton_press_callback(button, widget, data=None):
-            openButton.hide()
-            closeButton.show()
-            vbox1.show()
+            self.openButton.hide()
+            self.closeButton.show()
+            self.vbox1.show()
             self.switch_page("menu")
 
         def closeButton_press_callback(button, widget, data=None):
-            openButton.show()
-            closeButton.hide()
-            vbox1.hide()
+            self.openButton.show()
+            self.closeButton.hide()
+            self.vbox1.hide()
             return
 
         def show_mission(self, widget, data=None):
@@ -528,29 +561,29 @@ class Gui(hildon.Program):
         
         hbox1 = gtk.HBox(homogeneous=False, spacing=1)
         hbox2 = gtk.HBox(homogeneous=False, spacing=1)
-        vbox1 = gtk.VBox(homogeneous=False, spacing=1)
+        self.vbox1 = gtk.VBox(homogeneous=False, spacing=1)
         map = gui_map.Map(self._map, self)
         
         #SHOW / HIDE buttons----------------------
-        openButton = gtk.Button()
+        self.openButton = gtk.Button()
         buff5 = gtk.gdk.PixbufAnimation("static/ikoner/resultset_first.png")
         openArrow = gtk.Image()
         openArrow.set_from_animation(buff5)
         openArrow.show()
-        openButton.connect("clicked", openButton_press_callback, None)
+        self.openButton.connect("clicked", openButton_press_callback, None)
         
-        closeButton = gtk.Button()
+        self.closeButton = gtk.Button()
         buff6 = gtk.gdk.PixbufAnimation("static/ikoner/resultset_last.png")
         closeArrow = gtk.Image()
         closeArrow.set_from_animation(buff6)
         closeArrow.show()
         
-        closeButton.connect("clicked", closeButton_press_callback, None) 
-        openButton.add(openArrow)
-        openButton.show()
+        self.closeButton.connect("clicked", closeButton_press_callback, None) 
+        self.openButton.add(openArrow)
+        self.openButton.show()
         openArrow.show()
-        closeButton.add(closeArrow)
-        closeButton.hide()
+        self.closeButton.add(closeArrow)
+        self.closeButton.hide()
         closeArrow.show()
         
         # MENUBOX-----------------------
@@ -567,11 +600,11 @@ class Gui(hildon.Program):
 
         hbox1.pack_start(map, expand=True, fill=True, padding=0)
         hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
-        hbox2.pack_start(openButton, expand=False, fill=False, padding=0)
-        hbox2.pack_start(closeButton, expand=False, fill=False, padding=0)
-        hbox2.pack_start(vbox1, False, False, 0)
+        hbox2.pack_start(self.openButton, expand=False, fill=False, padding=0)
+        hbox2.pack_start(self.closeButton, expand=False, fill=False, padding=0)
+        hbox2.pack_start(self.vbox1, False, False, 0)
         
-        vbox1.pack_start(rightBook, False, False, padding=0)
+        self.vbox1.pack_start(rightBook, False, False, padding=0)
         
         hbox1.show()
         hbox2.show()
