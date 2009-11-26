@@ -248,13 +248,28 @@ class Map(gtk.DrawingArea):
 
     def red_dot(self, dotx, doty):
         session = get_session()
-        print dotx
-        print doty
-        for poi in session.query(POI).filter(POI.name==u"dot"):
-            print poi.name
+        objList = self._map.get_objects()
+        hit = False
+        for obj in objList:
+            print obj
+            list = self.pixel_to_gps(32,32)
+            value = obj["object"]
+            valueTwo = value.get_coordinate()
+            sideTop = valueTwo["latitude"]
+            sideLeft = valueTwo["longitude"]
+            sideRight = valueTwo["longitude"]+list[0]
+            sideBottom = valueTwo["latitude"]-list[1]
+            if doty > sideBottom and doty < sideTop and dotx < sideRight and dotx > sideLeft:
+                print "hit! " + obj["id"]
+                hit = True
+        self._map.delete_object(u"dot")
+        if hit == False:
+            for poi in session.query(POI).filter(POI.name==u"dot"):
+                poi.coordx = dotx
+                poi.coordy = doty
+                session.commit()
+            self.queue_draw()
         
-            poi.coordx = dotx
-            poi.coordy = doty
-            session.commit()
-        self.queue_draw()
-        self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
+            self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-0.0012,"latitude":doty+0.00060},"static/ikoner/add.png"))
+        
+

@@ -67,6 +67,7 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(POI(15.6001709, 58.40533172, 4, u"Sjukhus", sjukhus, datetime.now()))
 
     #UnitTypes
+
     ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
     brandbil = UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
     jonas = UnitType(u"jonas","static/ikoner/JonasInGlases.png")
@@ -79,6 +80,7 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(Unit(u"Ambulans två", ambulans, 15.57806, 58.40579, False))
     session.add(Unit(u"Brandbil", brandbil, 15.5729, 58.40193, False))
     session.add(Unit(u"Fotgängare", jonas, 15.5720, 58.4026, False))
+
     session.commit()
     #skapar en POI-type
     #self, coordx, coordy, id, name, sub_type, timestamp
