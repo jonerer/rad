@@ -6,29 +6,30 @@ import gst
 class GTK_Main:
 	def __init__(self):
 		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		window.set_title("Webcam-Viewer")
-		window.set_default_size(500, 400)
-		window.connect("destroy", gtk.main_quit, "WM destroy")
-		vbox = gtk.VBox()
-		window.add(vbox)
-		self.movie_window = gtk.DrawingArea()
-		vbox.add(self.movie_window)
-		hbox = gtk.HBox()
+                window.set_title("Raddningspatrullen communication system")
+                window.set_default_size(500, 400)
+                window.connect("destroy", gtk.main_quit, "WM destroy")
+                vbox = gtk.VBox()
+                window.add(vbox)
+                self.movie_window = gtk.DrawingArea()
+                vbox.add(self.movie_window)
+                hbox = gtk.HBox()
 
 		vbox.pack_start(hbox, False)
-		hbox.set_border_width(10)
-		hbox.pack_start(gtk.Label())
-		self.button = gtk.Button("Start") 
-		self.button.connect("clicked", self.start_stop)
-		hbox.pack_start(self.button, False)
-		self.button2 = gtk.Button("Quit")
-		self.button2.connect("clicked", self.exit)
-		hbox.pack_start(self.button2, False)
-		self.button3 = gtk.Button("Audio")
-		self.button3.connect("clicked", self.start_audio)
-		hbox.pack_start(self.button3, False)
-		hbox.add(gtk.Label())
-		window.show_all()
+                hbox.set_border_width(10)
+                hbox.pack_start(gtk.Label())
+                self.btnAudio = gtk.Button("Voice")
+                self.btnAudio.connect("clicked", self.voice)
+                hbox.pack_start(self.btnAudio, False)
+                self.button2 = gtk.Button("Quit")
+                self.button2.connect("clicked", self.exit)
+                hbox.pack_start(self.button2, False)
+                self.btnVideo = gtk.Button("Video")
+                self.btnVideo.connect("clicked", self.video)
+                hbox.pack_start(self.btnVideo, False)
+                hbox.add(gtk.Label())
+                window.show_all()
+
 		#Skickar
 		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.217.29 port=5435"
 		self.player = gst.parse_launch ( options )
@@ -52,7 +53,25 @@ class GTK_Main:
                 bus2.connect("message", self.on_message)
                 bus2.connect("sync-message::element", self.on_sync_message)
 
+	#Rostsamtal
+        def voice(self, w):
+                print "Voice choosen"
+                if(self.btnAudio.get_label() == "Voice"):
+                        self.btnAudio.set_label("Stop Voice")
+                else:
+                        self.btnAudio.set_label("Voice")
 
+        #Videosamtal
+        def video(self, w):
+                print "Video choosen"
+                if self.btnVideo.get_label() == "Video":
+                        self.btnVideo.set_label("Stop Video")
+                        self.player.set_state(gst.STATE_PLAYING)
+                        self.player2.set_state(gst.STATE_PLAYING)
+                else:
+                        self.player.set_state(gst.STATE_NULL)
+                        self.player2.set_state(gst.STATE_NULL)
+                        self.btnVideo.set_label("Video")
 
 	def start_stop(self, w):
 		if self.button.get_label() == "Start":
