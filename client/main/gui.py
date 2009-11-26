@@ -644,7 +644,7 @@ class Gui(hildon.Program):
             if bol:
                 statusLabel.set_label("Access granted")
                 for user in session.query(User):
-                    for unit in session.query(Unit).filter_by(type_id=user.type_id):
+                    for unit in session.query(Unit).filter_by(id=user.type_id):
                         unit.is_self = False
                     user.type_id
                     session.delete(user)
@@ -659,7 +659,7 @@ class Gui(hildon.Program):
             if not bol:
                 statusLabel.set_label("Access denied")
                 for user in session.query(User):
-                    for unit in session.query(Unit).filter_by(type_id=user.type_id):
+                    for unit in session.query(Unit).filter_by(id=user.type_id):
                         unit.is_self = False
                     session.delete(user)
                 session.commit()
