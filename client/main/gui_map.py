@@ -248,7 +248,7 @@ class Map(gtk.DrawingArea):
                 gps_per_pix_height * movement_y]
 
     def red_dot(self, dotx, doty):
-        session = get_session()
+        
         objList = self._map.get_objects()
         hit = False
         list = self.pixel_to_gps(32,32)
@@ -272,9 +272,7 @@ class Map(gtk.DrawingArea):
         
         if hit == False:
             
-                #poi.coordx = dotx
-                #poi.coordy = doty
-                #session.commit()
+
             self.queue_draw()
         
             self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))

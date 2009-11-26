@@ -410,21 +410,30 @@ class ShowObjectPage(Page):
         self.gui.switch_page("addObject")
 
     def __init__(self, gui):
-      
+        
         super(ShowObjectPage, self).__init__("object", gui, homogeneous=False,
                 spacing=0)
         self.size_request = (300,300)
-        #for poi in session.query(POI).filter(POI.name==unit):
+
         hbox1 = gtk.HBox()
         vbox1 = gtk.VBox()
+        self.image = gtk.Image()
+        self.image.set_from_file(None)
         newButton = create_menuButton("static/ikoner/map_add.png",
                 "Lagg till")
         self.label = gtk.Label("Brandbil")
         self.pack_start(self.label, False, False, padding=2)
+        self.pack_start(self.image, False, False, padding=2)
         self.show_all()
+        
     def update(self,unit):
-        self.label.set_text(str(unit["id"]))
-
+        session = get_session()
+        
+        for units in session.query(Unit).filter(Unit.name==unit["id"]):
+            self.label.set_text(str(units.name))
+            self.image.set_from_file(units.type.image)
+            
+            session.commit()
         
 class Gui(hildon.Program):
     _map = None
