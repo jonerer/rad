@@ -50,20 +50,6 @@ class GTK_Main:
 		bus2.connect("message", self.on_message)
 		bus2.connect("sync-message::element", self.on_sync_message)
 
-"""	def voiceBus():
-		 self.player3 = gst.parse_launch("udpsrc port=" + self.myPort + " ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink")
-		self.player4 = gst.parse_launch("dspilbcsrc dtx=0 ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! udpsink host=" + self.ip + " port= " + self.myPort )
-		bus3 = self.player.get_bus()
-		bus3.add_signal_watch()
-		bus3.enable_sync_message_emission()
-		bus3.connect("message", self.on_message)
-		bus3.connect("sync-message::element", self.on_sync_message)
-		bus4 = self.player4.get_bus()
-		bus4.add_signal_watch()
-		bus4.enable_sync_message_emission()
-		bus4.connect("message", self.on_message)
-		bus4.connect("sync-message::element", self.on_sync_message)
-"""
 	#Rostsamtal
 	def voice(self, w):
 		print "Voice choosen"
