@@ -691,13 +691,13 @@ class Gui(hildon.Program):
                             "Jag skiter i allt", gtk.RESPONSE_REJECT)
 
         user_text = gtk.Entry(max=0)
-        user_label = gtk.Label("Användare")
+        user_label = gtk.Label("AnvÃ¤ndare")
         user_box = gtk.HBox(spacing=1)
         user_box.pack_start(user_label, expand=False, fill=False, padding=1)
         user_box.pack_start(user_text, expand=False, fill=False, padding=1)
 
         pass_text = gtk.Entry(max=0)
-        pass_label = gtk.Label("Lösenord")
+        pass_label = gtk.Label("LÃ¶senord")
         pass_box = gtk.HBox(spacing=0)
         pass_box.pack_start(pass_label, expand=False, fill=False, padding=1)
         pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
