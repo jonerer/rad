@@ -1,3 +1,6 @@
+#!/usr/bin/python2.5
+# -*- coding: utf-8 -*
+
 import sys, os
 import pygtk, gtk, gobject
 import pygst
@@ -5,8 +8,13 @@ pygst.require("0.10")
 import gst
 class GTK_Main:
 	def __init__(self):
+
+		#Lite variabler
+		self.ip = '130.236.219.35'
+		self.port = '7331'
+
 		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		window.set_title("Webcam-Viewer")
+		window.set_title("Raddningspatrullen communication system")
 		window.set_default_size(500, 400)
 		window.connect("destroy", gtk.main_quit, "WM destroy")
 		vbox = gtk.VBox()
@@ -18,25 +26,23 @@ class GTK_Main:
 		vbox.pack_start(hbox, False)
 		hbox.set_border_width(10)
 		hbox.pack_start(gtk.Label())
-		self.button = gtk.Button("Start") 
-		self.button.connect("clicked", self.start_stop)
-		hbox.pack_start(self.button, False)
+		self.btnAudio = gtk.Button("Voice") 
+		self.btnAudio.connect("clicked", self.voice)
+		hbox.pack_start(self.btnAudio, False)
 		self.button2 = gtk.Button("Quit")
 		self.button2.connect("clicked", self.exit)
 		hbox.pack_start(self.button2, False)
+		self.btnVideo = gtk.Button("Video")
+                self.btnVideo.connect("clicked", self.video)
+                hbox.pack_start(self.btnVideo, False)
 		hbox.add(gtk.Label())
 		window.show_all()
-		#Skickar
-		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.12 port=5434"
+
+		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port +""
+
 		self.player = gst.parse_launch ( options )
-		#visar
-		options2 = "udpsrc port=5435 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
-
+		options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
 		self.player2 = gst.parse_launch( options2 )
-
-		#options = "v4l2src ! video/x-raw-yuv, width=320, height=240, framerate=8/1 ! autovideosink"
-		#self.player = gst.parse_launch ( options )
-
 
 		bus = self.player.get_bus()
 		bus.add_signal_watch()
@@ -44,22 +50,31 @@ class GTK_Main:
 		bus.connect("message", self.on_message)
 		bus.connect("sync-message::element", self.on_sync_message)
 		bus2 = self.player2.get_bus()
-                bus2.add_signal_watch()
-                bus2.enable_sync_message_emission()
-                bus2.connect("message", self.on_message)
-                bus2.connect("sync-message::element", self.on_sync_message)
+		bus2.add_signal_watch()
+		bus2.enable_sync_message_emission()
+		bus2.connect("message", self.on_message)
+		bus2.connect("sync-message::element", self.on_sync_message)
 
+	#Rostsamtal
+	def voice(self, w):
+		print "Voice choosen"
+		if(self.btnAudio.get_label() == "Voice"):
+			self.btnAudio.set_label("Stop Voice")
+		else:
+			self.btnAudio.set_label("Voice")
 
-
-	def start_stop(self, w):
-		if self.button.get_label() == "Start":
-			self.button.set_label("Stop")
+	#Videosamtal
+	def video(self, w):
+		print "Video choosen"
+		if self.btnVideo.get_label() == "Video":
+			self.btnVideo.set_label("Stop Video")
 			self.player.set_state(gst.STATE_PLAYING)
 			self.player2.set_state(gst.STATE_PLAYING)
 		else:
 			self.player.set_state(gst.STATE_NULL)
 			self.player2.set_state(gst.STATE_NULL)
-			self.button.set_label("Start")
+			self.btnVideo.set_label("Video")
+
 	def exit(self, widget, data=None):
 		gtk.main_quit()
 	def on_message(self, bus, message):
@@ -67,13 +82,13 @@ class GTK_Main:
 		if t == gst.MESSAGE_EOS:
 			self.player.set_state(gst.STATE_NULL)
 			self.player2.set_state(gst.STATE_NULL)
-			self.button.set_label("Start")
+			self.button.set_label("Video")
 		elif t == gst.MESSAGE_ERROR:
 			err, debug = message.parse_error()
 			print "Error: %s" % err, debug
 			self.player.set_state(gst.STATE_NULL)
 			self.player2.set_state(gst.STATE_NULL)
-			self.button.set_label("Start")
+			self.button.set_label("Video")
 	def on_sync_message(self, bus, message):
 		if message.structure is None:
 			return
