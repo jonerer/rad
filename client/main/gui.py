@@ -633,7 +633,8 @@ class Gui(hildon.Program):
             #session.query(User).all()
             self.user = unicode(userText.get_text())
             self.pw = unicode(passText.get_text())
-            login = str(packet.Packet("login", username=self.user, password=self.pw))
+            self.unitname = unicode(self.combo.get_active_text())
+            login = str(packet.Packet("login", username=self.user, password=self.pw, unitname=self.unitname))
             print rpc.send("qos", "add_packet", packet=login)
 
         hboxOUT  = gtk.HBox(homogeneous=False, spacing=1)
@@ -645,6 +646,9 @@ class Gui(hildon.Program):
         session = get_session()
         
         ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
+
+        self.combo.append_text(("Ingen unit"))
+        self.combo.set_active(0)
 
         for unit in session.query(Unit).order_by(Unit.name):
             self.combo.append_text(unit.name)
@@ -689,26 +693,24 @@ class Gui(hildon.Program):
         def access(bol):
             if bol:
                 statusLabel.set_label("Access granted")
-                for user in session.query(User):
-                    for unit in session.query(Unit).filter_by(id=user.type_id):
-                        unit.is_self = False
-                    user.type_id
-                    session.delete(user)
-                for unit in session.query(Unit).order_by(Unit.name):
-                    if unit.name == self.combo.get_active_text():
-                        unit.is_self = True
-                        currentuser = User(self.user, self.pw)
-                        currentuser.type = unit
-                        session.add(currentuser)
-                        print "Du matchade unit knäppis"
-                session.commit()
-            if not bol:
-                statusLabel.set_label("Access denied")
-                for user in session.query(User):
-                    for unit in session.query(Unit).filter_by(id=user.type_id):
-                        unit.is_self = False
-                    session.delete(user)
-                session.commit()
+                unit = self.combo.get_active_text()
+                #Kollar om user redan finns
+                insession = True
+                for users in session.query(User):
+                    users.type.is_self = False
+                    if users.name == self.user:
+                        insession = False
+                        current_user=users
+                        break
+                    else:
+                        insession = True
+                if insession:
+                    current_user = User(self.user,self.pw)
+                    session.commit()
+                #�ndrar users unit
+                for units in session.query(Unit).filter_by(name=unit):
+                    current_user.type = units
+                    current_user.type.is_self = True
        
         rpc.register("access", access)
         return hboxOUT
@@ -770,7 +772,6 @@ class Gui(hildon.Program):
             else:
                 sys.exit()
         dialog.destroy()
-
 
     def create_settings_view(self):
         frame = gtk.Frame("Inställningar")

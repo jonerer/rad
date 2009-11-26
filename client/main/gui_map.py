@@ -40,6 +40,7 @@ class Map(gtk.DrawingArea):
         self._width = None
         self._height = None
         
+        rpc.register("ping_with_coordinates", self.update_units)
         rpc.register("update_map", self.force_draw)
         # queue_draw() ärvs från klassen gtk.DrawingArea
         map.set_redraw_function(self.queue_draw)
@@ -248,7 +249,6 @@ class Map(gtk.DrawingArea):
                 gps_per_pix_height * movement_y]
 
     def red_dot(self, dotx, doty):
-        
         objList = self._map.get_objects()
         hit = False
         list = self.pixel_to_gps(32,32)
@@ -276,5 +276,27 @@ class Map(gtk.DrawingArea):
             self.queue_draw()
         
             self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
-        
+            poi.coordx = dotx
+            poi.coordy = doty
+            session.commit()
+        self.self.queue_draw()
+        self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
 
+    def update_units(self,lon,lat,pack=None):
+        print "update_units"
+        session = get_session()
+        if pack == None:
+            for units in session.query(Unit).filter_by(is_self=True):
+                print "Ditt unit name: ", units.name
+                update_unit = self._map.get_object(units.name)
+                print update_unit
+                update_unit["object"].make_dict(lon,lat)
+                #self._map.get_object(units.name)["Object"].make_dict(lon,lat)
+                ### HÄR FLUMMAR VI
+        else:
+            for units in session.query(Unit).filter_by(name=pack["name"]):
+                print "Ditt unit name: ", units.name
+                update_unit = self._map.get_object(units.name)
+                print update_unit
+                update_unit["object"].make_dict(pack["lon"],pack[lat])
+            

@@ -3,6 +3,7 @@ import time
 import gtk
 import struct
 import math
+from shared import packet
 from shared import rpc
 from shared.data import get_session, create_tables
 from shared.data.defs import *
@@ -305,7 +306,7 @@ class MapData(object):
     def get_object(self, object_id):
         for item in self._objects:
             if item["id"] == object_id:
-                return self._objects[item]
+                return item
 
     def get_objects(self):
         return self._objects
@@ -331,8 +332,7 @@ class MapObject(Picture):
         #call set_coordinate to update self pos
         #if self=true makes u update the object position
         if is_self:
-            rpc.register("ping_with_coordinates", self.make_dict)
-
+            pass
 #        if len(path) == 1:
         self.set_path_to_picture(path)
 #        else:
@@ -340,14 +340,17 @@ class MapObject(Picture):
             
     #Make dict to sen to set_coordinate
     def make_dict(self, lon, lat):
-        #dict = {"longitude":lon,"latitude":lat}
-        dict = {"longitude":lat,"latitude":lon}
+        print "make_dict"
+        dict = {"longitude":lon,"latitude":lat}
         session = get_session()
         for unit in session.query(Unit).filter(Unit.is_self==True):
             unit.coordx=lon
             unit.coordy=lat
+            unit_packet = str(packet.Packet("unit_update", name = unit.name, lon = unit.coordx , lat = unit.coordy))
+            rpc.send("qos", "add_packet", packet = unit_packet)
         session.commit()
         self.set_coordinate(dict)
+        print self 
         
     def set_coordinate(self, coordinate):
         self._coordinate = coordinate

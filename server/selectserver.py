@@ -7,6 +7,7 @@ from shared.data.serverdb import get_session, create_tables
 from shared.data.serverdb.defs import *
 import logging 
 from util import require_login
+from datetime import datetime
 
 
  
@@ -16,34 +17,33 @@ print "gör tables"
 create_tables()
 units = session.query(Unit).all()
 if "exempeldata" in sys.argv and len(units) == 0:
-    #Om du behöver fylla på databasen igen gör dessa nedanför
-    a=UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
-    b=UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
-    c=UnitType(u"sjukhus1", "static/ikoner/sjukhus.png")
-    d=UnitType(u"jonas","static/ikoner/JonasInGlases.png")
-    session.add(b)
-    session.add(c)
-    session.add(d)
-    session.add(a)
-    session.commit()
-    #skapar units
-    ambulans = Unit(u"hej", a, 15.57796, 58.40479)
+    
+    #POIType
+    sjukhus = POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
+    session.add(sjukhus)
+
+    #Lägger till alla poi's
+    session.add(POI(15.6001709, 58.40533172, 4, u"Sjukhus", sjukhus, datetime.now()))
+
+    #UnitTypes
+    ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
+    brandbil = UnitType(u"Brandbild1", "static/ikoner/brandbil.png")
+    jonas = UnitType(u"jonas","static/ikoner/JonasInGlases.png")
     session.add(ambulans)
-    ambulans2 = (Unit(u"ho", a, 15.57806, 58.40579))
-    session.add(ambulans2)
-    session.add(Unit(u"lets", b, 15.5729, 58.40193))
-    session.add(Unit(u"go", c, 15.5629, 58.4093))
-    session.add(Unit(u"III", d, 15.5829, 58.4093, True))
-    session.commit()
-    #Skapar användare
-    session.add(User(u"jonas", u"mittlosen"))
-    session.add(User(u"jon", u"supersecurepassword"))
-    session.add(User(u"resman", u"superprogrammer"))
-    session.add(User(u"Filho", u"jonas"))
-    session.commit()
+    session.add(brandbil)
+    session.add(jonas)
+
+    #skapar units
+    session.add(Unit(u"Ambulans ett", ambulans, 15.5829, 58.4093, False))
+    session.add(Unit(u"Ambulans två", ambulans, 15.57806, 58.40579, False))
+    session.add(Unit(u"Brandbil", brandbil, 15.5729, 58.40193, False))
     #skapar en POI-type
-    session.add(POIType(u"brand", "static/ikoner/rainbow.png"))
-    session.add(POIType(u"övrigt","static/ikoner/information.png"))
+    #self, coordx, coordy, id, name, sub_type, timestamp"
+
+    #skapar användare
+    session.add(User(u"jonas",u"mittlosen"))
+    session.add(User(u"jon", u"supersecurepassword"))
+    session.add(User(u"a",u"a"))
     session.commit()
 
 else:
@@ -71,11 +71,16 @@ class Connection(object):
         self.timestamp = time.time()
         self.timepinged = 0
         self.user = None
- 
+        self.unitname = None
+
 client_sockets = {}
 connections = {}
 clientrequests = {}
+<<<<<<< Updated upstream:server/selectserver.py
 host_addr = "130.236.76.103"
+=======
+host_addr = "130.236.76.135"
+>>>>>>> Stashed changes:server/selectserver.py
 host_port = 2345
 start_id = 1
  
@@ -110,7 +115,6 @@ def mission(connection, pack):
     info = loginfo["info"]
     coordx = loginfo["xEntry"]
     coordy = loginfo["yEntry"]
-
 clientrequests["mission_save"] = mission
 
 def login(connection, pack):
@@ -123,6 +127,9 @@ def login(connection, pack):
     loginfo = pack.data
     username = loginfo["username"]
     password = loginfo["password"]
+    unitname = loginfo["unitname"]
+    connection.unitname = unitname
+
     login_response = packet.Packet("login_response", login="False")
     for users in session.query(User).filter(User.name == username):
         if password == users.password:
@@ -142,24 +149,34 @@ def login(connection, pack):
 clientrequests["login"] = login
  
 #DETTA ÄR HELT JÄVLA KASST! GRUPP 2 SUGER DASE
-def alarm(connection, pack):
+#def alarm(connection, pack):
+#    connection.timestamp = time.time()
+#    connection.timepinged = 0
+#    id = pack.data["id"]
+#    name = pack.data["name"]
+#    timestamp = pack.data["timestamp"]
+#    sub_type = pack.data["sub_type"]
+#    poi_id = pack.data["poi_id"]
+#    contact_person = pack.data["contact_person"]
+#    contact_number = pack.data["contact_number"]
+#    other = pack.data["other"]
+#    if id == "":
+#        pack.data["id"]=get_id()
+#    alarm_response = packet.Packet("alarm_response")
+#    alarm_response.data = pack.data
+#    for connection in connections.values():
+#        connection.out_queue.put(alarm_response)
+#clientrequests["alarm"] = alarm
+
+def unit_update(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
-    id = pack.data["id"]
-    name = pack.data["name"]
-    timestamp = pack.data["timestamp"]
-    sub_type = pack.data["sub_type"]
-    poi_id = pack.data["poi_id"]
-    contact_person = pack.data["contact_person"]
-    contact_number = pack.data["contact_number"]
-    other = pack.data["other"]
-    if id == "":
-        pack.data["id"]=get_id()
-    alarm_response = packet.Packet("alarm_response")
-    alarm_response.data = pack.data
-    for connection in connections.values():
-        connection.out_queue.put(alarm_response)
-clientrequests["alarm"] = alarm
+    unit_response = packet.Packet("unit_response")
+    unit_response.data = pack.data
+    for conn in connections.values():
+        conn.out_queue.put(unit_response)
+
+clientrequests["unit_update"] = unit_update
 
 def poi(connection, pack):
     connection.timestamp = time.time()

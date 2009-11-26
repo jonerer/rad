@@ -32,7 +32,7 @@ units = session.query(Unit).all()
 types = session.query(UnitType).all()
 
 if "exempeldata" in sys.argv and len(types) == 0:
-
+    #POIType
     sjukhus = POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
     session.add(sjukhus)
 
@@ -73,6 +73,7 @@ for units in session.query(Unit).all():
     map.add_object(units.name, data_storage.MapObject(
         {"longitude":units.coordx,"latitude":units.coordy},
         units.type.image, units.is_self))
+
 for poi in session.query(POI).all():
     map.add_object(poi.name, data_storage.MapObject(
         {"longitude":poi.coordx,"latitude":poi.coordy},
@@ -85,4 +86,3 @@ app = gui.Gui(map)
 # Kör programmet
 print "Kör programmet."
 app.run()
-
