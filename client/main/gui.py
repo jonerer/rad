@@ -472,6 +472,10 @@ class Gui(hildon.Program):
         self.window.connect("window-state-event", self.on_window_state_change)
         # Programmet är inte i fullscreen-läge från början.
         self.window_in_fullscreen = False
+        
+        #Visar login-dialog
+        #self.show_login()
+
 
         self.view = gtk.Notebook()
         self.view.set_show_tabs(False)
@@ -667,7 +671,7 @@ class Gui(hildon.Program):
         rpc.register("access", access)
         return hboxOUT
 
-    def create_login_dialog(self):
+    def show_login(self):
         def dbcheck_press_callback(self, widget, data=None):   
             #Detta behövs inte här, men kanske inte fungerar på andra stället
             #session = get_session()
@@ -688,10 +692,10 @@ class Gui(hildon.Program):
                             self.window, 
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                             ("Logga in", gtk.RESPONSE_ACCEPT,
-                            "Jag skiter i allt", gtk.RESPONSE_REJECT))
+                            "Avsluta", gtk.RESPONSE_REJECT))
 
         user_text = gtk.Entry(max=0)
-        user_label = gtk.Label("Användare")
+        user_label = gtk.Label("Användarnamn")
         user_box = gtk.HBox(spacing=1)
         user_box.pack_start(user_label, expand=False, fill=False, padding=1)
         user_box.pack_start(user_text, expand=False, fill=False, padding=1)
@@ -702,16 +706,28 @@ class Gui(hildon.Program):
         pass_box.pack_start(pass_label, expand=False, fill=False, padding=1)
         pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
 
+        self.unit_type_selector = gtk.combo_box_new_text()
+        #Hillekod som har funktion?
+        ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
+        session = get_session()
+        for unit in session.query(Unit).order_by(Unit.name):
+            self.unit_type_selector.append_text(unit.name)
+            print "Det du har är: ", unit.name
+
         dialog.vbox.pack_start(user_box)
         dialog.vbox.pack_start(pass_box)
+        dialog.vbox.pack_start(self.unit_type_selector)
         dialog.vbox.show_all()
 
         while not access_granted:
             response = dialog.run()
             if response == gtk.RESPONSE_ACCEPT:
-                dbcheck_press_callback()
+                #dbcheck_press_callback()
+                print "Access_grantet!"
+                access_granted = True
             else:
                 sys.exit()
+        dialog.destroy()
 
 
     def create_settings_view(self):
