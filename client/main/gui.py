@@ -688,7 +688,7 @@ class Gui(hildon.Program):
                             self.window, 
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                             ("Logga in", gtk.RESPONSE_ACCEPT,
-                            "Jag skiter i allt", gtk.RESPONSE_REJECT)
+                            "Jag skiter i allt", gtk.RESPONSE_REJECT))
 
         user_text = gtk.Entry(max=0)
         user_label = gtk.Label("Användare")
@@ -706,12 +706,12 @@ class Gui(hildon.Program):
         dialog.vbox.pack_start(pass_box)
         dialog.vbox.show_all()
 
-        while not access_granted
-        response = dialog.run()
-        if response == gtk.RESPONSE_ACCEPT:
-            dbcheck_press_callback()
-        else:
-            sys.exit()
+        while not access_granted:
+            response = dialog.run()
+            if response == gtk.RESPONSE_ACCEPT:
+                dbcheck_press_callback()
+            else:
+                sys.exit()
 
 
     def create_settings_view(self):
