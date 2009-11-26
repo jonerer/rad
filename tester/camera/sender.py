@@ -24,6 +24,9 @@ class GTK_Main:
 		self.button2 = gtk.Button("Quit")
 		self.button2.connect("clicked", self.exit)
 		hbox.pack_start(self.button2, False)
+		self.button3 = gtk.Button("Audio")
+		self.button3.connect("clicked", self.start_audio)
+		hbox.pack_start(self.button3, False)
 		hbox.add(gtk.Label())
 		window.show_all()
 		#Skickar
