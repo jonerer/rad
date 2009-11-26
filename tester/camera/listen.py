@@ -9,6 +9,10 @@ import gst
 class GTK_Main:
 	def __init__(self):
 
+		#Lite variabler
+		self.ip = '130.236.219.35'
+		self.port = '7331'
+
 		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		window.set_title("Raddningspatrullen communication system")
 		window.set_default_size(500, 400)
@@ -34,9 +38,9 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
-		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host=130.236.219.35 port=7331"
+		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.prt +""
 		self.player = gst.parse_launch ( options )
-		options2 = "udpsrc port=7331 caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
+		options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
 		self.player2 = gst.parse_launch( options2 )
 
 		bus = self.player.get_bus()
