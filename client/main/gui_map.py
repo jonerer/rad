@@ -293,6 +293,10 @@ class Map(gtk.DrawingArea):
                 update_unit["object"].make_dict(lon,lat)
         else:
             pack = packet.Packet.from_str(pack)
+            print pack.data["name"]
+            print pack.data["lon"]
+            print pack.data["lat"]
             for units in session.query(Unit).filter(Unit.name==pack.data["name"]):
-                update_unit = self._map.get_object(units.name)
+                print units
+                update_unit = self._map.get_object(units.id)
                 update_unit["object"].make_dict(pack.data["lon"],pack.data["lat"],pack.data["name"])

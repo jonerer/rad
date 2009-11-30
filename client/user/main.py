@@ -30,7 +30,8 @@ def main():
         lon = lon + 0.002
         lat = lat + 0.002
         session = get_session()
-        for units in session.query(Unit).filter_by(is_self=True):
+        print "innan session"
+        for units in session.query(Unit).filter(Unit.is_self==True):
             print "yesh"
             rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
             print "skickat koord, updaterar map"

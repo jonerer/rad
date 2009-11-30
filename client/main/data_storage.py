@@ -352,8 +352,7 @@ class MapObject(Picture):
                 unit_packet = str(packet.Packet("unit_update", name = unit.name, lon = unit.coordx , lat = unit.coordy))
                 rpc.send("qos", "add_packet", packet=unit_packet)
         else:
-            pack = packet.Packet.from_str(pack)
-            for unit in session.query(Unit).filter(Unit.name == pack.data["name"]):
+            for unit in session.query(Unit).filter(Unit.name == pack):
                 unit.coordx=lon
                 unit.coordy=lat
         session.commit()
