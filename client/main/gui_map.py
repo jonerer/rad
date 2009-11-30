@@ -270,7 +270,7 @@ class Map(gtk.DrawingArea):
             sideRight = valueTwo["longitude"]+list[0]
             sideBottom = valueTwo["latitude"]-list[1]
             if doty > sideBottom and doty < sideTop and dotx < sideRight and dotx > sideLeft:
-                print "hit! " + obj["id"]
+                print "hit! "
                 hit = True
                 unit = obj["id"]
                 self._gui.show_object(obj)

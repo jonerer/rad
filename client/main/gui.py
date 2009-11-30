@@ -434,7 +434,7 @@ class ShowObjectPage(Page):
         hbox1.pack_start(self.label, False, False, padding=2)
 
         
-        vbox1.pack_start(self.idLabel, False, False, padding=2)
+       #vbox1.pack_start(self.idLabel, False, False, padding=2)
        #vbox1.pack_start(self.changedLabel, False, False, padding=2)
         #hbox1.pack_start(vbox1, False, False, padding=2)
         self.pack_start(hbox1, False, False, padding=2)
