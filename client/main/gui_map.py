@@ -97,7 +97,7 @@ class Map(gtk.DrawingArea):
             
 
             self._gui.map_dblclick(lon, lat)
-            self.red_dot(lon,lat)
+            self.map_clicked(lon,lat)
             print "coords lon,lat: %s,%s" % (lon, lat)
             #session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
             #self._map.add_object("skonaste", data_storage.MapObject(
@@ -248,7 +248,9 @@ class Map(gtk.DrawingArea):
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
 
-    def red_dot(self, dotx, doty):
+
+    def map_clicked(self, dotx, doty):
+
         objList = self._map.get_objects()
         hit = False
         list = self.pixel_to_gps(32,32)
@@ -261,26 +263,21 @@ class Map(gtk.DrawingArea):
             sideLeft = valueTwo["longitude"]
             sideRight = valueTwo["longitude"]+list[0]
             sideBottom = valueTwo["latitude"]-list[1]
+
             if doty > sideBottom and doty < sideTop and dotx < sideRight and dotx > sideLeft:
-                print "hit! " + obj["id"]
+                print "hit! " + obj["name"]
                 hit = True
                 unit = obj["id"]
                 self._gui.show_object(obj)
                 self._map.set_focus(dotx,doty)
-                
-        self._map.delete_object(u"dot")
-        
+        #pluppen som visas har id 5000 :P
+        self._map.delete_object(50000)
+
         if hit == False:
-            
 
             self.queue_draw()
-        
-            self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
-            poi.coordx = dotx
-            poi.coordy = doty
-            session.commit()
-        self.self.queue_draw()
-        self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
+            self._map.add_object(50000,None,u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
+
 
     def update_units(self,lon,lat,pack):
         session = get_session()
