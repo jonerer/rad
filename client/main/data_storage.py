@@ -294,9 +294,8 @@ class MapData(object):
     def remove_objects(self):
         self._objects = []
 
-    def add_object(self, object_id, map_object):
-        self._objects.append({"id":object_id,
-                               "object":map_object})
+    def add_object(self, object_id, object_name, map_object):
+        self._objects.append({"id":object_id, "name":object_name,"object":map_object})
 
     def delete_object(self, object_id):
         for item in self._objects:
