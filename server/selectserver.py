@@ -76,11 +76,7 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-<<<<<<< Updated upstream:server/selectserver.py
-host_addr = "130.236.76.103"
-=======
 host_addr = "130.236.76.135"
->>>>>>> Stashed changes:server/selectserver.py
 host_port = 2345
 start_id = 1
  
@@ -174,7 +170,9 @@ def unit_update(connection, pack):
     unit_response = packet.Packet("unit_response")
     unit_response.data = pack.data
     for conn in connections.values():
-        conn.out_queue.put(unit_response)
+        if conn != connection:
+            print "En annan client kontaktade dig med gps"
+            conn.out_queue.put(unit_response)
 
 clientrequests["unit_update"] = unit_update
 

@@ -4,7 +4,7 @@ import math
 import time
 import data_storage
 import gui
-
+from shared.packet import Packet
 from shared import rpc
 from datetime import datetime
 from shared.data import get_session, create_tables
@@ -282,8 +282,7 @@ class Map(gtk.DrawingArea):
         self.self.queue_draw()
         self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
 
-    def update_units(self,lon,lat,pack=None):
-        print "update_units"
+    def update_units(self,lon,lat,pack):
         session = get_session()
         if pack == None:
             for units in session.query(Unit).filter_by(is_self=True):
@@ -291,12 +290,10 @@ class Map(gtk.DrawingArea):
                 update_unit = self._map.get_object(units.name)
                 print update_unit
                 update_unit["object"].make_dict(lon,lat)
-                #self._map.get_object(units.name)["Object"].make_dict(lon,lat)
-                ### HÄR FLUMMAR VI
-        else:
-            for units in session.query(Unit).filter_by(name=pack["name"]):
+        if pack != None:
+            print "Du är inne i else update_units/pingwith cord"
+            packet = Packet.from_str(pack)
+            for units in session.query(Unit).filter_by(name=packet.data["name"]):
                 print "Ditt unit name: ", units.name
                 update_unit = self._map.get_object(units.name)
-                print update_unit
-                update_unit["object"].make_dict(pack["lon"],pack[lat])
-            
+                update_unit["object"].make_dict(packet.data["lon"],packet.data["lat"], packet.data["name"])

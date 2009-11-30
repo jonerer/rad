@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 #import gpsbt
 import time
+from shared.packet import Packet
 from shared import rpc
 from shared.data import get_session, create_tables
 from shared.data.defs import *
@@ -29,13 +30,10 @@ def main():
         time.sleep(5)
         lon = lon + 0.002
         lat = lat + 0.002
-        print lon
-        print lat
-        print "Nu skickar jag koordinater"
         session = get_session()
         for units in session.query(Unit).filter_by(is_self=True):
             print "yesh"
-            rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
+            rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat, pack = None)
             print "skickat koord, updaterar map"
             rpc.send("main", "update_map")
     #stop gps devices
