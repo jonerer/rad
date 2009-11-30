@@ -39,11 +39,13 @@ class GTK_Main:
 		window.show_all()
 
 	def Stream(self, choice, ip, port):
+		print "inne i Stream"
 		self.choice = choice
 		self.ip = ip
 		self.port = port
 
 		if(choice==Video):
+			print "inne i Stream Video"
 			options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
 
 			self.player = gst.parse_launch ( options )
