@@ -75,7 +75,7 @@ class GTK_Main:
 			bus4.connect("sync-message::element", self.on_sync_message)
 
 
-"""	def Stream(self, choice, ip, port):
+	"""def Stream(self, choice, ip, port):
 		print "inne i Stream"
 		self.choice = choice
 		self.ip = ip
@@ -116,8 +116,8 @@ class GTK_Main:
 			bus4.add_signal_watch()
 			bus4.enable_sync_message_emission()
 			bus4.connect("message", self.on_message)
-			bus4.connect("sync-message::element", self.on_sync_message)
-"""
+			bus4.connect("sync-message::element", self.on_sync_message)"""
+
 	#Rostsamtal
 	def voice(self, w):
 		print "Voice choosen"
