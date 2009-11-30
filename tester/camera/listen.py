@@ -38,13 +38,44 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
-		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
-		self.player = gst.parse_launch ( options )
-		options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
-		self.player2 = gst.parse_launch( options2 )
+		if(choice=="Video"):
+			print "inne i Stream Video"
+			options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
+
+			self.player = gst.parse_launch ( options )
+			options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
+			self.player2 = gst.parse_launch( options2 )
+
+			bus = self.player.get_bus()
+			bus.add_signal_watch()
+			bus.enable_sync_message_emission()
+			bus.connect("message", self.on_message)
+			bus.connect("sync-message::element", self.on_sync_message)
+			bus2 = self.player2.get_bus()
+			bus2.add_signal_watch()
+			bus2.enable_sync_message_emission()
+			bus2.connect("message", self.on_message)
+			bus2.connect("sync-message::element", self.on_sync_message)
+
+		elif(choice=="Voice"):
+			options3 = "udpsrc port="+self.port+" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink"
+			self.player3 = gst.parse_launch ( options3 )
+			options4 = "dspilbcsrc dtx=0 ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! udpsink host="+self.ip+" port= "+self.port+""
+			self.player4 = gst.parse_launch( options4 )
+
+			bus3 = self.player.get_bus()
+			bus3.add_signal_watch()
+			bus3.enable_sync_message_emission()
+			bus3.connect("message", self.on_message)
+			bus3.connect("sync-message::element", self.on_sync_message)
+			bus4 = self.player2.get_bus()
+			bus4.add_signal_watch()
+			bus4.enable_sync_message_emission()
+			bus4.connect("message", self.on_message)
+			bus4.connect("sync-message::element", self.on_sync_message)
 
 
-	def Stream(self, choice, ip, port):
+"""	def Stream(self, choice, ip, port):
 		print "inne i Stream"
 		self.choice = choice
 		self.ip = ip
@@ -86,7 +117,7 @@ class GTK_Main:
 			bus4.enable_sync_message_emission()
 			bus4.connect("message", self.on_message)
 			bus4.connect("sync-message::element", self.on_sync_message)
-
+"""
 	#Rostsamtal
 	def voice(self, w):
 		print "Voice choosen"
@@ -95,7 +126,7 @@ class GTK_Main:
 			self.choice = "Voice"
 			self.player3.set_state(gst.STATE_PLAYING)
 			self.player4.set_state(gst.STATE_PLAYING)
-			Stream(self.choice, self.ip, self.port)
+			#Stream(self.choice, self.ip, self.port)
 		else:
 			self.choice = ""
 			self.player3.set_state(gst.STATE_NULL)
@@ -110,7 +141,7 @@ class GTK_Main:
 			self.choice = "Video"
 			self.player.set_state(gst.STATE_PLAYING)
 			self.player2.set_state(gst.STATE_PLAYING)
-			Stream(self.choice, self.ip, self.port)
+			#Stream(self.choice, self.ip, self.port)
 		else:
 			self.choice = ""
 			self.player.set_state(gst.STATE_NULL)
@@ -154,4 +185,4 @@ if __name__ == "__main__":
 	GTK_Main()
 	gtk.gdk.threads_init()
 	gtk.main()
-	GTK_Main().Stream('Video', '130.236.217.195', 7331)
+	#GTK_Main().Stream('Video', '130.236.217.195', 7331)
