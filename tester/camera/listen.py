@@ -38,7 +38,7 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
-		if(choice=="Video"):
+		if(self.choice=="Video"):
 			print "inne i Stream Video"
 			options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
 
@@ -57,7 +57,7 @@ class GTK_Main:
 			bus2.connect("message", self.on_message)
 			bus2.connect("sync-message::element", self.on_sync_message)
 
-		elif(choice=="Voice"):
+		elif(self.choice=="Voice"):
 			options3 = "udpsrc port="+self.port+" ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! dspilbcsink"
 			self.player3 = gst.parse_launch ( options3 )
 			options4 = "dspilbcsrc dtx=0 ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! udpsink host="+self.ip+" port= "+self.port+""
