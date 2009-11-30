@@ -38,7 +38,7 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
-		if(self.choice=="Video"):
+		"""if(self.choice=="Video"):
 			print "inne i Stream Video"
 			options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
 
@@ -72,10 +72,9 @@ class GTK_Main:
 			bus4.add_signal_watch()
 			bus4.enable_sync_message_emission()
 			bus4.connect("message", self.on_message)
-			bus4.connect("sync-message::element", self.on_sync_message)
+			bus4.connect("sync-message::element", self.on_sync_message)"""
 
-
-	"""def Stream(self, choice, ip, port):
+	def Stream(self, choice, ip, port):
 		print "inne i Stream"
 		self.choice = choice
 		self.ip = ip
@@ -116,7 +115,7 @@ class GTK_Main:
 			bus4.add_signal_watch()
 			bus4.enable_sync_message_emission()
 			bus4.connect("message", self.on_message)
-			bus4.connect("sync-message::element", self.on_sync_message)"""
+			bus4.connect("sync-message::element", self.on_sync_message)
 
 	#Rostsamtal
 	def voice(self, w):
@@ -139,6 +138,7 @@ class GTK_Main:
 		if self.btnVideo.get_label() == "Video":
 			self.btnVideo.set_label("Stop Video")
 			self.choice = "Video"
+			self.Stream(self.choice, self.ip, self.port)
 			self.player.set_state(gst.STATE_PLAYING)
 			self.player2.set_state(gst.STATE_PLAYING)
 			#Stream(self.choice, self.ip, self.port)
