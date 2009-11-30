@@ -7,15 +7,14 @@ from shared.data.defs import *
 
 def main():
     rpc.set_name("rpcsender")
-    '''
+   
     context = gpsbt.start()
     # ensure that GPS device is ready to connect and to receive commands
     time.sleep(2)
     gpsdevice = gpsbt.gps()
-    '''
-    lon,lat = 15.5607839,58.3971288
+    
     while True:
-        '''
+       
         #read 3 times and show information
         for a in range(4):
             gpsdevice.get_fix()
@@ -25,10 +24,8 @@ def main():
         lat,lon = gpsdevice.get_position()
         print lon
         print lat
-        '''
+        
         time.sleep(5)
-        lon = lon + 0.002
-        lat = lat + 0.002
         session = get_session()
         print "innan session"
         for units in session.query(Unit).filter(Unit.is_self==True):
