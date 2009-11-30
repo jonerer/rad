@@ -439,7 +439,7 @@ class ShowObjectPage(Page):
         #hbox1.pack_start(vbox1, False, False, padding=2)
         self.pack_start(hbox1, False, False, padding=2)
         self.pack_start(self.xLabel, False, False, padding=2)
-        self.pack_start(self.yLabel False, False, padding=2)
+        self.pack_start(self.yLabel, False, False, padding=2)
         self.pack_start(self.changedLabel2, False, False, padding=2)
         self.pack_start(self.changedLabel, False, False, padding=2)
         self.show_all()
