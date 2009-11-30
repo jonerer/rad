@@ -7,7 +7,7 @@ class GTK_Main:
 	def __init__(self):
 
 		#Lite variabler
-                self.ip = '130.236.219.235'
+                self.ip = '130.236.218.217'
                 self.port = '7331'
 
 		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -35,25 +35,30 @@ class GTK_Main:
                 hbox.add(gtk.Label())
                 window.show_all()
 
-		#Skickar
-		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port +""
-		self.player = gst.parse_launch ( options )
-		#visar
-		options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
+	def startVideoOrVoiceConversation(self, choice, ip, port):
+		print "inne i startVideoOrVoiceConversation"
+		if(self.choice == voice):
+			null
+		elif(self.choice == video):
+			print "inne i choice video"
+			#Skickar
+			options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port +""
+			self.player = gst.parse_launch ( options )
+			#visar
+			options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
 
-		self.player2 = gst.parse_launch( options2 )
+			self.player2 = gst.parse_launch( options2 )
 
-
-		bus = self.player.get_bus()
-		bus.add_signal_watch()
-		bus.enable_sync_message_emission()
-		bus.connect("message", self.on_message)
-		bus.connect("sync-message::element", self.on_sync_message)
-		bus2 = self.player2.get_bus()
-                bus2.add_signal_watch()
-                bus2.enable_sync_message_emission()
-                bus2.connect("message", self.on_message)
-                bus2.connect("sync-message::element", self.on_sync_message)
+			bus = self.player.get_bus()
+			bus.add_signal_watch()
+			bus.enable_sync_message_emission()
+			bus.connect("message", self.on_message)
+			bus.connect("sync-message::element", self.on_sync_message)
+			bus2 = self.player2.get_bus()
+			bus2.add_signal_watch()
+			bus2.enable_sync_message_emission()
+			bus2.connect("message", self.on_message)
+			bus2.connect("sync-message::element", self.on_sync_message)
 
 	#Rostsamtal
         def voice(self, w):
@@ -106,6 +111,10 @@ class GTK_Main:
 			imagesink = message.src
 			imagesink.set_property("force-aspect-ratio", True)
 			imagesink.set_xwindow_id(self.movie_window.window.xid)
-GTK_Main()
-gtk.gdk.threads_init()
-gtk.main()
+def main():
+	gtk.main()
+
+if __name__ == "__main__":
+	MainStream().startVideoOrVoiceConversation(video, 130.236.219.235, 7331)
+	gtk.gdk.threads_init()
+	gtk.main()
