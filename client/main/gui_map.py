@@ -270,16 +270,13 @@ class Map(gtk.DrawingArea):
                 unit = obj["id"]
                 self._gui.show_object(obj)
                 self._map.set_focus(dotx,doty)
-
-        self._map.delete_object(u"dot")
+        #pluppen som visas har id 5000 :P
+        self._map.delete_object(50000)
 
         if hit == False:
 
-
             self.queue_draw()
-
-
-            self._map.add_object(56422,u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
+            self._map.add_object(50000,None,u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
 
 
     def update_units(self,lon,lat,pack=None):

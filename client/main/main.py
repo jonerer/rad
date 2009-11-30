@@ -70,12 +70,12 @@ else:
 
 #Ritar ut alla objekt i databasen
 for units in session.query(Unit).all():
-    map.add_object(units.id, units.name, data_storage.MapObject(
+    map.add_object(units.id, units.__tablename__, units.name, data_storage.MapObject(
         {"longitude":units.coordx,"latitude":units.coordy},
         units.type.image, units.is_self))
 
 for poi in session.query(POI).all():
-    map.add_object(poi.id, poi.name, data_storage.MapObject(
+    map.add_object(poi.id, poi.__tablename__, poi.name, data_storage.MapObject(
         {"longitude":poi.coordx,"latitude":poi.coordy},
         poi.type.image))
 

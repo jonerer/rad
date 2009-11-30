@@ -422,18 +422,30 @@ class ShowObjectPage(Page):
         newButton = create_menuButton("static/ikoner/map_add.png",
                 "Lagg till")
         self.label = gtk.Label("Brandbil")
+        self.idLabel = gtk.Label("ID: ")
+        self.coordLabel = gtk.Label("cord: ")
         self.pack_start(self.label, False, False, padding=2)
         self.pack_start(self.image, False, False, padding=2)
+        self.pack_start(self.idLabel, False, False, padding=2)
+        self.pack_start(self.coordLabel, False, False, padding=2)
         self.show_all()
         
     def update(self,unit):
         session = get_session()
-        
-        for units in session.query(Unit).filter(Unit.name==unit["id"]):
-            self.label.set_text(str(units.name))
-            self.image.set_from_file(units.type.image)
-            
-            session.commit()
+        if unit["type"] == "units":
+            for units in session.query(Unit).filter(Unit.id==unit["id"]):
+                self.label.set_text(str(units.name))
+                self.image.set_from_file(units.type.image)
+                self.idLabel.set_text("ID: " + str(units.id))
+                self.coordLabel.set_text("COORDS: " + "x="+ str(units.coordx)+"y="+ str(units.coordy))
+                session.commit()
+        elif unit["type"] == "poi":
+            for poi in session.query(POI).filter(POI.id==unit["id"]):
+                self.label.set_text(str(poi.name))
+                self.image.set_from_file(poi.type.image)
+                self.idLabel.set_text("ID: " + str(poi.id))
+                self.coordLabel.set_text("COORDS: " + "x="+ str(poi.coordx)+"y="+ str(poi.coordy))
+                session.commit()
         
 class Gui(hildon.Program):
     _map = None
@@ -707,7 +719,7 @@ class Gui(hildon.Program):
                 if insession:
                     current_user = User(self.user,self.pw)
                     session.commit()
-                #Ändrar users unit
+                #ï¿½ndrar users unit
                 for units in session.query(Unit).filter_by(name=unit):
                     current_user.type = units
                     current_user.type.is_self = True
