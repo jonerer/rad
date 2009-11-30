@@ -39,6 +39,8 @@ class Map(gtk.DrawingArea):
         self._gui = gui
         self._width = None
         self._height = None
+
+        rpc.register("update_items", self.update_items)
         
         rpc.register("ping_with_coordinates", self.update_units)
         rpc.register("update_map", self.force_draw)
@@ -55,6 +57,12 @@ class Map(gtk.DrawingArea):
                         gtk.gdk.LEAVE_NOTIFY_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.POINTER_MOTION_HINT_MASK)
+
+    def update_items(self, items):
+        # receive a dict describing db updates from server
+        print "ska uppdateras:"
+        for item in items:
+            print item
     
     def change_zoom(self, change):
         
@@ -271,16 +279,14 @@ class Map(gtk.DrawingArea):
         self._map.delete_object(u"dot")
         
         if hit == False:
-            
-
-            self.queue_draw()
         
             self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
+            self.queue_draw()
             poi.coordx = dotx
             poi.coordy = doty
             session.commit()
-        self.self.queue_draw()
         self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
+        self.self.queue_draw()
 
     def update_units(self,lon,lat,pack=None):
         print "update_units"

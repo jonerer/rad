@@ -5,6 +5,7 @@ from os import popen
 from shared import buffrify, packet
 from shared.data.serverdb import get_session, create_tables
 from shared.data.serverdb.defs import *
+from shared.settings import HOST_IP, HOST_PORT
 import logging 
 from util import require_login
 from datetime import datetime
@@ -76,8 +77,6 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-host_addr = "130.236.76.135"
-host_port = 2345
 start_id = 1
  
 def pong(connection, pack):
@@ -211,14 +210,14 @@ clientrequests["poi"] = poi
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
-s.bind((host_addr, host_port))
+s.bind((HOST_IP, HOST_PORT))
 s.setblocking(0)
 s.settimeout(0)
 s.listen(5)
 
 to_be_removed = []
  
-print "Server igång på %s:%s" % (host_addr, host_port)
+print "Server igång på %s:%s" % (HOST_IP, HOST_PORT)
 while True:
     try:
         acceptor = select.select([s,], [s,], [s,], 0)[0]

@@ -11,6 +11,7 @@ from simplejson import loads, dumps
 import subprocess
 from shared.data import get_session, create_tables
 from shared.data.defs import *
+from shared.settings import HOST_IP, HOST_PORT
 import logging
 
 #subprocess.call('ssh -f jonbe759@130.236.189.23 -L 2345:127.0.0.1:2345 -N sleep 1', shell=True)
@@ -34,9 +35,7 @@ class Connection(object):
     
     def __init__(self):
         self.pingtime = 6
-        self.host_addr = "130.236.76.135"
-        #self.host_addr = "localhost"
-        self.host_port = 2345
+        #self.host_addr = "localhost" self.host_port = 2345
         
         self.out_queue = Queue.Queue()
         self.out_buffer = ""
@@ -52,9 +51,9 @@ class Connection(object):
             print "Du är inne i while"
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print self.s.connect((self.host_addr, self.host_port))
+                print self.s.connect((HOST_IP, HOST_PORT))
                 self.connected = True
-                print "har kontakt med %s:%s" % (self.host_addr, self.host_port)
+                print "har kontakt med %s:%s" % (HOST_IP, HOST_PORT)
                 self.timestamp = time.time()
             except socket.error:
                 time.sleep(5)
