@@ -138,7 +138,7 @@ class GTK_Main:
 		if self.btnVideo.get_label() == "Video":
 			self.btnVideo.set_label("Stop Video")
 			self.choice = "Video"
-			Stream(self.choice, self.ip, self.port)
+			self.Stream(self.choice, self.ip, self.port)
 			self.player.set_state(gst.STATE_PLAYING)
 			self.player2.set_state(gst.STATE_PLAYING)
 			#Stream(self.choice, self.ip, self.port)
