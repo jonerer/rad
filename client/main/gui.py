@@ -4,6 +4,7 @@ import hildon
 import gui_map
 import time
 import sys
+import pango
 from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared import rpc, packet
@@ -414,20 +415,33 @@ class ShowObjectPage(Page):
         super(ShowObjectPage, self).__init__("object", gui, homogeneous=False,
                 spacing=0)
         self.size_request = (300,300)
-
-        hbox1 = gtk.HBox()
-        vbox1 = gtk.VBox()
+        
+        hbox1 = gtk.HBox(False, 0)
+        hbox2 = gtk.HBox(False, 0)
+        hbox3 = gtk.HBox(False, 0)
+        hbox4 = gtk.HBox(False, 0)
         self.image = gtk.Image()
         self.image.set_from_file(None)
         newButton = create_menuButton("static/ikoner/map_add.png",
                 "Lagg till")
         self.label = gtk.Label("Brandbil")
         self.idLabel = gtk.Label("ID: ")
-        self.coordLabel = gtk.Label("cord: ")
-        self.pack_start(self.label, False, False, padding=2)
-        self.pack_start(self.image, False, False, padding=2)
-        self.pack_start(self.idLabel, False, False, padding=2)
-        self.pack_start(self.coordLabel, False, False, padding=2)
+        self.xLabel = gtk.Label("x:")
+        self.yLabel = gtk.Label("y:")
+        self.changedLabel = gtk.Label("Last Changed:")
+        self.changedLabel2 = gtk.Label("Last Changed:")
+        hbox1.pack_start(self.image, False, False, padding=15)
+        hbox1.pack_start(self.label, False, False, padding=2)
+
+        
+        vbox1.pack_start(self.idLabel, False, False, padding=2)
+       #vbox1.pack_start(self.changedLabel, False, False, padding=2)
+        #hbox1.pack_start(vbox1, False, False, padding=2)
+        self.pack_start(hbox1, False, False, padding=2)
+        self.pack_start(self.xLabel, False, False, padding=2)
+        self.pack_start(self.yLabel False, False, padding=2)
+        self.pack_start(self.changedLabel2, False, False, padding=2)
+        self.pack_start(self.changedLabel, False, False, padding=2)
         self.show_all()
         
     def update(self,unit):
@@ -437,14 +451,20 @@ class ShowObjectPage(Page):
                 self.label.set_text(str(units.name))
                 self.image.set_from_file(units.type.image)
                 self.idLabel.set_text("ID: " + str(units.id))
-                self.coordLabel.set_text("COORDS: " + "x="+ str(units.coordx)+"y="+ str(units.coordy))
+                self.xLabel.set_text("coord X: " + str(units.coordx))
+                self.yLabel.set_text("coord Y: " + str(units.coordy))
+                self.changedLabel.set_text("Senast Ändrad: " + str(units.time_changed))
+                self.xLabel.modify_font(pango.FontDescription("Verdana"));
                 session.commit()
+                
         elif unit["type"] == "poi":
             for poi in session.query(POI).filter(POI.id==unit["id"]):
                 self.label.set_text(str(poi.name))
                 self.image.set_from_file(poi.type.image)
                 self.idLabel.set_text("ID: " + str(poi.id))
-                self.coordLabel.set_text("COORDS: " + "x="+ str(poi.coordx)+"y="+ str(poi.coordy))
+                self.xLabel.set_text("coord X: " + str(units.coordx))
+                self.yLabel.set_text("coord Y: " + str(units.coordy))
+                self.changedLabel.set_text("Senast Ändrad: " + str(units.time_changed))
                 session.commit()
         
 class Gui(hildon.Program):
@@ -553,12 +573,15 @@ class Gui(hildon.Program):
         active_page.map_dblclick(coordx, coordy)
 
     def show_object(self, unit):
-        self.switch_page("showObject")
-        self.openButton.hide()
-        self.closeButton.show()
-        self.vbox1.show()
-        active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
-        active_page.update(unit)
+        if unit["type"] == "poi" or unit["type"] == "units":
+            self.switch_page("showObject")
+            self.openButton.hide()
+            self.closeButton.show()
+            self.vbox1.show()
+            active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
+            active_page.update(unit)
+        else:
+            pass
 
         
     def create_map_view(self):
@@ -580,9 +603,9 @@ class Gui(hildon.Program):
             menuBox.hide()
             return
         
-        hbox1 = gtk.HBox(homogeneous=False, spacing=1)
-        hbox2 = gtk.HBox(homogeneous=False, spacing=1)
-        self.vbox1 = gtk.VBox(homogeneous=False, spacing=1)
+        hbox1 = gtk.HBox(False, 1)
+        hbox2 = gtk.HBox(False, 1)
+        self.vbox1 = gtk.VBox(False, 1)
         map = gui_map.Map(self._map, self)
         
         #SHOW / HIDE buttons----------------------
@@ -634,7 +657,6 @@ class Gui(hildon.Program):
         self._map_change_zoom = map.change_zoom
         
         return hbox1
-
 
     def create_login_view(self):
         def dbcheck_press_callback(button, widget, data=None):   

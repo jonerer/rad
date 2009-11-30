@@ -37,7 +37,7 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(sjukhus)
 
     #Lägger till alla poi's
-    session.add(POI(15.6001709, 58.40533172, 4, u"Sjukhus", sjukhus, datetime.now()))
+    session.add(POI(15.6001709, 58.40533172, 4, u"Sjukhus", sjukhus, "N/A", datetime.now(), datetime.now()))
 
     #UnitTypes
 
@@ -49,10 +49,10 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(jonas)
 
     #skapar units
-    session.add(Unit(u"Ambulans ett", ambulans, 15.5829, 58.4093, False))
-    session.add(Unit(u"Ambulans två", ambulans, 15.57806, 58.40579, False))
-    session.add(Unit(u"Brandbil", brandbil, 15.5729, 58.40193, False))
-    session.add(Unit(u"Fotgängare", jonas, 15.5720, 58.4026, False))
+    session.add(Unit(u"Ambulans ett", ambulans, 15.5829, 58.4093, datetime.now(), False))
+    session.add(Unit(u"Ambulans två", ambulans, 15.57806, 58.40579, datetime.now(), False))
+    session.add(Unit(u"Brandbil", brandbil, 15.5729, 58.40193, datetime.now(), False))
+    session.add(Unit(u"Fotgängare", jonas, 15.5720, 58.4026, datetime.now(), False))
 
     session.commit()
     #skapar en POI-type
