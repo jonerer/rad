@@ -38,6 +38,12 @@ class GTK_Main:
 		hbox.add(gtk.Label())
 		window.show_all()
 
+		options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
+		self.player = gst.parse_launch ( options )
+		options2 = "udpsrc port="+ self.port +" caps=application/x-rtp,clock-rate=90000 ! rtph263depay ! hantro4100dec ! xvimagesink"
+		self.player2 = gst.parse_launch( options2 )
+
+
 	def Stream(self, choice, ip, port):
 		print "inne i Stream"
 		self.choice = choice
