@@ -150,4 +150,4 @@ def main():
 if __name__ == "__main__":
 	GTK_Main()
 	gtk.gdk.threads_init()
-	GTK_Main().Stream('', '130.236.217.195', 7331)
+	#GTK_Main().Stream('', '130.236.217.195', 7331)
