@@ -306,4 +306,4 @@ class Map(gtk.DrawingArea):
                 print units
                 update_unit = self._map.get_object(units.id)
                 update_unit["object"].make_dict(pack.data["lon"],pack.data["lat"],pack.data["name"])
-        self._map.force_draw()
+        self.queue_draw()
