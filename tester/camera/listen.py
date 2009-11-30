@@ -12,7 +12,7 @@ class GTK_Main:
 		#Lite variabler
 		self.ip = '130.236.217.195'
 		self.port = '7331'
-		self.choice = ''
+		self.choice = 'Video'
 
 		window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		window.set_title("Raddningspatrullen communication system")
