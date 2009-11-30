@@ -144,8 +144,10 @@ class GTK_Main:
 			imagesink.set_property("force-aspect-ratio", True)
 			imagesink.set_xwindow_id(self.movie_window.window.xid)
 
+def main():
+	gtk.main()
+
 if __name__ == "__main__":
 	GTK_Main()
 	gtk.gdk.threads_init()
 	GTK_Main().Stream('', '130.236.217.195', 7331)
-	gtk.main()
