@@ -131,7 +131,8 @@ network_listeners["login_required"] = login_required
 
 def unit_response(pack):
     connection.timestamp = time.time()
-    rpc.send("main", "ping_with_coordinates", lon = pack.data["lon"], lat = pack.data["lat"], pack = str(pack))
+    print "Du kör unit_response"
+    rpc.send("main","ping_with_coordinates", lon = pack.data["lon"], lat = pack.data["lat"], pack = packet.Packet.str(pack))
 network_listeners["unit_response"] = unit_response
  
 def ping_response(pack):

@@ -283,18 +283,16 @@ class Map(gtk.DrawingArea):
         self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
 
     def update_units(self,lon,lat,pack=None):
-        pack = packet.Packet.from_str(pack)
         print "update_units"
         session = get_session()
         if pack == None:
-            for units in session.query(Unit).filter_by(Unit.is_self==True):
+            for units in session.query(Unit).filter(Unit.is_self==True):
                 print "Ditt unit name: ", units.name
-                update_unit = self._map.get_object(units.name)
-                print update_unit
+                update_unit = self._map.get_object(units.id)
+                print "Ditt object map är :",update_unit
                 update_unit["object"].make_dict(lon,lat)
         else:
-            for units in session.query(Unit).filter_by(Unit.name==pack.data["name"]):
-                print "Ditt unit name: ", units.name
+            pack = packet.Packet.from_str(pack)
+            for units in session.query(Unit).filter(Unit.name==pack.data["name"]):
                 update_unit = self._map.get_object(units.name)
-                print update_unit
                 update_unit["object"].make_dict(pack.data["lon"],pack.data["lat"],pack.data["name"])

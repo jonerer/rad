@@ -338,18 +338,21 @@ class MapObject(Picture):
 #            self.set_commands(path)
             
     #Make dict to sen to set_coordinate
-    def make_dict(self, lon, lat, pack):
+    def make_dict(self, lon, lat, pack=None):
         print "make_dict"
         dict = {"longitude":lon,"latitude":lat}
         session = get_session()
+        print "Du är ute"
         if pack == None:
+            print "Du är innanför"
             for unit in session.query(Unit).filter(Unit.is_self==True):
                 unit.coordx=lon
                 unit.coordy=lat
+                print "Du ska skicka till servern: ", unit.name
                 unit_packet = str(packet.Packet("unit_update", name = unit.name, lon = unit.coordx , lat = unit.coordy))
-                rpc.send("qos", "add_packet", packet = unit_packet)
+                rpc.send("qos", "add_packet", packet=unit_packet)
         else:
-            pack = Packet.from_str(pack)
+            pack = packet.Packet.from_str(pack)
             for unit in session.query(Unit).filter(Unit.name == pack.data["name"]):
                 unit.coordx=lon
                 unit.coordy=lat
