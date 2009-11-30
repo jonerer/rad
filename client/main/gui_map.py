@@ -4,7 +4,7 @@ import math
 import time
 import data_storage
 import gui
-from shared.packet import Packet
+from shared import packet
 from shared import rpc
 from datetime import datetime
 from shared.data import get_session, create_tables
@@ -97,7 +97,7 @@ class Map(gtk.DrawingArea):
             
 
             self._gui.map_dblclick(lon, lat)
-            self.map_clicked(lon,lat)
+            self.red_dot(lon,lat)
             print "coords lon,lat: %s,%s" % (lon, lat)
             #session.add(POI(15.57806, 58.40579, 2, u"ho", a, datetime.now()))
             #self._map.add_object("skonaste", data_storage.MapObject(
@@ -248,9 +248,7 @@ class Map(gtk.DrawingArea):
         return [gps_per_pix_width * movement_x,
                 gps_per_pix_height * movement_y]
 
-
-    def map_clicked(self, dotx, doty):
-
+    def red_dot(self, dotx, doty):
         objList = self._map.get_objects()
         hit = False
         list = self.pixel_to_gps(32,32)
@@ -263,34 +261,40 @@ class Map(gtk.DrawingArea):
             sideLeft = valueTwo["longitude"]
             sideRight = valueTwo["longitude"]+list[0]
             sideBottom = valueTwo["latitude"]-list[1]
-
             if doty > sideBottom and doty < sideTop and dotx < sideRight and dotx > sideLeft:
-                print "hit! " + obj["name"]
+                print "hit! " + obj["id"]
                 hit = True
                 unit = obj["id"]
                 self._gui.show_object(obj)
                 self._map.set_focus(dotx,doty)
-        #pluppen som visas har id 5000 :P
-        self._map.delete_object(50000)
-
+                
+        self._map.delete_object(u"dot")
+        
         if hit == False:
+            
 
             self.queue_draw()
-            self._map.add_object(50000,None,u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
+        
+            self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/add.png"))
+            poi.coordx = dotx
+            poi.coordy = doty
+            session.commit()
+        self.self.queue_draw()
+        self._map.add_object(u"dot", data_storage.MapObject({"longitude":dotx,"latitude":doty},"static/ikoner/JonasInGlases.png"))
 
-
-    def update_units(self,lon,lat,pack):
+    def update_units(self,lon,lat,pack=None):
+        pack = packet.Packet.from_str(pack)
+        print "update_units"
         session = get_session()
         if pack == None:
-            for units in session.query(Unit).filter_by(is_self=True):
+            for units in session.query(Unit).filter_by(Unit.is_self==True):
                 print "Ditt unit name: ", units.name
                 update_unit = self._map.get_object(units.name)
                 print update_unit
                 update_unit["object"].make_dict(lon,lat)
-        if pack != None:
-            print "Du är inne i else update_units/pingwith cord"
-            packet = Packet.from_str(pack)
-            for units in session.query(Unit).filter_by(name=packet.data["name"]):
+        else:
+            for units in session.query(Unit).filter_by(Unit.name==pack.data["name"]):
                 print "Ditt unit name: ", units.name
                 update_unit = self._map.get_object(units.name)
-                update_unit["object"].make_dict(packet.data["lon"],packet.data["lat"], packet.data["name"])
+                print update_unit
+                update_unit["object"].make_dict(pack.data["lon"],pack.data["lat"],pack.data["name"])

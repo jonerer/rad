@@ -48,14 +48,14 @@ class Page(gtk.VBox):
 
 class MenuPage(Page):
     def hille_e_tjock(self, widget, data=None):
-        print "tjockade på hille"
+        print "tjockade pÃ¥ hille"
         session = get_session()
         poiPacket = str(packet.Packet("poi",id = "", poi_type = u"brand", name = "Vallarondellen", coordx = "15.5680", coordy = "58.4100"))
         rpc.send("qos", "add_packet", packet=poiPacket)
         #alarm = str(packet.Packet("alarm", id = "", type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
-    #Kanske behövs flyttas till ett mer logiskt ställe!
+    #Kanske behÃ¶vs flyttas till ett mer logiskt stÃ¤lle!
     def add_poi(self, pack):
         print "hihi add_poi"
         pack = packet.Packet.from_str(str(pack))
@@ -82,7 +82,7 @@ class MenuPage(Page):
         self.size_request = (300,300)
         # CREATE BUTTONS
         objButton = create_menuButton("static/ikoner/map.png","Objekt")
-        setButton = create_menuButton("static/ikoner/cog.png","Inställningar")
+        setButton = create_menuButton("static/ikoner/cog.png","InstÃ¤llningar")
         conButton = create_menuButton("static/ikoner/book_addresses.png","Kontakter")
         misButton = create_menuButton("static/ikoner/book.png","Uppdrag")
         jonasButton = create_menuButton("static/ikoner/JonasInGlases.png","Jonas")
@@ -709,20 +709,26 @@ class Gui(hildon.Program):
                 #Kollar om user redan finns
                 insession = True
                 for users in session.query(User):
-                    users.type.is_self = False
+                    if users.type:
+                        users.type.is_self = False
                     if users.name == self.user:
                         insession = False
-                        current_user=users
+                        current_user = users
                         break
                     else:
                         insession = True
                 if insession:
+                    print "Skapar användare"
                     current_user = User(self.user,self.pw)
+                    session.add(current_user)
                     session.commit()
                 #�ndrar users unit
                 for units in session.query(Unit).filter_by(name=unit):
                     current_user.type = units
                     current_user.type.is_self = True
+                    session.commit()
+            else:
+                statusLabel.set_label("Access denied")
        
         rpc.register("access", access)
         return hboxOUT
@@ -834,37 +840,25 @@ class Gui(hildon.Program):
         menu.append(menuItemExit)
 
         return menu
-    #  // TOP MENU------------------------------
-    def get_treeview(self, args):
-        if len(args) == 1:
-            return args[0]
-        else:
-            return args[2]
-
-    def get_row_number_from_treeview(self, treeview):
-        row = treeview.get_selection().get_selected_rows()
-        return row[1][0][0]
-
-    # Denna funktion har skapats eftersom det är aningen omständigt att få ut
-    # värden från en markering i en lista. Skicka in listan och kolumnen du
-    # vill ha ut värdet ifrån så sköter funktionen resten. Första kolumnen är 0,
+    # vÃ¤rden frÃ¥n en markering i en lista. Skicka in listan och kolumnen du
+    # vill ha ut vÃ¤rdet ifrÃ¥n sÃ¥ skÃ¶ter funktionen resten. FÃ¶rsta kolumnen Ã¤r 0,
     # andra 1 osv. 
     def get_value_from_treeview(self, treeview, column):
-        # Läs mer om vad row innehåller här (gtk.TreeSelection.get_selected_row):
+        # LÃ¤s mer om vad row innehÃ¥ller hÃ¤r (gtk.TreeSelection.get_selected_row):
         # http://www.pygtk.org/pygtk2reference/class-gtktreeselection.html
         row = treeview.get_selection().get_selected_rows()
       
         if len(row[1]) > 0:
-            # row innehåller en tuple med (ListStore(s), path(s))
-            # Vi plockar ut första värdet i paths. Eftersom vi enbart tillåter
-            # användaren att markera en rad i taget kommer det alltid bara finnas
-            # ett värde i paths.
+            # row innehÃ¥ller en tuple med (ListStore(s), path(s))
+            # Vi plockar ut fÃ¶rsta vÃ¤rdet i paths. Eftersom vi enbart tillÃ¥ter
+            # anvÃ¤ndaren att markera en rad i taget kommer det alltid bara finnas
+            # ett vÃ¤rde i paths.
             path = row[1][0]
           
-            # Hämtar modellen för treeview
+            # HÃ¤mtar modellen fÃ¶r treeview
             treemodel = treeview.get_model()
           
-            # Returnerar värdet
+            # Returnerar vÃ¤rdet
             return treemodel.get_value(treemodel.get_iter(path), column)
         else:
             return None
@@ -873,7 +867,7 @@ class Gui(hildon.Program):
         self.view.set_current_page(num)
 
     def menu_exit(self, widget, data=None):
-        # Stänger net GUI:t.
+        # StÃ¤nger net GUI:t.
         gtk.main_quit()
 
     def run(self):

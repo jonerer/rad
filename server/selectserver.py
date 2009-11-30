@@ -171,9 +171,8 @@ def unit_update(connection, pack):
     unit_response.data = pack.data
     for conn in connections.values():
         if conn != connection:
-            print "En annan client kontaktade dig med gps"
+            print "Du försökte ändra nån annans coordinat"
             conn.out_queue.put(unit_response)
-
 clientrequests["unit_update"] = unit_update
 
 def poi(connection, pack):

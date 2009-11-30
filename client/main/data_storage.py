@@ -338,21 +338,19 @@ class MapObject(Picture):
 #            self.set_commands(path)
             
     #Make dict to sen to set_coordinate
-    def make_dict(self, lon, lat, unit_id=None):
+    def make_dict(self, lon, lat, pack):
         print "make_dict"
         dict = {"longitude":lon,"latitude":lat}
         session = get_session()
-        if unit_id == None:
+        if pack == None:
             for unit in session.query(Unit).filter(Unit.is_self==True):
-                print "Inne i unit.is_self"
                 unit.coordx=lon
                 unit.coordy=lat
                 unit_packet = str(packet.Packet("unit_update", name = unit.name, lon = unit.coordx , lat = unit.coordy))
                 rpc.send("qos", "add_packet", packet = unit_packet)
-        if unit_id != None:
-            print "inne i unit_id: ", unit_id
-            for unit in session.query(Unit).filter(Unit.name==unit_id):
-                print "Print unit: " , unit
+        else:
+            pack = Packet.from_str(pack)
+            for unit in session.query(Unit).filter(Unit.name == pack.data["name"]):
                 unit.coordx=lon
                 unit.coordy=lat
         session.commit()
