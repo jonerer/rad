@@ -37,7 +37,7 @@ class GTK_Main:
 		hbox.pack_start(self.btnVideo, False)
 		hbox.add(gtk.Label())
 		window.show_all()
-"""
+'''
 		if(self.choice=="Video"):
 			print "inne i Stream Video"
 			options = "v4l2src ! video/x-raw-yuv,width=320,height=240,framerate=8/1 ! hantro4200enc ! rtph263pay ! udpsink host="+ self.ip +" port="+ self.port
@@ -73,7 +73,7 @@ class GTK_Main:
 			bus4.enable_sync_message_emission()
 			bus4.connect("message", self.on_message)
 			bus4.connect("sync-message::element", self.on_sync_message)
-"""
+'''
 
 	def Stream(self, choice, ip, port):
 		print "inne i Stream"
