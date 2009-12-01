@@ -11,6 +11,7 @@ from shared import rpc, packet
 from datetime import datetime
 import data_storage
 import video
+import video2
 
 
 def create_menuButton(bild,label):
@@ -164,7 +165,7 @@ class ContactPage(Page):
 
     #def videoCall(self, widget, data=None):
     def videoCall(self):
-        self.size_request(600,300)
+        size_request(600,300)
         user = self.combo.get_active_text()
         ip = self.contacts[user]
         print "user ip: ", ip
