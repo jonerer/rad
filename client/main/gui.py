@@ -449,7 +449,7 @@ class ShowObjectPage(Page):
             for units in session.query(Unit).filter(Unit.id==unit["id"]):
                 self.gui._map.delete_object(5001)
                 self.gui._map.add_object(5001, "ActiveObject", u"ActiveObject",
-data_storage.MapObject({"longitude":units.coordx-,"latitude":units.coordy},
+data_storage.MapObject({"longitude":units.coordx,"latitude":units.coordy},
 "static/ikoner/bullets/bullet_blue.png"))
                 self.label.set_text(str(units.name))
                 self.image.set_from_file(units.type.image)
