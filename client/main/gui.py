@@ -162,14 +162,16 @@ class ContactPage(Page):
         self.show_all()
         rpc.register("add_contactlist", self.add_contactlist)
 
-    def videoCall(self, widget, data=None):
+    #def videoCall(self, widget, data=None):
+    def videoCall(self):
         self.size_request(600,300)
         user = self.combo.get_active_text()
         ip = self.contacts[user]
         print "user ip: ", ip
         video.video()
         
-    def voiceCall(self, widget, data=None):
+    #def voiceCall(self, widget, data=None):
+    def voiceCall(self):
         self.size_request(600,300)
         user = self.combo.get_active_text()
         ip = self.contacts[user]
