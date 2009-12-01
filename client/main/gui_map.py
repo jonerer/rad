@@ -65,7 +65,7 @@ class Map(gtk.DrawingArea):
             print item
     
     def change_zoom(self, change):
-        
+        print "poop"
         # Frigör minnet genom att ladda ur alla tiles för föregående nivå
         level = self._map.get_level(self._zoom_level)
         level.unload_tiles("all")
@@ -279,7 +279,9 @@ class Map(gtk.DrawingArea):
         self._map.delete_object(5000)
         
         if hit == False:
-            self._map.add_object(5000, "dot", u"dot", data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)},"static/ikoner/bullets/bullet_add.png"))
+            self._map.add_object(5000, "dot", u"dot",
+data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)
+},"static/ikoner/heart.png"))
         self.queue_draw()
 
     def update_units(self,lon,lat,pack=None):
