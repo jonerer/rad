@@ -10,7 +10,7 @@ class GTK_Main:
 	def __init__(self):
 		print "inne i init"
 		#Lite variabler
-		self.ip = '130.236.217.195'
+		self.ip = '192.168.1.39'
 		self.port = '7331'
 		self.choice = ''
 
