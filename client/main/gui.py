@@ -160,11 +160,11 @@ class ContactPage(Page):
         self.show_all()
         rpc.register("add_contactlist", self.add_contactlist)
 
-    def videoCall(self, widget, data=None):
-        user = self.combo.get_active_text()
-        ip = self.contacts[user]
-        print "user ip: ", ip
-        #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
+    #def videoCall(self, widget, data=None):
+        #user = self.combo.get_active_text()
+        #ip = self.contacts[user]
+        #print "user ip: ", ip
+        ##rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
 class MissionPage(Page):
   
