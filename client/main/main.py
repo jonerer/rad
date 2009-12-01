@@ -37,7 +37,7 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(sjukhus)
 
     #Lägger till alla poi's
-    session.add(POI(15.6001709, 58.40533172, 4, u"Sjukhus", sjukhus, "N/A", datetime.now(), datetime.now()))
+    session.add(POI(15.6001709, 58.40533172, u"Sjukhus", sjukhus, u"N/A", datetime.now(), datetime.now()))
 
     #UnitTypes
 

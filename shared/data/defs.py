@@ -51,17 +51,14 @@ class POI(Base):
     time_changed = Column(Integer)
     type = relation(POIType, backref=backref("poi", order_by=id)) 
     subtype = Column(Unicode) 
-    
-    uid = Column(Integer) #Internt ID?
     type_id = Column(Integer, ForeignKey("poi_types.id"))
     
     
-    def __init__(self, coordx, coordy, uid, name, type, subtype, time_created, time_changed):
+    def __init__(self, coordx, coordy, name, type, subtype, time_created, time_changed):
         from shared.data import get_session, create_tables
         session = get_session()
         self.coordx = coordx
         self.coordy = coordy
-        self.uid = uid
         self.type = type
         self.subtype = subtype
         self.name = name
