@@ -42,7 +42,6 @@ class Page(gtk.VBox):
     def map_dblclick(self, coordx, coordy):
         pass
         #print "got dblclick i Page! coords: %s, %s" % (coordx,coordy)
-
     def on_show(self):
         pass
         #print "visar sida %s" % self.page_name

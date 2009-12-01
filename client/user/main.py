@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*
-#import gpsbt
+import gpsbt
 import time
 from shared import rpc
 from shared.data import get_session, create_tables
