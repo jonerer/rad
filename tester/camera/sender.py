@@ -70,12 +70,12 @@ class GTK_Main:
 			options4 = "dspilbcsrc dtx=0 ! audio/x-iLBC,rate=8000,channels=1,mode=20 ! udpsink host="+self.ip+" port= "+self.port+""
 			self.player4 = gst.parse_launch( options4 )
 
-			bus3 = self.player.get_bus()
+			bus3 = self.player3.get_bus()
 			bus3.add_signal_watch()
 			bus3.enable_sync_message_emission()
 			bus3.connect("message", self.on_message)
 			bus3.connect("sync-message::element", self.on_sync_message)
-			bus4 = self.player2.get_bus()
+			bus4 = self.player4.get_bus()
 			bus4.add_signal_watch()
 			bus4.enable_sync_message_emission()
 			bus4.connect("message", self.on_message)
