@@ -448,6 +448,10 @@ class ShowObjectPage(Page):
         session = get_session()
         if unit["type"] == "units":
             for units in session.query(Unit).filter(Unit.id==unit["id"]):
+                self.gui._map.delete_object(5001)
+                self.gui._map.add_object(5001, "ActiveObject", u"ActiveObject",
+data_storage.MapObject({"longitude":units.coordx-,"latitude":units.coordy},
+"static/ikoner/bullets/bullet_blue.png"))
                 self.label.set_text(str(units.name))
                 self.image.set_from_file(units.type.image)
                 self.idLabel.set_text("ID: " + str(units.id))
@@ -605,9 +609,23 @@ class Gui(hildon.Program):
         
         hbox1 = gtk.HBox(False, 1)
         hbox2 = gtk.HBox(False, 1)
+        vboxMenu = gtk.VBox(False, 1)
         self.vbox1 = gtk.VBox(False, 1)
         map = gui_map.Map(self._map, self)
-        
+#SIDEBAR TEST
+        image1 = gtk.Image()
+        zoomIn = gtk.Image()
+        zoomOut = gtk.Image()
+        zoomFull = gtk.Image()
+        image1.set_from_file("static/ikoner/sidebar/key.png")
+        zoomIn.set_from_file("static/ikoner/sidebar/magnifier_zoom_in.png")
+        zoomOut.set_from_file("static/ikoner/sidebar/magnifier_zoom_out.png")
+        zoomFull.set_from_file("static/ikoner/sidebar/map_magnify.png")
+        vboxMenu.pack_start(zoomIn,False,True, 3)
+        vboxMenu.pack_start(zoomOut,False,True, 3)
+        vboxMenu.pack_start(zoomFull,False,True, 3)
+        vboxMenu.pack_start(image1,False,True, 3)
+        vboxMenu.show_all()
         #SHOW / HIDE buttons----------------------
         self.openButton = gtk.Button()
         buff5 = gtk.gdk.PixbufAnimation("static/ikoner/resultset_first.png")
@@ -642,6 +660,7 @@ class Gui(hildon.Program):
         
         # MISSIONBOX-----------------------
 
+        hbox1.pack_start(vboxMenu, expand=False, fill=False, padding=3)
         hbox1.pack_start(map, expand=True, fill=True, padding=0)
         hbox1.pack_start(hbox2, expand=False, fill=False, padding=0)
         hbox2.pack_start(self.openButton, expand=False, fill=False, padding=0)
