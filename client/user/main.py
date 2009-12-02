@@ -35,7 +35,7 @@ def main():
             lon=15.5812375
             lat=58.39972796 
             firstplace = True
-        time.sleep(5)
+        time.sleep(15)
         session = get_session()
         for units in session.query(Unit).filter(Unit.is_self==True):
             print "Skickar koordinater"

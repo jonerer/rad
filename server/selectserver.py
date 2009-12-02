@@ -78,7 +78,16 @@ class Connection(object):
 client_sockets = {}
 connections = {}
 clientrequests = {}
-start_id = 1
+
+def get_unique_id():
+    import random
+    return int(str(random.randint(0,100000)) + "1")
+
+@require_login
+def get_map_updates(connection, pack):
+    p = packet.Packet.from_str(pack)
+    print "lollar: %s" % p.data
+clientrequests["get_map_updates"] = get_map_updates
  
 def pong(connection, pack):
     print "Sätter ny timestamp"
@@ -178,18 +187,17 @@ clientrequests["unit_update"] = unit_update
 def poi(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
-    global start_id
     #lägg i databas
-    for row in session.query(POI).order_by(POI.id.desc()).limit(1):
-        start_id = row.id + 1
     id = pack.data["id"]
-    if not id:
-        id = start_id
     name = pack.data["name"]
     timestamp = pack.timestamp
     poi_type_name = pack.data["poi_type"]
     coordx = pack.data["coordx"]
     coordy = pack.data["coordy"]
+    if coordx == "" or coordy == "":
+        logging.warn("fick en add poi med tomma lat och lon :S")
+        return
+    pack.data["unique_id"] = get_unique_id()
     session.bind
     session.query(POI).all()
     loginfo = pack.data
@@ -201,7 +209,7 @@ def poi(connection, pack):
     for poi_types in session.query(POIType).filter(POIType.name==poi_type_name):
         print "Kom in i foren"
         poi_type = poi_types
-    session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
+    session.add(POI(coordx, coordy, name, poi_type, timestamp, timestamp, unique_id=pack.data["unique_id"]))
     session.commit()
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data
