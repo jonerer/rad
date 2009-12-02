@@ -10,33 +10,33 @@ class GTK_Main:
     def __init__(self):
         print "inne i init"
         #Lite variabler
-        self.ip = '192.168.1.38'
+        #self.ip = '192.168.1.38'
         self.port = '7331'
         self.choice = ''
 
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title("Raddningspatrullen communication system")
-        window.set_default_size(500, 400)
-        window.connect("destroy", gtk.main_quit, "WM destroy")
-        vbox = gtk.VBox()
-        window.add(vbox)
-        self.movie_window = gtk.DrawingArea()
-        vbox.add(self.movie_window)
-        hbox = gtk.HBox()
-        vbox.pack_start(hbox, False)
-        hbox.set_border_width(10)
-        hbox.pack_start(gtk.Label())
-        self.btnAudio = gtk.Button("Voice")
-        self.btnAudio.connect("clicked", self.voice)
-        hbox.pack_start(self.btnAudio, False)
-        self.button2 = gtk.Button("Quit")
-        self.button2.connect("clicked", self.exit)
-        hbox.pack_start(self.button2, False)
-        self.btnVideo = gtk.Button("Video")
-        self.btnVideo.connect("clicked", self.video)
-        hbox.pack_start(self.btnVideo, False)
-        hbox.add(gtk.Label())
-        window.show_all()
+#        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+#        window.set_title("Raddningspatrullen communication system")
+#        window.set_default_size(500, 400)
+#        window.connect("destroy", gtk.main_quit, "WM destroy")
+#        vbox = gtk.VBox()
+#        window.add(vbox)
+#        self.movie_window = gtk.DrawingArea()
+#        vbox.add(self.movie_window)
+#        hbox = gtk.HBox()
+#        vbox.pack_start(hbox, False)
+#        hbox.set_border_width(10)
+#        hbox.pack_start(gtk.Label())
+#        self.btnAudio = gtk.Button("Voice")
+#        self.btnAudio.connect("clicked", self.voice)
+#        hbox.pack_start(self.btnAudio, False)
+#        self.button2 = gtk.Button("Quit")
+#        self.button2.connect("clicked", self.exit)
+#        hbox.pack_start(self.button2, False)
+#        self.btnVideo = gtk.Button("Video")
+#        self.btnVideo.connect("clicked", self.video)
+#        hbox.pack_start(self.btnVideo, False)
+#        hbox.add(gtk.Label())
+#        window.show_all()
 
     def Stream(self, choice, ip, port):
         print "inne i Stream"
@@ -82,12 +82,14 @@ class GTK_Main:
             bus4.connect("sync-message::element", self.on_sync_message)
 
     #Rostsamtal
-    def voice(self, w):
+    def voice(self, w, ip):
+        if ip = None:
+            ip = "130.236.219.140"
         print "Voice choosen"
         if(self.btnAudio.get_label() == "Voice"):
             self.btnAudio.set_label("Stop Voice")
             self.choice = "Voice"
-            self.Stream(self.choice, self.ip, self.port)
+            self.Stream(self.choice, ip, self.port)
             self.player3.set_state(gst.STATE_PLAYING)
             self.player4.set_state(gst.STATE_PLAYING)
             #Stream(self.choice, self.ip, self.port)
@@ -98,12 +100,14 @@ class GTK_Main:
             self.btnAudio.set_label("Voice")
 
     #Videosamtal
-    def video(self, w):
+    def video(self, w, ip):
+        if ip = None:
+            ip = "130.236.219.140"
         print "Video choosen"
         if self.btnVideo.get_label() == "Video":
             self.btnVideo.set_label("Stop Video")
             self.choice = "Video"
-            self.Stream(self.choice, self.ip, self.port)
+            self.Stream(self.choice, ip, self.port)
             self.player.set_state(gst.STATE_PLAYING)
             self.player2.set_state(gst.STATE_PLAYING)
             #Stream(self.choice, self.ip, self.port)
