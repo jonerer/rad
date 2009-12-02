@@ -28,7 +28,6 @@ def main():
         print lat
         '''
         if firstplace:
-            print "Du är inne i firstplace"
             lon = 15.5666574
             lat = 58.39585456
             firstplace = False
@@ -38,12 +37,9 @@ def main():
             firstplace = True
         time.sleep(5)
         session = get_session()
-        print "innan session"
         for units in session.query(Unit).filter(Unit.is_self==True):
-            print "yesh"
+            print "Skickar koordinater"
             rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
-            print "skickat koord, updaterar map"
-            rpc.send("main", "update_map")
     #stop gps devices
     #gpsbt.stop(context)
 

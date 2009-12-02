@@ -342,15 +342,13 @@ class MapObject(Picture):
         print "make_dict"
         dict = {"longitude":lon,"latitude":lat}
         session = get_session()
-        print "Du är ute"
         if pack == None:
-            print "Du är innanför"
             for unit in session.query(Unit).filter(Unit.is_self==True):
                 unit.coordx=lon
                 unit.coordy=lat
-                print "Du ska skicka till servern: ", unit.name
                 unit_packet = str(packet.Packet("unit_update", name = unit.name, lon = unit.coordx , lat = unit.coordy))
                 rpc.send("qos", "add_packet", packet=unit_packet)
+                print "rpc till qos klar"
         else:
             for unit in session.query(Unit).filter(Unit.name == pack):
                 unit.coordx=lon
