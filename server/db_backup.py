@@ -6,14 +6,16 @@ import threading
 """
 För att inte skriva in lösen:
 A ska logga in på B
-A: ssh-keygen -t rsa /home/USER_NAME/filnamn
-kopiera filnamn.pub till B:s /home/USER_NAME/.ssh/authorized_keys
+A: ssh-keygen
+välj var du vill spara nyckeln
+tryck enter två ggr
+ssh-copy-id -i nyckeln.pub username@backup_ip
 """
 
-folder = "ca/private/"
-username = "lytharn"
-backup_ip = "192.168.1.40"
-backup_folder = "/home/lytharn/folder1"
+folder = ""
+username = ""
+backup_ip = ""
+backup_folder = ""
 time_between_backup = 3600
 
 """
