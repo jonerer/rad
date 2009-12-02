@@ -82,7 +82,7 @@ class GTK_Main:
             bus4.connect("sync-message::element", self.on_sync_message)
 
     #Rostsamtal
-    def voice(self, w, ip):
+    def voice(self, ip):
         if ip == None:
             ip = "130.236.219.140"
         print "Voice choosen"
@@ -100,7 +100,7 @@ class GTK_Main:
             self.btnAudio.set_label("Voice")
 
     #Videosamtal
-    def video(self, w, ip):
+    def video(self, ip):
         if ip == None:
             ip = "130.236.219.140"
         print "Video choosen"
