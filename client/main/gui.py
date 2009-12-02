@@ -11,7 +11,7 @@ from shared import rpc, packet
 from datetime import datetime
 import data_storage
 from video import GTK_Main
-import video2 import GTK_Main2
+from video2 import GTK_Main2
 
 
 def create_menuButton(bild,label):
