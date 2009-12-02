@@ -116,7 +116,7 @@ class SettingsPage(Page):
         self.pack_start(button, False, False, padding=2)
 
         self.show_all()
-        
+
 class ContactPage(Page):
 
     def add_contactlist(self, pack):
@@ -127,7 +127,7 @@ class ContactPage(Page):
         self.combo.get_model().clear()
         for user in self.contacts:
             self.combo.append_text(user)
-
+            
     def on_show(self): 
         contact_send = str(packet.Packet("contact_req"))
         rpc.send("qos", "add_packet", packet=contact_send)
@@ -215,47 +215,82 @@ class AddMissionPage(Page):
                                 info=info, xEntry=xEntry, yEntry=yEntry))
             print rpc.send("qos", "add_packet", packet=mission_save)
         
+        hbox1 = gtk.HBox()
+        vbox1 = gtk.VBox()
+        self.vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
         nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
         infoEntry = gtk.Entry()
         xLabel = gtk.Label("X-koordinat:")
-        xEntry = gtk.Entry()
+        self.xEntry = gtk.Entry()
         yLabel = gtk.Label("Y-koordinat:")
-        yEntry = gtk.Entry()
+        self.yEntry = gtk.Entry()
         okButton = gtk.Button("ok")
-        #infoView = gtk.TextView(None)
-        #infoView.set_editable(True)
-        #infoTextBuffer = infoView.get_buffer()
-        #infoScroll = gtk.ScrolledWindow()
-        #infoScroll.set_size_request(294,150)
-        #infoScroll.add(infoView)
-        #infoScroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        #infoView.set_wrap_mode(gtk.WRAP_WORD)
         
-        self.pack_start(nameLabel, False, False,0)
-        self.pack_start(nameEntry, False, False,0)
-        self.pack_start(infoLabel, False, False,0)
-        self.pack_start(infoEntry, False, False,0)
-        self.pack_start(xLabel, False, False,0)
-        self.pack_start(xEntry, False, False,0)
-        self.pack_start(yLabel, False, False,0)
-        self.pack_start(yEntry, False, False,0)
-        self.pack_start(okButton, False, False,0)
+        self.infoView = gtk.TextView(buffer=None)
+        self.infoView.set_wrap_mode(gtk.WRAP_WORD)
+        infoLabel2 = gtk.Label("Info:")
+        self.infoView.set_size_request(300,200)
+
+        vbox1.set_size_request(300,300)
+        vbox1.pack_start(nameLabel, False, False,0)
+        vbox1.pack_start(nameEntry, False, False,0)
+        vbox1.pack_start(infoLabel, False, False,0)
+        vbox1.pack_start(infoEntry, False, False,0)
+        vbox1.pack_start(xLabel, False, False,0)
+        vbox1.pack_start(self.xEntry, False, False,0)
+        vbox1.pack_start(yLabel, False, False,0)
+        vbox1.pack_start(self.yEntry, False, False,0)
+        vbox1.pack_start(okButton, False, False,0)
+        
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
+        self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
+        self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","G�m Detaljer")
         backButton.connect("clicked", self.gui.switch_page, "mission")
         okButton.connect("clicked", dbupdate_press_callback, None)
+        self.showDetails.connect("clicked", self.details, "show")
+        self.hideDetails.connect("clicked", self.details, "hide")
         
-        hbox1 = gtk.HBox()
-        hbox1.pack_start(backButton, True, True, padding=2)
-        hbox1.pack_start(saveButton, True, True, padding=2)
-        self.pack_start(hbox1, False, False, 2)
+        hbox2 = gtk.HBox()
+        hbox2.pack_start(backButton, True, True, padding=2)
+        hbox2.pack_start(saveButton, True, True, padding=2)
+        vbox1.pack_start(hbox2,False,False,2)
+        vbox1.pack_start(self.showDetails,False,False,2)
+        vbox1.pack_start(self.hideDetails,False,False,2)
+        self.vbox2.pack_start(infoLabel2,False,False,0)
+        self.vbox2.pack_start(self.infoView,False,False,0)
         
+        hbox1.pack_start(vbox1, False, False, 2)
+        hbox1.pack_start(self.vbox2, False, False, 2)
+        self.pack_start(hbox1,False,False,0)
 
         self.show_all()
+        self.vbox2.hide()
+        self.hideDetails.hide()
+        
+    def map_dblclick(self, coordx, coordy):
+        self.xEntry.set_text(str(coordx))
+        self.yEntry.set_text(str(coordy))
 
+    def on_show(self):
+        # simulera en "göm detaljer"
+        self.details(None, "hide")
+        
+    def details(self, button, state, widget=None):
+        if state == "show":
+            self.gui.rightBook.set_size_request(600,300)
+            self.vbox2.show()
+            self.showDetails.hide()
+            self.hideDetails.show()
+        elif state == "hide":
+            self.gui.rightBook.set_size_request(300,300)
+            self.vbox2.hide()
+            self.showDetails.show()
+            self.hideDetails.hide()
+            
 class RemoveMissionPage(Page):
 
     def __init__(self, gui):
@@ -398,7 +433,6 @@ class AddObjectPage(Page):
         rpc.send("qos", "add_packet", packet=poi)
     
     def map_dblclick(self, coordx, coordy):
-        print "Jon bajsar!"
         self.xEntry.set_text(str(coordx))
         self.yEntry.set_text(str(coordy))
 
