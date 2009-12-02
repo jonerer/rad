@@ -10,6 +10,8 @@ from shared.data.defs import *
 from shared import rpc, packet
 from datetime import datetime
 import data_storage
+import video
+import video2
 
 
 def create_menuButton(bild,label):
@@ -144,7 +146,8 @@ class ContactPage(Page):
         newButton = create_menuButton("static/ikoner/phone.png", "Ring")
         videoButton = create_menuButton("static/ikoner/JonasInGlases.png", "Video")
         backButton.connect("clicked", self.gui.switch_page, "menu")
-        videoButton.connect("clicked", self.videoCall)
+        #videoButton.connect("clicked", self.videoCall())
+        #newButton.connect("clicked", self.voiceCall())
         label = gtk.Label("Välj Kontakt:")
 
 
@@ -161,10 +164,22 @@ class ContactPage(Page):
         rpc.register("add_contactlist", self.add_contactlist)
 
     #def videoCall(self, widget, data=None):
+    #def videoCall(self):
+        #self.set_size_request(600,300)
         #user = self.combo.get_active_text()
         #ip = self.contacts[user]
         #print "user ip: ", ip
-        ##rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
+        #video.video()
+        
+    ##def voiceCall(self, widget, data=None):
+    #def voiceCall(self):
+        #self.set_size_request(600,300)
+        #user = self.combo.get_active_text()
+        #ip = self.contacts[user]
+        #print "user ip: ", ip
+        #video2.video()
+        #video.Stream("Video", ip, "7331")
+        #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
 class MissionPage(Page):
   
