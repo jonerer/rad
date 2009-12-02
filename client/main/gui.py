@@ -146,8 +146,8 @@ class ContactPage(Page):
         newButton = create_menuButton("static/ikoner/phone.png", "Ring")
         videoButton = create_menuButton("static/ikoner/JonasInGlases.png", "Video")
         backButton.connect("clicked", self.gui.switch_page, "menu")
-        videoButton.connect("clicked", self.videoCall())
-        newButton.connect("clicked", self.voiceCall())
+        #videoButton.connect("clicked", self.videoCall())
+        #newButton.connect("clicked", self.voiceCall())
         label = gtk.Label("Välj Kontakt:")
 
 
@@ -164,20 +164,20 @@ class ContactPage(Page):
         rpc.register("add_contactlist", self.add_contactlist)
 
     #def videoCall(self, widget, data=None):
-    def videoCall(self):
-        size_request(600,300)
-        user = self.combo.get_active_text()
-        ip = self.contacts[user]
-        print "user ip: ", ip
-        video.video()
+    #def videoCall(self):
+        #self.set_size_request(600,300)
+        #user = self.combo.get_active_text()
+        #ip = self.contacts[user]
+        #print "user ip: ", ip
+        #video.video()
         
-    #def voiceCall(self, widget, data=None):
-    def voiceCall(self):
-        self.size_request(600,300)
-        user = self.combo.get_active_text()
-        ip = self.contacts[user]
-        print "user ip: ", ip
-        video2.video()
+    ##def voiceCall(self, widget, data=None):
+    #def voiceCall(self):
+        #self.set_size_request(600,300)
+        #user = self.combo.get_active_text()
+        #ip = self.contacts[user]
+        #print "user ip: ", ip
+        #video2.video()
         #video.Stream("Video", ip, "7331")
         #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
@@ -620,25 +620,52 @@ class Gui(hildon.Program):
         def show_mission(self, widget, data=None):
             menuBox.hide()
             return
-        
+        def side_bar_clicked(self, data, widget=None):
+            print "inne"
+            if data == "+":
+                map.change_zoom("+")
+            else:
+                map.change_zoom("-")
+            return True
+
+        def create_barButton(bild):
+            buttonBox = gtk.HBox(False, spacing=1)
+            button = gtk.Button()
+            buff = gtk.gdk.PixbufAnimation(bild)
+            image = gtk.Image()
+            image.set_from_animation(buff)
+            image.show()
+            buttonBox.pack_start(image, expand=False, fill=False, padding=5)
+            button.add(buttonBox)
+            button.show_all()
+            button.set_size_request(60, 40)
+            return button
+
         hbox1 = gtk.HBox(False, 1)
         hbox2 = gtk.HBox(False, 1)
         vboxMenu = gtk.VBox(False, 1)
         self.vbox1 = gtk.VBox(False, 1)
         map = gui_map.Map(self._map, self)
 #SIDEBAR TEST
-        image1 = gtk.Image()
-        zoomIn = gtk.Image()
-        zoomOut = gtk.Image()
-        zoomFull = gtk.Image()
-        image1.set_from_file("static/ikoner/sidebar/key.png")
-        zoomIn.set_from_file("static/ikoner/sidebar/magnifier_zoom_in.png")
-        zoomOut.set_from_file("static/ikoner/sidebar/magnifier_zoom_out.png")
-        zoomFull.set_from_file("static/ikoner/sidebar/map_magnify.png")
+        image1 = create_barButton("static/ikoner/sidebar/key.png")
+        zoomIn = create_barButton("static/ikoner/sidebar/magnifier_zoom_in.png")
+        
+        zoomOut=create_barButton("static/ikoner/sidebar/magnifier_zoom_out.png")
+        zoomFull = create_barButton("static/ikoner/sidebar/map_magnify.png")
+        helpButton = create_barButton("static/ikoner/help.png")  
+        onlineButton = create_barButton("static/ikoner/status_online.png")  
+        soundButton = create_barButton("static/ikoner/sound_mute.png")  
+         
+        zoomIn.connect("clicked", side_bar_clicked, "+")
+        zoomOut.connect("clicked", side_bar_clicked, "-")
+        zoomFull.connect("clicked", closeButton_press_callback, None)
         vboxMenu.pack_start(zoomIn,False,True, 3)
-        vboxMenu.pack_start(zoomOut,False,True, 3)
         vboxMenu.pack_start(zoomFull,False,True, 3)
-        vboxMenu.pack_start(image1,False,True, 3)
+        vboxMenu.pack_start(zoomOut,False,True, 3)
+        vboxMenu.pack_end(image1,False,True, 3)
+        vboxMenu.pack_end(helpButton,False,True, 3)
+        vboxMenu.pack_end(soundButton,False,True, 3)
+        vboxMenu.pack_end(onlineButton,False,True, 3)
         vboxMenu.show_all()
         #SHOW / HIDE buttons----------------------
         self.openButton = gtk.Button()
