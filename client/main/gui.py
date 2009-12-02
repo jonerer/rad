@@ -222,10 +222,14 @@ class AddMissionPage(Page):
         nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
         infoEntry = gtk.Entry()
-        xLabel = gtk.Label("X-koordinat:")
-        self.xEntry = gtk.Entry()
-        yLabel = gtk.Label("Y-koordinat:")
-        self.yEntry = gtk.Entry()
+        poiLabel = gtk.Label("POI:")
+        poiEntry = gtk.Entry()
+        poiButton = gtk.Button("Lägg Till")
+        self.combo = gtk.Combo()
+        self.poiList = []
+        self.poiListDATA = []
+        self.combo.set_popdown_strings(self.poiList)
+
         okButton = gtk.Button("ok")
         
         self.infoView = gtk.TextView(buffer=None)
@@ -238,10 +242,10 @@ class AddMissionPage(Page):
         vbox1.pack_start(nameEntry, False, False,0)
         vbox1.pack_start(infoLabel, False, False,0)
         vbox1.pack_start(infoEntry, False, False,0)
-        vbox1.pack_start(xLabel, False, False,0)
-        vbox1.pack_start(self.xEntry, False, False,0)
-        vbox1.pack_start(yLabel, False, False,0)
-        vbox1.pack_start(self.yEntry, False, False,0)
+        vbox1.pack_start(poiLabel, False, False,0)
+        vbox1.pack_start(poiEntry, False, False,0)
+        vbox1.pack_start(poiButton, False, False,0)
+        vbox1.pack_start(self.combo,False,False,10)
         vbox1.pack_start(okButton, False, False,0)
         
         
@@ -270,11 +274,11 @@ class AddMissionPage(Page):
         self.show_all()
         self.vbox2.hide()
         self.hideDetails.hide()
+    def update(self, unit):
+        self.poiList.append(str(unit["name"]))
+        self.poiListDATA.append(unit["id"])
+        self.combo.set_popdown_strings(self.poiList)
         
-    def map_dblclick(self, coordx, coordy):
-        self.xEntry.set_text(str(coordx))
-        self.yEntry.set_text(str(coordy))
-
     def on_show(self):
         # simulera en "göm detaljer"
         self.details(None, "hide")
@@ -520,9 +524,9 @@ data_storage.MapObject({"longitude":units.coordx,"latitude":units.coordy},
                 self.label.set_text(str(poi.name))
                 self.image.set_from_file(poi.type.image)
                 self.idLabel.set_text("ID: " + str(poi.id))
-                self.xLabel.set_text("coord X: " + str(units.coordx))
-                self.yLabel.set_text("coord Y: " + str(units.coordy))
-                self.changedLabel.set_text("Senast Ändrad: " + str(units.time_changed))
+                self.xLabel.set_text("coord X: " + str(poi.coordx))
+                self.yLabel.set_text("coord Y: " + str(poi.coordy))
+                self.changedLabel.set_text("Senast Ändrad: " + str(poi.time_changed))
                 session.commit()
         
 class Gui(hildon.Program):
@@ -632,16 +636,19 @@ class Gui(hildon.Program):
         active_page.map_dblclick(coordx, coordy)
 
     def show_object(self, unit):
-        if unit["type"] == "poi" or unit["type"] == "units":
-            self.switch_page("showObject")
-            self.openButton.hide()
-            self.closeButton.show()
-            self.vbox1.show()
+        currentPage = self.rightBook.get_current_page()
+        if currentPage is not 4:
+            if unit["type"] == "units" or unit["type"] == "poi":
+                self.switch_page("showObject")
+                self.openButton.hide()
+                self.closeButton.show()
+                self.vbox1.show()
+                active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
+                active_page.update(unit)
+        elif currentPage is 4 and unit["type"] is "poi":
+            print "NAJS"
             active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
             active_page.update(unit)
-        else:
-            pass
-
         
     def create_map_view(self):
 
