@@ -6,7 +6,7 @@ import pygtk, gtk, gobject
 import pygst
 pygst.require("0.10")
 import gst
-class GTK_Main2:
+class GTK_Maine:
     def __init__(self):
         print "inne i init"
         #Lite variabler
@@ -151,6 +151,6 @@ class GTK_Main2:
             imagesink.set_xwindow_id(self.movie_window.window.xid)
 
 if __name__ == "__main__":
-    GTK_Main2()
+    GTK_Maine()
     gtk.gdk.threads_init()
     gtk.main()

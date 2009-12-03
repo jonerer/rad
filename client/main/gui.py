@@ -11,7 +11,7 @@ from shared import rpc, packet
 from datetime import datetime
 import data_storage
 from video import GTK_Main
-from video2 import GTK_Main2
+from video2 import GTK_Maine
 
 
 def create_menuButton(bild,label):
@@ -165,7 +165,7 @@ class ContactPage(Page):
 
     #def videoCall(self, widget, data=None):
     def videoCall(self, w):
-        self.set_size_request(600,300)
+        self.size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
         #print "user ip: ", ip
@@ -173,11 +173,11 @@ class ContactPage(Page):
         
     #def voiceCall(self, widget, data=None):
     def voiceCall(self, w):
-        self.set_size_request(600,300)
+        self.size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
         print "user ip: ", ip
-        GTK_Main2().video()
+        GTK_Maine().video()
         #video.Stream("Video", ip, "7331")
         #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
