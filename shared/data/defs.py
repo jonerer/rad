@@ -50,20 +50,20 @@ class POI(Base):
     time_created = Column(Integer)
     time_changed = Column(Integer)
     type = relation(POIType, backref=backref("poi", order_by=id)) 
-    subtype = Column(Unicode) 
     type_id = Column(Integer, ForeignKey("poi_types.id"))
     
+    unique_id = Column(Integer, nullable=True)
     
-    def __init__(self, coordx, coordy, name, type, subtype, time_created, time_changed):
+    def __init__(self, coordx, coordy, name, type, time_created, time_changed, unique_id=None):
         from shared.data import get_session, create_tables
         session = get_session()
         self.coordx = coordx
         self.coordy = coordy
         self.type = type
-        self.subtype = subtype
         self.name = name
         self.time_created = time_created
         self.time_changed = time_changed
+        self.unique_id = unique_id
         
 #class Alarm(Base):
     #__tablename__ = "alarm"
@@ -96,6 +96,8 @@ class Unit(Base):
     
     is_self = Column(Boolean)
     type_id = Column(Integer, ForeignKey("unit_types.id"))
+
+    unique_id = Column(Integer, nullable=True)
 
     def get_image(self):
         if not self.is_self:

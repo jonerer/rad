@@ -289,17 +289,11 @@ data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)
         session = get_session()
         if pack == None:
             for units in session.query(Unit).filter(Unit.is_self==True):
-                print "Ditt unit name: ", units.name
                 update_unit = self._map.get_object(units.id)
-                print "Ditt object map är :",update_unit
                 update_unit["object"].make_dict(lon,lat)
         else:
             pack = packet.Packet.from_str(pack)
-            print pack.data["name"]
-            print pack.data["lon"]
-            print pack.data["lat"]
             for units in session.query(Unit).filter(Unit.name==pack.data["name"]):
-                print units
                 update_unit = self._map.get_object(units.id)
                 update_unit["object"].make_dict(pack.data["lon"],pack.data["lat"],pack.data["name"])
         self.queue_draw()

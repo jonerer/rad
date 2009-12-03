@@ -63,7 +63,6 @@ class MenuPage(Page):
         pack = packet.Packet.from_str(str(pack))
         session = get_session()
         loginfo = pack.data
-        id = pack.data["id"]
         name = pack.data["name"]
         timestamp = pack.timestamp
         poi_type = pack.data["poi_type"]
@@ -71,12 +70,13 @@ class MenuPage(Page):
         coordy = pack.data["coordy"]
         for poi_name in session.query(POIType).filter(POIType.name==poi_type):
             poi_type = poi_name
-        session.add(POI(coordx, coordy, id, name, poi_type, timestamp))
+        session.add(POI(coordx, coordy, name, poi_type, timestamp, timestamp, unique_id=pack.data["unique_id"]))
         session.commit()
         for poi in session.query(POI).filter(POI.name == name):
-            self.gui._map.add_object(poi.name, data_storage.MapObject(
-                {"longitude":poi.coordx,"latitude":poi.coordy},
-                poi.poi_type.image))
+            self.gui._map.add_object(poi.id, "poi", poi.name, 
+                    data_storage.MapObject({
+                        "longitude":poi.coordx,"latitude":poi.coordy},
+                        poi.type.image))
         self.gui._map.redraw()
 
     def __init__(self, gui):
@@ -222,10 +222,14 @@ class AddMissionPage(Page):
         nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
         infoEntry = gtk.Entry()
-        xLabel = gtk.Label("X-koordinat:")
-        self.xEntry = gtk.Entry()
-        yLabel = gtk.Label("Y-koordinat:")
-        self.yEntry = gtk.Entry()
+        poiLabel = gtk.Label("POI:")
+        poiEntry = gtk.Entry()
+        poiButton = gtk.Button("Lägg Till")
+        self.combo = gtk.Combo()
+        self.poiList = []
+        self.poiListDATA = []
+        self.combo.set_popdown_strings(self.poiList)
+
         okButton = gtk.Button("ok")
         
         self.infoView = gtk.TextView(buffer=None)
@@ -238,10 +242,10 @@ class AddMissionPage(Page):
         vbox1.pack_start(nameEntry, False, False,0)
         vbox1.pack_start(infoLabel, False, False,0)
         vbox1.pack_start(infoEntry, False, False,0)
-        vbox1.pack_start(xLabel, False, False,0)
-        vbox1.pack_start(self.xEntry, False, False,0)
-        vbox1.pack_start(yLabel, False, False,0)
-        vbox1.pack_start(self.yEntry, False, False,0)
+        vbox1.pack_start(poiLabel, False, False,0)
+        vbox1.pack_start(poiEntry, False, False,0)
+        vbox1.pack_start(poiButton, False, False,0)
+        vbox1.pack_start(self.combo,False,False,10)
         vbox1.pack_start(okButton, False, False,0)
         
         
@@ -270,11 +274,11 @@ class AddMissionPage(Page):
         self.show_all()
         self.vbox2.hide()
         self.hideDetails.hide()
+    def update(self, unit):
+        self.poiList.append(str(unit["name"]))
+        self.poiListDATA.append(unit["id"])
+        self.combo.set_popdown_strings(self.poiList)
         
-    def map_dblclick(self, coordx, coordy):
-        self.xEntry.set_text(str(coordx))
-        self.yEntry.set_text(str(coordy))
-
     def on_show(self):
         # simulera en "göm detaljer"
         self.details(None, "hide")
@@ -355,18 +359,16 @@ class AddObjectPage(Page):
         self.vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
         self.nameEntry = gtk.Entry()
-        objLabel = gtk.Label("Object:")
-        self.objEntry = gtk.Entry()
         typeLabel = gtk.Label("Typ:")
         self.poi_type_selector = gtk.combo_box_new_text()
         #typeLabel = gtk.Label("Typ:")
         #self.typeEntry = gtk.Entry()
         infoLabel = gtk.Label("Information:")
         infoEntry = gtk.Entry()
-        xLabel = gtk.Label("X-koordinat:")
+        self.pos_label = gtk.Label("Position:")
+        self.pos_plz_click = gtk.Label("(klicka på kartan):")
         self.xEntry = gtk.Entry()
         self.xEntry.set_editable(False)
-        yLabel = gtk.Label("Y-koordinat:")
         self.yEntry = gtk.Entry()
         self.yEntry.set_editable(False)
         
@@ -378,13 +380,11 @@ class AddObjectPage(Page):
         vbox1.set_size_request(300,300)
         vbox1.pack_start(nameLabel, False, False,0)
         vbox1.pack_start(self.nameEntry, False, False,0)
-        vbox1.pack_start(objLabel, False, False,0)
-        vbox1.pack_start(self.objEntry, False, False,0)
         vbox1.pack_start(typeLabel, False, False,0)
         vbox1.pack_start(self.poi_type_selector, False, False,0)
-        vbox1.pack_start(xLabel, False, False,0)
+        vbox1.pack_start(self.pos_label, False, False,0)
+        vbox1.pack_start(self.pos_plz_click, False, False,0)
         vbox1.pack_start(self.xEntry, False, False,0)
-        vbox1.pack_start(yLabel, False, False,0)
         vbox1.pack_start(self.yEntry, False, False,0)
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
@@ -424,21 +424,31 @@ class AddObjectPage(Page):
         self.pack_start(hbox1,False,False,0)
         self.show_all()
         self.vbox2.hide()
+        self.xEntry.hide()
+        self.yEntry.hide()
         self.hideDetails.hide()
 
     def send_object(self, button):
         #lägg till så man kan fixa in type
         print self.poi_type_selector.get_active_text()
         poi = str(packet.Packet("poi",id = "", poi_type = unicode(self.poi_type_selector.get_active_text()), name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
+        
         rpc.send("qos", "add_packet", packet=poi)
     
     def map_dblclick(self, coordx, coordy):
+        print "Jon bajsar!"
+        self.xEntry.show()
+        self.yEntry.show()
+        self.pos_plz_click.hide()
         self.xEntry.set_text(str(coordx))
         self.yEntry.set_text(str(coordy))
 
     def on_show(self):
         # simulera en "göm detaljer"
         self.details(None, "hide")
+        self.xEntry.hide()
+        self.yEntry.hide()
+        self.pos_plz_click.show()
         
     def details(self, button, state, widget=None):
         if state == "show":
@@ -514,9 +524,9 @@ data_storage.MapObject({"longitude":units.coordx,"latitude":units.coordy},
                 self.label.set_text(str(poi.name))
                 self.image.set_from_file(poi.type.image)
                 self.idLabel.set_text("ID: " + str(poi.id))
-                self.xLabel.set_text("coord X: " + str(units.coordx))
-                self.yLabel.set_text("coord Y: " + str(units.coordy))
-                self.changedLabel.set_text("Senast Ändrad: " + str(units.time_changed))
+                self.xLabel.set_text("coord X: " + str(poi.coordx))
+                self.yLabel.set_text("coord Y: " + str(poi.coordy))
+                self.changedLabel.set_text("Senast Ändrad: " + str(poi.time_changed))
                 session.commit()
         
 class Gui(hildon.Program):
@@ -525,6 +535,7 @@ class Gui(hildon.Program):
     def require_login(self):
         # TODO: snyggare:
         # den här räknar me att login e på sista sidan
+        # och TVINGAR inget.
         last_page = self.view.get_n_pages()
         self.view.set_current_page(last_page-1)
 
@@ -625,16 +636,19 @@ class Gui(hildon.Program):
         active_page.map_dblclick(coordx, coordy)
 
     def show_object(self, unit):
-        if unit["type"] == "poi" or unit["type"] == "units":
-            self.switch_page("showObject")
-            self.openButton.hide()
-            self.closeButton.show()
-            self.vbox1.show()
+        currentPage = self.rightBook.get_current_page()
+        if currentPage is not 4:
+            if unit["type"] == "units" or unit["type"] == "poi":
+                self.switch_page("showObject")
+                self.openButton.hide()
+                self.closeButton.show()
+                self.vbox1.show()
+                active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
+                active_page.update(unit)
+        elif currentPage is 4 and unit["type"] is "poi":
+            print "NAJS"
             active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
             active_page.update(unit)
-        else:
-            pass
-
         
     def create_map_view(self):
 
