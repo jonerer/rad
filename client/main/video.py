@@ -84,7 +84,7 @@ class GTK_Main:
     #Rostsamtal
     def voice(self, ip):
         if ip == None:
-            ip = "130.236.219.140"
+            ip = "130.236.219.163"
         print "Voice choosen"
         if(self.btnAudio.get_label() == "Voice"):
             self.btnAudio.set_label("Stop Voice")
@@ -102,7 +102,7 @@ class GTK_Main:
     #Videosamtal
     def video(self, ip):
         if ip == None:
-            ip = "130.236.219.140"
+            ip = "130.236.219.163"
         print "Video choosen"
         if self.btnVideo.get_label() == "Video":
             self.btnVideo.set_label("Stop Video")

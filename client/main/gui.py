@@ -169,7 +169,7 @@ class ContactPage(Page):
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
         #print "user ip: ", ip
-        GTK_Main().video()
+        GTK_Main().video(ip)
         
     #def voiceCall(self, widget, data=None):
     def voiceCall(self, w):
