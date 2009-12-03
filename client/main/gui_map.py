@@ -285,7 +285,7 @@ data_storage.MapObject({"longitude":dotx-(list[0]/2),"latitude":doty+(list[1]/2)
         self.queue_draw()
 
     def update_units(self,lon,lat,pack=None):
-        print "update_units"
+        print "update_units", time.time()
         session = get_session()
         if pack == None:
             for units in session.query(Unit).filter(Unit.is_self==True):

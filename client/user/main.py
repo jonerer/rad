@@ -38,8 +38,9 @@ def main():
         time.sleep(15)
         session = get_session()
         for units in session.query(Unit).filter(Unit.is_self==True):
-            print "Skickar koordinater"
+            print "Skickar koordinater", time.time()
             rpc.send("main", "ping_with_coordinates", lon=lon, lat=lat)
+            print "Klar med skickar koordinater", time.time()
     #stop gps devices
     #gpsbt.stop(context)
 

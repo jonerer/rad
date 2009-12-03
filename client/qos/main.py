@@ -5,6 +5,7 @@ import socket, sys, time, select
 import Queue
 import threading
 import gtk
+import time
 from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
@@ -87,8 +88,11 @@ class Connection(object):
  
     def add_packet(self, packet):
         """ receives stuff from dbus and DOO EEETT"""
+        print "add_packet", time.time()
         packet = Packet.from_str(packet)
+        print "innan queue", time.time()
         self.out_queue.put(packet)
+        print "klar med add_packet", time.time()
  
     def send(self):
         while self.connected:
@@ -107,7 +111,7 @@ class Connection(object):
                 else:
                     self.out_buffer = ""
             if time.time()-self.timestamp > self.pingtime:
-                print "server has gone down bad"
+                print "server has pinged out"
                 self.s.shutdown(socket.SHUT_RDWR)
                 self.s.close()
                 self.connected = False
