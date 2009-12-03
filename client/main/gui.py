@@ -206,6 +206,7 @@ class AddMissionPage(Page):
         super(AddMissionPage, self).__init__("addMission", gui, homogeneous=False,
                 spacing=0)
         self.size_request = (300,300)
+        self.unit = None
         def dbupdate_press_callback(self, widget, data=None):   
             name = unicode(nameEntry.get_text())
             info = unicode(infoEntry.get_text())
@@ -214,21 +215,24 @@ class AddMissionPage(Page):
             mission_save = str(packet.Packet("mission_save", name=name,\
                                 info=info, xEntry=xEntry, yEntry=yEntry))
             print rpc.send("qos", "add_packet", packet=mission_save)
-        
+            
+
+            
         hbox1 = gtk.HBox()
         vbox1 = gtk.VBox()
         self.vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
-        nameEntry = gtk.Entry()
+        self.nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
         infoEntry = gtk.Entry()
         poiLabel = gtk.Label("POI:")
-        poiEntry = gtk.Entry()
+        self.poiEntry = gtk.Entry()
         poiButton = gtk.Button("Lägg Till")
         self.combo = gtk.Combo()
         self.poiList = []
         self.poiListDATA = []
         self.combo.set_popdown_strings(self.poiList)
+        self.poiEntry.set_text("Välj en POI")
 
         okButton = gtk.Button("ok")
         
@@ -239,24 +243,27 @@ class AddMissionPage(Page):
 
         vbox1.set_size_request(300,300)
         vbox1.pack_start(nameLabel, False, False,0)
-        vbox1.pack_start(nameEntry, False, False,0)
+        vbox1.pack_start(self.nameEntry, False, False,0)
         vbox1.pack_start(infoLabel, False, False,0)
         vbox1.pack_start(infoEntry, False, False,0)
         vbox1.pack_start(poiLabel, False, False,0)
-        vbox1.pack_start(poiEntry, False, False,0)
+        vbox1.pack_start(self.poiEntry, False, False,0)
         vbox1.pack_start(poiButton, False, False,0)
         vbox1.pack_start(self.combo,False,False,10)
         vbox1.pack_start(okButton, False, False,0)
         
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
+        saveButton.connect("clicked", self.save, None)
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
         self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","G�m Detaljer")
         backButton.connect("clicked", self.gui.switch_page, "mission")
         okButton.connect("clicked", dbupdate_press_callback, None)
+        poiButton.connect("clicked", self.add_poi, None)
         self.showDetails.connect("clicked", self.details, "show")
         self.hideDetails.connect("clicked", self.details, "hide")
+        
         
         hbox2 = gtk.HBox()
         hbox2.pack_start(backButton, True, True, padding=2)
@@ -274,11 +281,24 @@ class AddMissionPage(Page):
         self.show_all()
         self.vbox2.hide()
         self.hideDetails.hide()
-    def update(self, unit):
-        self.poiList.append(str(unit["name"]))
-        self.poiListDATA.append(unit["id"])
-        self.combo.set_popdown_strings(self.poiList)
+        rpc.register("add_mission", self.add_mission)
         
+    def save(self, button, widget=None):
+        session = get_session()
+        missionPacket = str(packet.Packet("mission_save", name = self.nameEntry.get_text()))
+        rpc.send("qos", "add_packet", packet=missionPacket)  
+          
+    def add_poi(self, button, widget=None):
+        self.poiList.append(str(self.unit["name"]))
+        self.poiListDATA.append(self.unit["id"])
+        self.combo.set_popdown_strings(self.poiList)
+        self.poiEntry.set_text("Välj en POI")
+        self.unit = None     
+
+    def update(self, unit):
+        self.unit = unit
+        self.poiEntry.set_text(str(self.unit["name"]))
+               
     def on_show(self):
         # simulera en "göm detaljer"
         self.details(None, "hide")
@@ -294,6 +314,16 @@ class AddMissionPage(Page):
             self.vbox2.hide()
             self.showDetails.show()
             self.hideDetails.hide()
+    
+    def add_mission(self, pack):
+        print "add_mission"
+        pack = packet.Packet.from_str(str(pack))
+        session = get_session()
+        name = pack.data["name"]
+        time_created = datetime.now()
+        time_changed = datetime.now()
+        session.add(Mission(name, time_created, time_changed))
+        session.commit()
             
 class RemoveMissionPage(Page):
 

@@ -127,6 +127,11 @@ class Connection(object):
 connection = Connection()
 if "--read-keys" in sys.argv or True: # ha true nu iaf
     threading.Thread(target=read_keys).start()
+    
+def mission_response(pack):
+    connection.timestamp = time.time()
+    rpc.send("main", "add_mission", pack=str(pack))
+network_listeners["mission_response"] = mission_response
 
 def login_required(pack):
     rpc.send("main", "require_login")
