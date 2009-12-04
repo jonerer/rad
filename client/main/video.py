@@ -84,38 +84,38 @@ class GTK_Main:
     #Rostsamtal
     def voice(self, ip):
         if ip == None:
-            ip = "130.236.219.163"
+            ip = "130.236.218.43"
         print "Voice choosen"
-        if(self.btnAudio.get_label() == "Voice"):
-            self.btnAudio.set_label("Stop Voice")
-            self.choice = "Voice"
-            self.Stream(self.choice, ip, self.port)
-            self.player3.set_state(gst.STATE_PLAYING)
-            self.player4.set_state(gst.STATE_PLAYING)
+        #if(self.btnAudio.get_label() == "Voice"):
+        #    self.btnAudio.set_label("Stop Voice")
+        self.choice = "Voice"
+        self.Stream(self.choice, ip, self.port)
+        self.player3.set_state(gst.STATE_PLAYING)
+        self.player4.set_state(gst.STATE_PLAYING)
             #Stream(self.choice, self.ip, self.port)
-        else:
-            self.choice = ""
-            self.player3.set_state(gst.STATE_NULL)
-            self.player4.set_state(gst.STATE_NULL)
-            self.btnAudio.set_label("Voice")
+        #else:
+        #    self.choice = ""
+        #    self.player3.set_state(gst.STATE_NULL)
+        #    self.player4.set_state(gst.STATE_NULL)
+        #    self.btnAudio.set_label("Voice")
 
     #Videosamtal
     def video(self, ip):
         if ip == None:
-            ip = "130.236.219.163"
+            ip = "130.236.218.43"
         print "Video choosen"
-        if self.btnVideo.get_label() == "Video":
-            self.btnVideo.set_label("Stop Video")
-            self.choice = "Video"
-            self.Stream(self.choice, ip, self.port)
-            self.player.set_state(gst.STATE_PLAYING)
-            self.player2.set_state(gst.STATE_PLAYING)
+        #if self.btnVideo.get_label() == "Video":
+        #    self.btnVideo.set_label("Stop Video")
+        self.choice = "Video"
+        self.Stream(self.choice, ip, self.port)
+        self.player.set_state(gst.STATE_PLAYING)
+        self.player2.set_state(gst.STATE_PLAYING)
             #Stream(self.choice, self.ip, self.port)
-        else:
-            self.choice = ""
-            self.player.set_state(gst.STATE_NULL)
-            self.player2.set_state(gst.STATE_NULL)
-            self.btnVideo.set_label("Video")
+        #else:
+        #    self.choice = ""
+        #    self.player.set_state(gst.STATE_NULL)
+        #    self.player2.set_state(gst.STATE_NULL)
+        #    self.btnVideo.set_label("Video")
 
     def exit(self, widget, data=None):
         gtk.main_quit()
