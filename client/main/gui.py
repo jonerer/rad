@@ -828,8 +828,8 @@ class Gui(hildon.Program):
             #session.query(User).all()
             self.user = unicode(userText.get_text())
             self.pw = unicode(passText.get_text())
-            self.unitname = unicode(self.combo.get_active_text())
-            login = str(packet.Packet("login", username=self.user, password=self.pw, unitname=self.unitname))
+            self.unit_name = unicode(self.combo.get_active_text())
+            login = str(packet.Packet("login", username=self.user, password=self.pw, unitname=self.unit_name))
             print rpc.send("qos", "add_packet", packet=login)
 
         hboxOUT  = gtk.HBox(homogeneous=False, spacing=1)
@@ -917,22 +917,56 @@ class Gui(hildon.Program):
         return hboxOUT
 
     def show_login(self):
-        def dbcheck_press_callback(self, widget, data=None):   
+        def dbcheck_press_callback():   
             #Detta behövs inte här, men kanske inte fungerar på andra stället
             #session = get_session()
             #create_tables()        
             #session.bind
             #session.query(User).all()
-            user = unicode(user_text.get_text())
-            pw = unicode(pass_text.get_text())
-            login = str(packet.Packet("login", username=user, password=pw))
+            self.user = unicode(user_text.get_text())
+            self.pw = unicode(pass_text.get_text())
+            self.unit_name = unicode(self.unit_type_selector.get_active_text())
+            login = str(packet.Packet("login",
+                                    username=self.user,
+                                    password=self.pw
+                                    unitname=self.unit_name))
             print rpc.send("qos", "add_packet", packet=login)
 
-        def access(bool):
-            global access_granted
-            access_granted = bool
+        def access(bol):
+            global login_not_checked
+            if bol:
+                status_label.set_label("Status: Access Granted!")
+                unit = self.unit_type_selector.get_active_text()
+                #Kollar om user redan finns
+                insession = True
+                for users in session.query(User):
+                    if users.type:
+                        users.type.is_self = False
+                    if users.name == self.user:
+                        insession = False
+                        current_user = users
+                        break
+                    else:
+                        insession = True
+                if insession:
+                    print "Skapar användare"
+                    current_user = User(self.user,self.pw)
+                    session.add(current_user)
+                    session.commit()
+                #�ndrar users unit
+                for units in session.query(Unit).filter_by(name=unit):
+                    current_user.type = units
+                    current_user.type.is_self = True
+                    session.commit()
+            else:
+                access_granted == False
+                status_label.set_label("Status: Access Denied!")
+            login_not_checked = False
+       
+        rpc.register("access", access)
 
         access_granted = False
+        login_not_checked = True
         dialog = gtk.Dialog("Logga in",
                             self.window, 
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -952,23 +986,25 @@ class Gui(hildon.Program):
         pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
 
         self.unit_type_selector = gtk.combo_box_new_text()
-        #Hillekod som har funktion?
-        ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
         session = get_session()
         for unit in session.query(Unit).order_by(Unit.name):
             self.unit_type_selector.append_text(unit.name)
             print "Det du har är: ", unit.name
+        
+        self.status_label = gtk.Label("Status:")
 
         dialog.vbox.pack_start(user_box)
         dialog.vbox.pack_start(pass_box)
         dialog.vbox.pack_start(self.unit_type_selector)
+        dialog.vbox.pack_start(self.status_label)
         dialog.vbox.show_all()
 
         while not access_granted:
             response = dialog.run()
             if response == gtk.RESPONSE_ACCEPT:
-                #dbcheck_press_callback()
-                print "Access_grantet!"
+                dbcheck_press_callback()
+                while login_not_checked:
+                    time.sleep(0.01)
                 access_granted = True
             else:
                 sys.exit()
