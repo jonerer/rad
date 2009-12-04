@@ -332,16 +332,14 @@ class RemoveMissionPage(Page):
                 spacing=0)
         self.size_request = (300,300)
         nameLabel = gtk.Label("Uppdrag:")
-        selectBox = gtk.Combo()
+        self.selectBox = gtk.combo_box_new_text()
         testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Sk�ggetorp"]
-        selectBox.set_popdown_strings(testList)
         # TESTLIST SKA ERS?TTAS MED DATABAS-DATA
-
-        
         self.pack_start(nameLabel, False, False,0)
-        self.pack_start(selectBox, False, False,0)
+        self.pack_start(self.selectBox, False, False,0)
         
         deleteButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
+        deleteButton.connect("clicked", self.remove_item, None)
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         backButton.connect("clicked", self.gui.switch_page, "mission")
         
@@ -349,9 +347,34 @@ class RemoveMissionPage(Page):
         hbox1.pack_start(backButton, True, True, padding=2)
         hbox1.pack_start(deleteButton, True, True, padding=2)
         self.pack_start(hbox1, False, False, 2)
-        
-
         self.show_all()
+        
+        #GÖR SÅ ATT SERVERN TAR BORT OCKSÅ!
+    def remove_item(self, button, widget=None):
+        text = self.selectBox.get_active_text()
+        id = ""
+        for letter in text:
+            if letter == ":":
+                break
+            id = id+letter
+        session = get_session()
+        for mission in session.query(Mission).filter(Mission.id==int(id)):
+            print mission.name
+            session.delete(mission)
+            session.commit()
+        self.delete_mission()
+        
+    def on_show(self):
+        self.delete_mission()
+
+    def delete_mission(self):
+        self.selectBox.get_model().clear()
+        session = get_session()
+        for mission in session.query(Mission):
+            text = str(mission.id)+ ": "+mission.name 
+            self.selectBox.append_text(text)
+            
+        
 
 class ObjectPage(Page):
     def checkNew(self, button, widget=None):
