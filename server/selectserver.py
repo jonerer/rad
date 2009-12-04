@@ -222,14 +222,14 @@ clientrequests["poi"] = poi
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
-s.bind((HOST_IP, HOST_PORT))
+s.bind((HOST_IP[0], HOST_PORT))
 s.setblocking(0)
 s.settimeout(0)
 s.listen(5)
 
 to_be_removed = []
  
-print "Server igång på %s:%s" % (HOST_IP, HOST_PORT)
+print "Server igång på %s:%s" % (HOST_IP[0], HOST_PORT)
 while True:
     try:
         acceptor = select.select([s,], [s,], [s,], 0)[0]

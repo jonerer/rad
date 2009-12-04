@@ -165,19 +165,21 @@ class ContactPage(Page):
 
     #def videoCall(self, widget, data=None):
     def videoCall(self, w):
-        self.size_request(600,300)
+        self.gui.rightBook.set_size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
+        self.vbox1.hide()
         #print "user ip: ", ip
-        GTK_Main().video(ip)
+        #GTK_Main().video(ip)
         
     #def voiceCall(self, widget, data=None):
     def voiceCall(self, w):
-        self.size_request(600,300)
+        self.gui.rightBook.set_size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
+        self.vbox1.hide()
         print "user ip: ", ip
-        GTK_Maine().video()
+        #GTK_Maine().video(ip)
         #video.Stream("Video", ip, "7331")
         #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
