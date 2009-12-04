@@ -6,7 +6,7 @@ import pygtk, gtk, gobject
 import pygst
 pygst.require("0.10")
 import gst
-class GTK_Main2:
+class GTK_Maine:
     def __init__(self):
         print "inne i init"
         #Lite variabler
@@ -84,7 +84,7 @@ class GTK_Main2:
     #Rostsamtal
     def voice(self, w, ip):
         if ip == None:
-            ip = "130.236.217.109"
+            ip = "130.236.217.138"
         print "Voice choosen"
         if(self.btnAudio.get_label() == "Voice"):
             self.btnAudio.set_label("Stop Voice")
@@ -102,7 +102,7 @@ class GTK_Main2:
     #Videosamtal
     def video(self, w, ip):
         if ip == None:
-            ip = "130.236.217.109"
+            ip = "130.236.217.138"
         print "Video choosen"
         if self.btnVideo.get_label() == "Video":
             self.btnVideo.set_label("Stop Video")
@@ -151,6 +151,6 @@ class GTK_Main2:
             imagesink.set_xwindow_id(self.movie_window.window.xid)
 
 if __name__ == "__main__":
-    GTK_Main2()
+    GTK_Maine()
     gtk.gdk.threads_init()
     gtk.main()

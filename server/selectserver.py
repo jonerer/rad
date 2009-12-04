@@ -111,15 +111,18 @@ def contact_send(connection, pack):
 clientrequests["contact_req"] = contact_send
 
 def mission(connection, pack):
+    print "du är inne i mission"
     connection.timestamp = time.time()
     connection.timepinged = 0
     session.bind
     session.query(Mission).all()
     loginfo = pack.data
     name = loginfo["name"]
-    info = loginfo["info"]
-    coordx = loginfo["xEntry"]
-    coordy = loginfo["yEntry"]
+    time_created = datetime.now()
+    time_changed = datetime.now()
+    mission_response = packet.Packet("mission_response")
+    mission_response.data = pack.data
+    connection.out_queue.put(mission_response)
 clientrequests["mission_save"] = mission
 
 def login(connection, pack):

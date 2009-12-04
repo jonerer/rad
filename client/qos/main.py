@@ -5,6 +5,7 @@ import socket, sys, time, select
 import Queue
 import threading
 import gtk
+import time
 from shared import rpc, buffrify
 from shared.packet import Packet
 from simplejson import loads, dumps
@@ -44,20 +45,30 @@ class Connection(object):
  
         self.KeyboardInterrupt = False
         self.connected = False
+        
+        self.current_server = 0
+        
+        self.server_try = 0
  
     def reconnect(self):
         print "Du kör reconnect"
         while not self.connected and not self.KeyboardInterrupt:
             print "Du är inne i while"
+            if self.server_try == 5:
+                if self.current_server == 0:
+                    self.current_server = 1
+                elif self.current_server == 1:
+                    self.current_server = 0
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print self.s.connect((HOST_IP, HOST_PORT))
+                print self.s.connect((HOST_IP[self.current_server], HOST_PORT))
                 self.connected = True
-                print "har kontakt med %s:%s" % (HOST_IP, HOST_PORT)
+                print "har kontakt med %s:%s" % (HOST_IP[self.current_server], HOST_PORT)
                 self.timestamp = time.time()
             except socket.error:
                 time.sleep(5)
-                print "Couldn't connect to that server"
+                print "Couldn't connect to that server", HOST_IP[self.current_server]
+                self.server_try = self.server_try + 1 
             if self.connected:
                 threading.Thread(target=self.send).start()
                 self.receive()
@@ -87,8 +98,11 @@ class Connection(object):
  
     def add_packet(self, packet):
         """ receives stuff from dbus and DOO EEETT"""
+        print "add_packet", time.time()
         packet = Packet.from_str(packet)
+        print "innan queue", time.time()
         self.out_queue.put(packet)
+        print "klar med add_packet", time.time()
  
     def send(self):
         while self.connected:
@@ -107,7 +121,7 @@ class Connection(object):
                 else:
                     self.out_buffer = ""
             if time.time()-self.timestamp > self.pingtime:
-                print "server has gone down bad"
+                print "server has pinged out"
                 self.s.shutdown(socket.SHUT_RDWR)
                 self.s.close()
                 self.connected = False
@@ -123,6 +137,11 @@ class Connection(object):
 connection = Connection()
 if "--read-keys" in sys.argv or True: # ha true nu iaf
     threading.Thread(target=read_keys).start()
+    
+def mission_response(pack):
+    connection.timestamp = time.time()
+    rpc.send("main", "add_mission", pack=str(pack))
+network_listeners["mission_response"] = mission_response
 
 def login_required(pack):
     rpc.send("main", "require_login")

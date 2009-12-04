@@ -11,7 +11,7 @@ from shared import rpc, packet
 from datetime import datetime
 import data_storage
 from video import GTK_Main
-from video2 import GTK_Main2
+from video2 import GTK_Maine
 
 
 def create_menuButton(bild,label):
@@ -165,19 +165,19 @@ class ContactPage(Page):
 
     #def videoCall(self, widget, data=None):
     def videoCall(self, w):
-        self.set_size_request(600,300)
+        self.size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
         #print "user ip: ", ip
-        GTK_Main().video()
+        GTK_Main().video(ip)
         
     #def voiceCall(self, widget, data=None):
     def voiceCall(self, w):
-        self.set_size_request(600,300)
+        self.size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
         print "user ip: ", ip
-        GTK_Main2().video()
+        GTK_Maine().video()
         #video.Stream("Video", ip, "7331")
         #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
@@ -206,6 +206,7 @@ class AddMissionPage(Page):
         super(AddMissionPage, self).__init__("addMission", gui, homogeneous=False,
                 spacing=0)
         self.size_request = (300,300)
+        self.unit = None
         def dbupdate_press_callback(self, widget, data=None):   
             name = unicode(nameEntry.get_text())
             info = unicode(infoEntry.get_text())
@@ -214,18 +215,25 @@ class AddMissionPage(Page):
             mission_save = str(packet.Packet("mission_save", name=name,\
                                 info=info, xEntry=xEntry, yEntry=yEntry))
             print rpc.send("qos", "add_packet", packet=mission_save)
-        
+            
+
+            
         hbox1 = gtk.HBox()
         vbox1 = gtk.VBox()
         self.vbox2 = gtk.VBox()
         nameLabel = gtk.Label("Namn:")
-        nameEntry = gtk.Entry()
+        self.nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
         infoEntry = gtk.Entry()
-        xLabel = gtk.Label("X-koordinat:")
-        self.xEntry = gtk.Entry()
-        yLabel = gtk.Label("Y-koordinat:")
-        self.yEntry = gtk.Entry()
+        poiLabel = gtk.Label("POI:")
+        self.poiEntry = gtk.Entry()
+        poiButton = gtk.Button("Lägg Till")
+        self.combo = gtk.Combo()
+        self.poiList = []
+        self.poiListDATA = []
+        self.combo.set_popdown_strings(self.poiList)
+        self.poiEntry.set_text("Välj en POI")
+
         okButton = gtk.Button("ok")
         
         self.infoView = gtk.TextView(buffer=None)
@@ -235,24 +243,27 @@ class AddMissionPage(Page):
 
         vbox1.set_size_request(300,300)
         vbox1.pack_start(nameLabel, False, False,0)
-        vbox1.pack_start(nameEntry, False, False,0)
+        vbox1.pack_start(self.nameEntry, False, False,0)
         vbox1.pack_start(infoLabel, False, False,0)
         vbox1.pack_start(infoEntry, False, False,0)
-        vbox1.pack_start(xLabel, False, False,0)
-        vbox1.pack_start(self.xEntry, False, False,0)
-        vbox1.pack_start(yLabel, False, False,0)
-        vbox1.pack_start(self.yEntry, False, False,0)
+        vbox1.pack_start(poiLabel, False, False,0)
+        vbox1.pack_start(self.poiEntry, False, False,0)
+        vbox1.pack_start(poiButton, False, False,0)
+        vbox1.pack_start(self.combo,False,False,10)
         vbox1.pack_start(okButton, False, False,0)
         
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
+        saveButton.connect("clicked", self.save, None)
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
         self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","G�m Detaljer")
         backButton.connect("clicked", self.gui.switch_page, "mission")
         okButton.connect("clicked", dbupdate_press_callback, None)
+        poiButton.connect("clicked", self.add_poi, None)
         self.showDetails.connect("clicked", self.details, "show")
         self.hideDetails.connect("clicked", self.details, "hide")
+        
         
         hbox2 = gtk.HBox()
         hbox2.pack_start(backButton, True, True, padding=2)
@@ -270,11 +281,24 @@ class AddMissionPage(Page):
         self.show_all()
         self.vbox2.hide()
         self.hideDetails.hide()
+        rpc.register("add_mission", self.add_mission)
         
-    def map_dblclick(self, coordx, coordy):
-        self.xEntry.set_text(str(coordx))
-        self.yEntry.set_text(str(coordy))
+    def save(self, button, widget=None):
+        session = get_session()
+        missionPacket = str(packet.Packet("mission_save", name = self.nameEntry.get_text()))
+        rpc.send("qos", "add_packet", packet=missionPacket)  
+          
+    def add_poi(self, button, widget=None):
+        self.poiList.append(str(self.unit["name"]))
+        self.poiListDATA.append(self.unit["id"])
+        self.combo.set_popdown_strings(self.poiList)
+        self.poiEntry.set_text("Välj en POI")
+        self.unit = None     
 
+    def update(self, unit):
+        self.unit = unit
+        self.poiEntry.set_text(str(self.unit["name"]))
+               
     def on_show(self):
         # simulera en "göm detaljer"
         self.details(None, "hide")
@@ -290,6 +314,16 @@ class AddMissionPage(Page):
             self.vbox2.hide()
             self.showDetails.show()
             self.hideDetails.hide()
+    
+    def add_mission(self, pack):
+        print "add_mission"
+        pack = packet.Packet.from_str(str(pack))
+        session = get_session()
+        name = pack.data["name"]
+        time_created = datetime.now()
+        time_changed = datetime.now()
+        session.add(Mission(name, time_created, time_changed))
+        session.commit()
             
 class RemoveMissionPage(Page):
 
@@ -298,16 +332,14 @@ class RemoveMissionPage(Page):
                 spacing=0)
         self.size_request = (300,300)
         nameLabel = gtk.Label("Uppdrag:")
-        selectBox = gtk.Combo()
+        self.selectBox = gtk.combo_box_new_text()
         testList = ["Operation: Save the Whale", "Nuke Accident", "Brand i Sk�ggetorp"]
-        selectBox.set_popdown_strings(testList)
         # TESTLIST SKA ERS?TTAS MED DATABAS-DATA
-
-        
         self.pack_start(nameLabel, False, False,0)
-        self.pack_start(selectBox, False, False,0)
+        self.pack_start(self.selectBox, False, False,0)
         
         deleteButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
+        deleteButton.connect("clicked", self.remove_item, None)
         backButton = create_menuButton("static/ikoner/arrow_undo.png","Avbryt")
         backButton.connect("clicked", self.gui.switch_page, "mission")
         
@@ -315,9 +347,34 @@ class RemoveMissionPage(Page):
         hbox1.pack_start(backButton, True, True, padding=2)
         hbox1.pack_start(deleteButton, True, True, padding=2)
         self.pack_start(hbox1, False, False, 2)
-        
-
         self.show_all()
+        
+        #GÖR SÅ ATT SERVERN TAR BORT OCKSÅ!
+    def remove_item(self, button, widget=None):
+        text = self.selectBox.get_active_text()
+        id = ""
+        for letter in text:
+            if letter == ":":
+                break
+            id = id+letter
+        session = get_session()
+        for mission in session.query(Mission).filter(Mission.id==int(id)):
+            print mission.name
+            session.delete(mission)
+            session.commit()
+        self.delete_mission()
+        
+    def on_show(self):
+        self.delete_mission()
+
+    def delete_mission(self):
+        self.selectBox.get_model().clear()
+        session = get_session()
+        for mission in session.query(Mission):
+            text = str(mission.id)+ ": "+mission.name 
+            self.selectBox.append_text(text)
+            
+        
 
 class ObjectPage(Page):
     def checkNew(self, button, widget=None):
@@ -520,9 +577,9 @@ data_storage.MapObject({"longitude":units.coordx,"latitude":units.coordy},
                 self.label.set_text(str(poi.name))
                 self.image.set_from_file(poi.type.image)
                 self.idLabel.set_text("ID: " + str(poi.id))
-                self.xLabel.set_text("coord X: " + str(units.coordx))
-                self.yLabel.set_text("coord Y: " + str(units.coordy))
-                self.changedLabel.set_text("Senast Ändrad: " + str(units.time_changed))
+                self.xLabel.set_text("coord X: " + str(poi.coordx))
+                self.yLabel.set_text("coord Y: " + str(poi.coordy))
+                self.changedLabel.set_text("Senast Ändrad: " + str(poi.time_changed))
                 session.commit()
         
 class Gui(hildon.Program):
@@ -632,16 +689,19 @@ class Gui(hildon.Program):
         active_page.map_dblclick(coordx, coordy)
 
     def show_object(self, unit):
-        if unit["type"] == "poi" or unit["type"] == "units":
-            self.switch_page("showObject")
-            self.openButton.hide()
-            self.closeButton.show()
-            self.vbox1.show()
+        currentPage = self.rightBook.get_current_page()
+        if currentPage is not 4:
+            if unit["type"] == "units" or unit["type"] == "poi":
+                self.switch_page("showObject")
+                self.openButton.hide()
+                self.closeButton.show()
+                self.vbox1.show()
+                active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
+                active_page.update(unit)
+        elif currentPage is 4 and unit["type"] is "poi":
+            print "NAJS"
             active_page = self.rightBook.get_nth_page(self.rightBook.get_current_page())
             active_page.update(unit)
-        else:
-            pass
-
         
     def create_map_view(self):
 
