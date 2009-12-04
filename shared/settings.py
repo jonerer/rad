@@ -1,5 +1,7 @@
+HOST_IP = []
 
-HOST_IP = "130.236.76.114"
+HOST_IP.append("130.236.76.135")
+HOST_IP.append("130.236.76.114")
 
 HOST_PORT = 2345
 

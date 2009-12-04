@@ -45,20 +45,30 @@ class Connection(object):
  
         self.KeyboardInterrupt = False
         self.connected = False
+        
+        self.current_server = 0
+        
+        self.server_try = 0
  
     def reconnect(self):
         print "Du kör reconnect"
         while not self.connected and not self.KeyboardInterrupt:
             print "Du är inne i while"
+            if self.server_try == 5:
+                if self.current_server == 0:
+                    self.current_server = 1
+                elif self.current_server == 1:
+                    self.current_server = 0
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print self.s.connect((HOST_IP, HOST_PORT))
+                print self.s.connect((HOST_IP[self.current_server], HOST_PORT))
                 self.connected = True
-                print "har kontakt med %s:%s" % (HOST_IP, HOST_PORT)
+                print "har kontakt med %s:%s" % (HOST_IP[self.current_server], HOST_PORT)
                 self.timestamp = time.time()
             except socket.error:
                 time.sleep(5)
-                print "Couldn't connect to that server"
+                print "Couldn't connect to that server", HOST_IP[self.current_server]
+                self.server_try = self.server_try + 1 
             if self.connected:
                 threading.Thread(target=self.send).start()
                 self.receive()
