@@ -262,7 +262,6 @@ class Map(gtk.DrawingArea):
         list = self.pixel_to_gps(32,32)
         unit = None
         for obj in objList:
-            print obj
             value = obj["object"]
             valueTwo = value.get_coordinate()
             sideTop = valueTwo["latitude"]

@@ -229,7 +229,7 @@ clientrequests["poi"] = poi
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
-print HOST_IP[0]
+print "Binder servern till %s" % HOST_IP[0]
 s.bind((HOST_IP[0], HOST_PORT))
 s.setblocking(0)
 s.settimeout(0)
@@ -237,7 +237,7 @@ s.listen(5)
 
 to_be_removed = []
  
-print "Server igång på %s:%s" % (HOST_IP, HOST_PORT)
+print "Server igång på %s:%s" % (HOST_IP[0], HOST_PORT)
 while True:
     try:
         time.sleep(0.1)

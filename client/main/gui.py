@@ -175,19 +175,21 @@ class ContactPage(Page):
 
     #def videoCall(self, widget, data=None):
     def videoCall(self, w):
-        self.size_request(600,300)
+        self.gui.rightBook.set_size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
+        self.vbox1.hide()
         #print "user ip: ", ip
-        GTK_Main().video(ip)
+        #GTK_Main().video(ip)
         
     #def voiceCall(self, widget, data=None):
     def voiceCall(self, w):
-        self.size_request(600,300)
+        self.gui.rightBook.set_size_request(600,300)
         userip = self.combo.get_active_text()
         ip = self.contacts[userip]
+        self.vbox1.hide()
         print "user ip: ", ip
-        GTK_Maine().video()
+        #GTK_Maine().video(ip)
         #video.Stream("Video", ip, "7331")
         #rpc.send("A-w-e-s-o-m-e O", ipaddr = ip)
         
@@ -535,7 +537,7 @@ class ShowObjectPage(Page):
         
         super(ShowObjectPage, self).__init__("object", gui, homogeneous=False,
                 spacing=0)
-        self.size_request = (300,300)
+        
         
         hbox1 = gtk.HBox(False, 0)
         hbox2 = gtk.HBox(False, 0)
@@ -569,10 +571,6 @@ class ShowObjectPage(Page):
         session = get_session()
         if unit["type"] == "units":
             for units in session.query(Unit).filter(Unit.id==unit["id"]):
-                self.gui._map.delete_object(5001)
-                self.gui._map.add_object(5001, "ActiveObject", u"ActiveObject",
-data_storage.MapObject({"longitude":units.coordx,"latitude":units.coordy},
-"static/ikoner/bullets/bullet_blue.png"))
                 self.label.set_text(str(units.name))
                 self.image.set_from_file(units.type.image)
                 self.idLabel.set_text("ID: " + str(units.id))
@@ -757,25 +755,24 @@ class Gui(hildon.Program):
         self.vbox1 = gtk.VBox(False, 1)
         map = gui_map.Map(self._map, self)
 #SIDEBAR TEST
-        image1 = create_barButton("static/ikoner/sidebar/key.png")
+        login = create_barButton("static/ikoner/sidebar/key.png")
         zoomIn = create_barButton("static/ikoner/sidebar/magnifier_zoom_in.png")
         
         zoomOut=create_barButton("static/ikoner/sidebar/magnifier_zoom_out.png")
         zoomFull = create_barButton("static/ikoner/sidebar/map_magnify.png")
-        helpButton = create_barButton("static/ikoner/help.png")  
+
         onlineButton = create_barButton("static/ikoner/status_online.png")  
-        soundButton = create_barButton("static/ikoner/sound_mute.png")  
-         
+        onlineImage = gtk.Image()
+        onlineImage.set_from_file("static/ikoner/status_offline.png")
+        
         zoomIn.connect("clicked", side_bar_clicked, "+")
         zoomOut.connect("clicked", side_bar_clicked, "-")
         zoomFull.connect("clicked", closeButton_press_callback, None)
         vboxMenu.pack_start(zoomIn,False,True, 3)
         vboxMenu.pack_start(zoomFull,False,True, 3)
         vboxMenu.pack_start(zoomOut,False,True, 3)
-        vboxMenu.pack_end(image1,False,True, 3)
-        vboxMenu.pack_end(helpButton,False,True, 3)
-        vboxMenu.pack_end(soundButton,False,True, 3)
-        vboxMenu.pack_end(onlineButton,False,True, 3)
+        vboxMenu.pack_end(login,False,True, 3)
+        vboxMenu.pack_end(onlineImage,False,True, 3)
         vboxMenu.show_all()
         #SHOW / HIDE buttons----------------------
         self.openButton = gtk.Button()
@@ -783,6 +780,7 @@ class Gui(hildon.Program):
         openArrow = gtk.Image()
         openArrow.set_from_animation(buff5)
         openArrow.show()
+        login.connect("clicked", self.handle_menu_items, 2)
         self.openButton.connect("clicked", openButton_press_callback, None)
         
         self.closeButton = gtk.Button()
@@ -791,7 +789,7 @@ class Gui(hildon.Program):
         closeArrow.set_from_animation(buff6)
         closeArrow.show()
         
-        self.closeButton.connect("clicked", closeButton_press_callback, None) 
+        self.closeButton.connect("clicked", closeButton_press_callback, None)
         self.openButton.add(openArrow)
         self.openButton.show()
         openArrow.show()
@@ -837,9 +835,9 @@ class Gui(hildon.Program):
             #session.query(User).all()
             self.user = unicode(userText.get_text())
             self.pw = unicode(passText.get_text())
-            self.unitname = unicode(self.combo.get_active_text())
-            login = str(packet.Packet("login", username=self.user, password=self.pw, unitname=self.unitname))
-            rpc.send("qos", "add_packet", packet=login)
+            self.unit_name = unicode(self.combo.get_active_text())
+            login = str(packet.Packet("login", username=self.user, password=self.pw, unitname=self.unit_name))
+            print rpc.send("qos", "add_packet", packet=login)
 
         hboxOUT  = gtk.HBox(homogeneous=False, spacing=1)
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
@@ -936,22 +934,56 @@ class Gui(hildon.Program):
         return hboxOUT
 
     def show_login(self):
-        def dbcheck_press_callback(self, widget, data=None):   
+        def dbcheck_press_callback():   
             #Detta behövs inte här, men kanske inte fungerar på andra stället
             #session = get_session()
             #create_tables()        
             #session.bind
             #session.query(User).all()
-            user = unicode(user_text.get_text())
-            pw = unicode(pass_text.get_text())
-            login = str(packet.Packet("login", username=user, password=pw))
+            self.user = unicode(user_text.get_text())
+            self.pw = unicode(pass_text.get_text())
+            self.unit_name = unicode(self.unit_type_selector.get_active_text())
+            login = str(packet.Packet("login",
+                                    username=self.user,
+                                    password=self.pw
+                                    unitname=self.unit_name))
             print rpc.send("qos", "add_packet", packet=login)
 
-        def access(bool):
-            global access_granted
-            access_granted = bool
+        def access(bol):
+            global login_not_checked
+            if bol:
+                status_label.set_label("Status: Access Granted!")
+                unit = self.unit_type_selector.get_active_text()
+                #Kollar om user redan finns
+                insession = True
+                for users in session.query(User):
+                    if users.type:
+                        users.type.is_self = False
+                    if users.name == self.user:
+                        insession = False
+                        current_user = users
+                        break
+                    else:
+                        insession = True
+                if insession:
+                    print "Skapar användare"
+                    current_user = User(self.user,self.pw)
+                    session.add(current_user)
+                    session.commit()
+                #�ndrar users unit
+                for units in session.query(Unit).filter_by(name=unit):
+                    current_user.type = units
+                    current_user.type.is_self = True
+                    session.commit()
+            else:
+                access_granted == False
+                status_label.set_label("Status: Access Denied!")
+            login_not_checked = False
+       
+        rpc.register("access", access)
 
         access_granted = False
+        login_not_checked = True
         dialog = gtk.Dialog("Logga in",
                             self.window, 
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -971,23 +1003,25 @@ class Gui(hildon.Program):
         pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
 
         self.unit_type_selector = gtk.combo_box_new_text()
-        #Hillekod som har funktion?
-        ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
         session = get_session()
         for unit in session.query(Unit).order_by(Unit.name):
             self.unit_type_selector.append_text(unit.name)
             print "Det du har är: ", unit.name
+        
+        self.status_label = gtk.Label("Status:")
 
         dialog.vbox.pack_start(user_box)
         dialog.vbox.pack_start(pass_box)
         dialog.vbox.pack_start(self.unit_type_selector)
+        dialog.vbox.pack_start(self.status_label)
         dialog.vbox.show_all()
 
         while not access_granted:
             response = dialog.run()
             if response == gtk.RESPONSE_ACCEPT:
-                #dbcheck_press_callback()
-                print "Access_grantet!"
+                dbcheck_press_callback()
+                while login_not_checked:
+                    time.sleep(0.01)
                 access_granted = True
             else:
                 sys.exit()
@@ -1024,20 +1058,16 @@ class Gui(hildon.Program):
         # Skapar tre stycken meny-inlägg.
         menuItemKarta = gtk.MenuItem("Karta")
         menuItemInstallningar = gtk.MenuItem("Inställningar")
-        menuItemLogin = gtk.MenuItem("Login")
         menuItemSeparator = gtk.SeparatorMenuItem()
         menuItemExit = gtk.MenuItem("Exit")
 
         menuItemKarta.connect("activate", self.handle_menu_items, 0)
         menuItemInstallningar.connect("activate", self.handle_menu_items, 1)
-        menuItemLogin.connect("activate", self.handle_menu_items, 2)
         menuItemExit.connect("activate", self.menu_exit)
-
         # Skapar en meny som vi lägger in dessa inlägg i.
         menu = gtk.Menu()
         menu.append(menuItemKarta)
         menu.append(menuItemInstallningar)
-        menu.append(menuItemLogin)
         menu.append(menuItemSeparator)
         menu.append(menuItemExit)
 
