@@ -77,11 +77,14 @@ class Connection(object):
     def receive(self):
         while self.connected:
             try:
+                #print "ska recva"
                 read = self.s.recv(1024)
+                #print "har recvat %s" % read
                 if read != "":
                     self.in_buffer += read
                     can_split = buffrify.split_buffer(self.in_buffer)
                     if can_split is not None:
+                        #print " är inte none."
                         self.in_buffer = can_split[1]
                         pack = Packet.from_str(can_split[0])
                         print "> %s, %s" % (pack.type, str(pack.data))

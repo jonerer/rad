@@ -12,6 +12,8 @@ from datetime import datetime
 import data_storage
 from video import GTK_Main
 from video2 import GTK_Maine
+from datetime import datetime
+import gobject
 
 
 def create_menuButton(bild,label):
@@ -63,20 +65,28 @@ class MenuPage(Page):
         pack = packet.Packet.from_str(str(pack))
         session = get_session()
         loginfo = pack.data
-        name = pack.data["name"]
-        timestamp = pack.timestamp
-        poi_type = pack.data["poi_type"]
-        coordx = pack.data["coordx"]
-        coordy = pack.data["coordy"]
-        for poi_name in session.query(POIType).filter(POIType.name==poi_type):
-            poi_type = poi_name
-        session.add(POI(coordx, coordy, name, poi_type, timestamp, timestamp, unique_id=pack.data["unique_id"]))
+        try:
+            poi = session.query(POI).filter(POI.unique_id == pack.data["unique_id"]).one()
+        except:
+            poi = POI()
+            poi.created = pack.timestamp
+        poi.name = pack.data["name"]
+        poi.changed = datetime.fromtimestamp(pack.data["changed"])
+        poi.coordx = pack.data["coordx"]
+        poi.coordy = pack.data["coordy"]
+        poi.type = session.query(POIType).filter(POIType.name==pack.data["poi_type"]).one()
+        poi.unique_id = pack.data["unique_id"]
+        session.add(poi)
         session.commit()
-        for poi in session.query(POI).filter(POI.name == name):
-            self.gui._map.add_object(poi.id, "poi", poi.name, 
-                    data_storage.MapObject({
-                        "longitude":poi.coordx,"latitude":poi.coordy},
-                        poi.type.image))
+        self.gui._map.add_object(poi.id, "poi", poi.name, 
+                data_storage.MapObject({
+                    "longitude":poi.coordx,"latitude":poi.coordy},
+                    poi.type.image))
+        #for poi in session.query(POI).filter(POI.name == name):
+        #    self.gui._map.add_object(poi.id, "poi", poi.name, 
+        #            data_storage.MapObject({
+        #                "longitude":poi.coordx,"latitude":poi.coordy},
+        #                poi.type.image))
         self.gui._map.redraw()
 
     def __init__(self, gui):
@@ -643,7 +653,6 @@ class Gui(hildon.Program):
         self._pages["removeMission"] = RemoveMissionPage(self)
         self._pages["object"] = ObjectPage(self)
         self._pages["addObject"] = AddObjectPage(self)
-        self._pages["showObject"] = ShowObjectPage(self)
 
         # Möjliggör fullscreen-läge
         self.window.connect("key-press-event", self.on_key_press)
@@ -882,6 +891,9 @@ class Gui(hildon.Program):
         hboxOUT.show()
         self.combo.show()
         #Skapar rpc
+
+        def receive_updates(val):
+            print "recv yeah %s" %val
         
         def access(bol):
             if bol:
@@ -903,11 +915,18 @@ class Gui(hildon.Program):
                     current_user = User(self.user,self.pw)
                     session.add(current_user)
                     session.commit()
-                #�ndrar users unit
+                #ändrar users unit
                 for units in session.query(Unit).filter_by(name=unit):
                     current_user.type = units
                     current_user.type.is_self = True
                     session.commit()
+                # begär uppdateringar från servern
+                status = {}
+                status["POI"] = [(p.unique_id, p.changed.strftime("%s")) \
+                        for p in session.query(POI).all()]
+                print status
+                p = str(packet.Packet("request_updates", status=status))
+                gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
             else:
                 statusLabel.set_label("Access denied")
        

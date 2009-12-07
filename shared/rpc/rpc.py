@@ -3,7 +3,7 @@
 
 import osso, simplejson, logging
 name = None
-osso_context = None
+osso_c = None
 osso_rpc = None
 has_dbus_registered = False
 
@@ -33,8 +33,35 @@ def receive(interface, method, arguments, user_data):
         # only return strings
         return str(e)
 
-def send(target_name, method, **kwargs):
+def send_async(target_name, method, callback=None, **kwargs):
+    from types import ListType
+    logging.warn("send_async är EXPERIMENTAL, funkar sisådär. använd hellre gobject.timeout_add: http://www.pygtk.org/pygtk2reference/gobject-functions.html")
+    def gen_func(cb):
+        def func(lol, boll, *args, **kwargs):
+            # first two args are teh lol.
+            try:
+                val = simplejson.loads(args[0])
+            except simplejson.JSONDecodeError, e:
+                logging.error("fick ett fel i RPC till %s, %s: %s" % (target_name,method,val))
+            print "is none? %s" % (cb is None)
+            if cb is not None:
+                return cb(val)
+        return func
     if kwargs == {}:
+        rpc_args = tuple()
+    else:
+        rpc_args = (simplejson.dumps(kwargs),)
+    val = osso_rpc.rpc_async_run("rad.%s" % target_name,
+        "/rad/%s" % target_name,
+        "rad.%s" % target_name,
+        method,
+        gen_func(callback),
+        rpc_args=rpc_args)
+
+def send(target_name, method, args=None, **kwargs):
+    if args is not None:
+        rpc_args = (simplejson.dumps(args),)
+    elif kwargs == {}:
         rpc_args = tuple()
     else:
         rpc_args = (simplejson.dumps(kwargs),)

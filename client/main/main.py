@@ -13,6 +13,10 @@ from shared.data.defs import *
 import logging
 import subprocess
 from datetime import datetime
+import gtk
+
+gtk.gdk.threads_init()
+
 
 if sys.version_info[1] == 3:
     print "nu glömde du skriva python2.5... trooooooliiiigt"
@@ -37,7 +41,7 @@ if "exempeldata" in sys.argv and len(types) == 0:
     session.add(sjukhus)
 
     #Lägger till alla poi's
-    session.add(POI(15.6001709, 58.40533172, u"Sjukhus", sjukhus, u"N/A", datetime.now(), datetime.now()))
+    session.add(POI(15.6001709, 58.40533172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), unique_id=1001))
 
     #UnitTypes
 
