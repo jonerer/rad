@@ -991,7 +991,7 @@ class Gui(hildon.Program):
         session = get_session()
         for unit in session.query(Unit).order_by(Unit.name):
             self.unit_type_selector.append_text(unit.name)
-        
+        self.unit_type_selector.set_active(3) 
         self.status_label = gtk.Label("Status:")
 
         self.dialog.vbox.pack_start(user_box)
