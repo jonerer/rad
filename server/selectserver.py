@@ -97,8 +97,7 @@ clientrequests["pong"] = pong
 
 @require_login
 def request_updates(connection, pack):
-    p = packet.Packet.from_str(pack)
-    print p.data["status"]
+    print "req: %s" % pack.data
     to_send = []
     
 clientrequests["request_updates"] = request_updates
@@ -230,7 +229,8 @@ clientrequests["poi"] = poi
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, struct.pack("i",1))
-s.bind((HOST_IP, HOST_PORT))
+print HOST_IP[0]
+s.bind((HOST_IP[0], HOST_PORT))
 s.setblocking(0)
 s.settimeout(0)
 s.listen(5)
