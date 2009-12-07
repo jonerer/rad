@@ -9,6 +9,7 @@ def ping():
     return "pong!"
 
 def ping2(id):
+    print "tog emot: %s" % id
     return "pong me id %d" % id, "eller?"
 
 rpc.set_name("pinger")

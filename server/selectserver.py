@@ -96,6 +96,14 @@ def pong(connection, pack):
 clientrequests["pong"] = pong
 
 @require_login
+def request_updates(connection, pack):
+    p = packet.Packet.from_str(pack)
+    print p.data["status"]
+    to_send = []
+    
+clientrequests["request_updates"] = request_updates
+
+@require_login
 def contact_send(connection, pack):
     print "du e fan king på contact_send i servern"
     connection.timestamp = time.time()
@@ -232,6 +240,7 @@ to_be_removed = []
 print "Server igång på %s:%s" % (HOST_IP, HOST_PORT)
 while True:
     try:
+        time.sleep(0.1)
         acceptor = select.select([s,], [s,], [s,], 0)[0]
         if acceptor:
             newsocket, addr = s.accept()

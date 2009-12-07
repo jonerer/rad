@@ -1,5 +1,6 @@
 # coding: utf-8
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 #ändra echo till false om du inte vill se SQL kod
 
 from sqlalchemy.orm import sessionmaker
@@ -14,7 +15,7 @@ def get_session(db="sqlite:///client/db.db", echo=False):
     if _dbfile is None or _dbfile != db:
         # new db
         _engine = create_engine(db, echo=echo)
-        _session = sessionmaker(bind=_engine)()
+        _session = sessionmaker(bind=_engine, expire_on_commit=False)()
     return _session
 
 def create_tables():
