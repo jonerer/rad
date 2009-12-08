@@ -1003,11 +1003,10 @@ class Gui(hildon.Program):
         user_box.pack_start(user_text, expand=False, fill=False, padding=1)
 
         pass_text = gtk.Entry(max=0)
+        pass_text.set_invisible_char("*")
+        pass_text.set_visibility(False)
         pass_label = gtk.Label("Lösenord")
         pass_box = gtk.HBox(spacing=0)
-        pass_box.set_invisible_char("*")
-        pass_box.set_visibility(False)
-        pass_box.visible = False
         pass_box.pack_start(pass_label, expand=False, fill=False, padding=1)
         pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
 

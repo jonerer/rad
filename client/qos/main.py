@@ -166,6 +166,7 @@ network_listeners["ping"] = ping_response
 def login_response(pack):
     login_boolean = parseBoolean(pack.data["login"])
     connection.timestamp = time.time()
+    print "innan rpc access"
     rpc.send("main", "access", bol=login_boolean)
 network_listeners["login_response"] = login_response
  

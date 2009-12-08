@@ -156,7 +156,6 @@ def login(connection, pack):
     password = loginfo["password"]
     unitname = loginfo["unitname"]
     connection.unitname = unitname
-
     login_response = packet.Packet("login_response", login="False")
     for users in session.query(User).filter(User.name == username):
         if password == users.password:
