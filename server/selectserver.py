@@ -61,7 +61,7 @@ else:
 
 class Connection(object):
     
-    pingtime = 3
+    pingtime = 15
  
     def __init__(self, socket, addr):
         self.addr, self.port = addr
@@ -104,6 +104,7 @@ def request_updates(connection, pack):
     status = pack.data["status"]
     to_send = []
     for poi in session.query(POI).all():
+        should_send = False
         print "servern har %s, ändrad %s" % (poi.unique_id, poi.changed)
         if str(poi.unique_id) in client_pois.keys():
             client_poi_changed = datetime.fromtimestamp(float(client_pois[str(poi.unique_id)]))
@@ -113,7 +114,18 @@ def request_updates(connection, pack):
                 # TODO: be klienten om uppdaterade
             else:
                 to_send.append(poi)
+                should_send = True
                 print "servern e nyare."
+        else:
+            should_send = True
+        if should_send:
+            p = packet.Packet("poi_response", poi_type=poi.type.name,
+                    name=poi.name, changed=float(poi.changed.strftime("%s")),
+                    coordy=poi.coordy, coordx=poi.coordx, unique_id=poi.unique_id)
+            connection.out_queue.put(p)
+            #datan ser ut som FÖLJER: { u'poi_type': u'sjukhus1', u'name': u'mm', 'created': 1260273998.0, 'changed': 1260273998.0, u'coordy': u'58.4070476', u'id': u'', 'unique_id': 257491, u'coordx': u'15.5693523'}
+
+                
 clientrequests["request_updates"] = request_updates
 
 @require_login
@@ -212,6 +224,7 @@ def poi(connection, pack):
     id = pack.data["id"]
     name = pack.data["name"]
     timestamp = pack.timestamp
+
     poi_type_name = pack.data["poi_type"]
     coordx = pack.data["coordx"]
     coordy = pack.data["coordy"]
@@ -219,6 +232,8 @@ def poi(connection, pack):
         logging.warn("fick en add poi med tomma lat och lon :S")
         return
     pack.data["unique_id"] = get_unique_id()
+    pack.data["changed"] = float(pack.timestamp.strftime("%s"))
+    pack.data["created"] = float(pack.timestamp.strftime("%s"))
     session.query(POI).all()
     loginfo = pack.data
     hej = u"Hej"
