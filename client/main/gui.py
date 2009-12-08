@@ -896,6 +896,7 @@ class Gui(hildon.Program):
             print "recv yeah %s" %val
         
         def access(bol):
+            print "körde första!"
             if bol:
                 statusLabel.set_label("Access granted")
                 unit = self.combo.get_active_text()
@@ -922,8 +923,8 @@ class Gui(hildon.Program):
                     session.commit()
                 # begär uppdateringar från servern
                 status = {}
-                status["POI"] = [(p.unique_id, p.changed.strftime("%s")) \
-                        for p in session.query(POI).all()]
+                status["POI"] = dict([(p.unique_id, p.changed.strftime("%s")) \
+                        for p in session.query(POI).all()])
                 print status
                 p = str(packet.Packet("request_updates", status=status))
                 gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
@@ -945,11 +946,12 @@ class Gui(hildon.Program):
             self.unit_name = unicode(self.unit_type_selector.get_active_text())
             login = str(packet.Packet("login",
                                     username=self.user,
-                                    password=self.pw
+                                    password=self.pw,
                                     unitname=self.unit_name))
             print rpc.send("qos", "add_packet", packet=login)
 
         def access(bol):
+            print "ja körde visst andra :S"
             global login_not_checked
             if bol:
                 status_label.set_label("Status: Access Granted!")
@@ -999,6 +1001,9 @@ class Gui(hildon.Program):
         pass_text = gtk.Entry(max=0)
         pass_label = gtk.Label("Lösenord")
         pass_box = gtk.HBox(spacing=0)
+        pass_box.set_invisible_char("*")
+        pass_box.set_visibility(False)
+        pass_box.visible = False
         pass_box.pack_start(pass_label, expand=False, fill=False, padding=1)
         pass_box.pack_start(pass_text, expand=False, fill=False, padding=1)
 

@@ -24,7 +24,8 @@ if "exempeldata" in sys.argv and len(units) == 0:
     session.add(sjukhus)
 
     #Lägger till alla poi's
-    session.add(POI(15.6001709, 58.40533172, u"Sjukhus", sjukhus, u"N/A", datetime.now(), datetime.now()))
+    session.add(POI(15.6001709, 58.40633172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), 501))
+    session.add(POI(15.5981709, 58.40533172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), 1001))
 
     #UnitTypes
     ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
@@ -90,16 +91,29 @@ def get_map_updates(connection, pack):
 clientrequests["get_map_updates"] = get_map_updates
  
 def pong(connection, pack):
-    print "Sätter ny timestamp"
     connection.timestamp = time.time()
     connection.timepinged = 0
 clientrequests["pong"] = pong
 
 @require_login
 def request_updates(connection, pack):
-    print "req: %s" % pack.data
+    # hitta alla pois ja har, dra bort alla som har samma eller senare
+    # changed.
+    print "client_pois: %s" % pack.data["status"]["POI"].keys()
+    client_pois = pack.data["status"]["POI"]
+    status = pack.data["status"]
     to_send = []
-    
+    for poi in session.query(POI).all():
+        print "servern har %s, ändrad %s" % (poi.unique_id, poi.changed)
+        if str(poi.unique_id) in client_pois.keys():
+            client_poi_changed = datetime.fromtimestamp(float(client_pois[str(poi.unique_id)]))
+            print u"client har den också!! me datan %s" % client_poi_changed
+            if client_poi_changed > poi.changed:
+                print "klienten e nyare."
+                # TODO: be klienten om uppdaterade
+            else:
+                to_send.append(poi)
+                print "servern e nyare."
 clientrequests["request_updates"] = request_updates
 
 @require_login
@@ -121,7 +135,6 @@ def mission(connection, pack):
     print "du är inne i mission"
     connection.timestamp = time.time()
     connection.timepinged = 0
-    session.bind
     session.query(Mission).all()
     loginfo = pack.data
     name = loginfo["name"]
@@ -137,7 +150,6 @@ def login(connection, pack):
     print "Du är inne i login acceptor"
     connection.timestamp = time.time()
     connection.timepinged = 0
-    session.bind
     session.query(User).all()
     loginfo = pack.data
     username = loginfo["username"]
@@ -208,7 +220,6 @@ def poi(connection, pack):
         logging.warn("fick en add poi med tomma lat och lon :S")
         return
     pack.data["unique_id"] = get_unique_id()
-    session.bind
     session.query(POI).all()
     loginfo = pack.data
     hej = u"Hej"
@@ -223,6 +234,7 @@ def poi(connection, pack):
     session.commit()
     poi_response = packet.Packet("poi_response")
     poi_response.data = pack.data
+    print "datan ser ut som FÖLJER: %s" % poi_response.data
     for connection in connections.values():
         connection.out_queue.put(poi_response)
 clientrequests["poi"] = poi
@@ -261,7 +273,7 @@ while True:
             # TODO: fixa in_buffern :p
             # och in_queue
             connection = connections[sock.fileno()]
-            print "läsa från %s" % sock.fileno()
+            #print "läsa från %s" % sock.fileno()
             read = sock.recv(1024)
             if read != "":
                 connection.in_buffer += read
@@ -282,7 +294,7 @@ while True:
  
             if connection.out_buffer == "" and \
                 not connection.out_queue.empty():
-                print connection.id
+                #print "skriver till %s (%s)" % (connection.id, connection.user)
                 abba = connection.out_queue.get()
                 connection.out_buffer = buffrify.create_pack(str(abba))
  

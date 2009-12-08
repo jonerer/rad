@@ -54,13 +54,15 @@ class Connection(object):
         print "Du kör reconnect"
         while not self.connected and not self.KeyboardInterrupt:
             print "Du är inne i while"
-            if self.server_try == 5:
-                if self.current_server == 0:
-                    self.current_server = 1
-                elif self.current_server == 1:
+            if self.server_try == 2:
+                if len(HOST_IP) > self.current_server + 1:
+                    self.current_server += 1
+                else:
                     self.current_server = 0
+                self.server_try = 0
             try:
                 self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                print self.current_server
                 print self.s.connect((HOST_IP[self.current_server], HOST_PORT))
                 self.connected = True
                 print "har kontakt med %s:%s" % (HOST_IP[self.current_server], HOST_PORT)
