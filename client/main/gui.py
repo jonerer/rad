@@ -661,7 +661,7 @@ class Gui(hildon.Program):
         self.window_in_fullscreen = False
         
         #Visar login-dialog
-        #self.show_login()
+        self.show_login()
 
 
         self.view = gtk.Notebook()
@@ -669,7 +669,7 @@ class Gui(hildon.Program):
         self.view.set_show_border(False)
         self.view.insert_page(self.create_map_view())
         self.view.insert_page(self.create_settings_view())
-        self.view.insert_page(self.create_login_view())
+        #self.view.insert_page(self.create_login_view())
         self.view.show()
         
         # Lägger in vyn i fönstret
@@ -944,18 +944,21 @@ class Gui(hildon.Program):
             self.user = unicode(user_text.get_text())
             self.pw = unicode(pass_text.get_text())
             self.unit_name = unicode(self.unit_type_selector.get_active_text())
+            print self.user
+            print self.pw
+            print self.unit_name
             login = str(packet.Packet("login",
                                     username=self.user,
                                     password=self.pw,
                                     unitname=self.unit_name))
-            print rpc.send("qos", "add_packet", packet=login)
+            print login
+            rpc.send("qos", "add_packet", packet=login)
 
         def access(bol):
             print "ja körde visst andra :S"
-            global login_not_checked
             if bol:
-                status_label.set_label("Status: Access Granted!")
-                unit = self.unit_type_selector.get_active_text()
+                print "Access"
+                self.status_label.set_label("Status: Access Granted!")
                 #Kollar om user redan finns
                 insession = True
                 for users in session.query(User):
@@ -973,20 +976,21 @@ class Gui(hildon.Program):
                     session.add(current_user)
                     session.commit()
                 #�ndrar users unit
-                for units in session.query(Unit).filter_by(name=unit):
+                for units in session.query(Unit).filter_by(name=self.unit_name):
                     current_user.type = units
                     current_user.type.is_self = True
                     session.commit()
+                self.access_granted = True
             else:
-                access_granted == False
-                status_label.set_label("Status: Access Denied!")
-            login_not_checked = False
+                print "Denied"
+                self.status_label.set_label("Status: Access Denied!")
+            self.dialog.response(gtk.RESPONSE_NONE)
        
         rpc.register("access", access)
 
-        access_granted = False
+        self.access_granted = False
         login_not_checked = True
-        dialog = gtk.Dialog("Logga in",
+        self.dialog = gtk.Dialog("Logga in",
                             self.window, 
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                             ("Logga in", gtk.RESPONSE_ACCEPT,
@@ -1011,26 +1015,23 @@ class Gui(hildon.Program):
         session = get_session()
         for unit in session.query(Unit).order_by(Unit.name):
             self.unit_type_selector.append_text(unit.name)
-            print "Det du har är: ", unit.name
-        
+        self.unit_type_selector.set_active(3) 
         self.status_label = gtk.Label("Status:")
 
-        dialog.vbox.pack_start(user_box)
-        dialog.vbox.pack_start(pass_box)
-        dialog.vbox.pack_start(self.unit_type_selector)
-        dialog.vbox.pack_start(self.status_label)
-        dialog.vbox.show_all()
-
-        while not access_granted:
-            response = dialog.run()
+        self.dialog.vbox.pack_start(user_box)
+        self.dialog.vbox.pack_start(pass_box)
+        self.dialog.vbox.pack_start(self.unit_type_selector)
+        self.dialog.vbox.pack_start(self.status_label)
+        self.dialog.vbox.show_all()
+        
+        while not self.access_granted:
+            response = self.dialog.run()
             if response == gtk.RESPONSE_ACCEPT:
                 dbcheck_press_callback()
-                while login_not_checked:
-                    time.sleep(0.01)
-                access_granted = True
+                self.dialog.run()
             else:
                 sys.exit()
-        dialog.destroy()
+        self.dialog.destroy()
 
     def create_settings_view(self):
         frame = gtk.Frame("Inställningar")
