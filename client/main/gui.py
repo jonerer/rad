@@ -597,8 +597,10 @@ class Gui(hildon.Program):
         # TODO: snyggare:
         # den här räknar me att login e på sista sidan
         # och TVINGAR inget.
-        last_page = self.view.get_n_pages()
-        self.view.set_current_page(last_page-1)
+        print "Show login"
+        self.show_login()
+        #last_page = self.view.get_n_pages()
+        #self.view.set_current_page(last_page-1)
 
     def on_window_state_change(self, widget, event, *args):
         if event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN:
