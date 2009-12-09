@@ -70,12 +70,12 @@ class MenuPage(Page):
         except:
             poi = POI()
             poi.created = pack.timestamp
+            poi.unique_id = pack.data["unique_id"]
         poi.name = pack.data["name"]
         poi.changed = datetime.fromtimestamp(pack.data["changed"])
         poi.coordx = pack.data["coordx"]
         poi.coordy = pack.data["coordy"]
         poi.type = session.query(POIType).filter(POIType.name==pack.data["poi_type"]).one()
-        poi.unique_id = pack.data["unique_id"]
         session.add(poi)
         session.commit()
         self.gui._map.add_object(poi.id, "poi", poi.name, 
@@ -983,6 +983,13 @@ class Gui(hildon.Program):
                     current_user.type.is_self = True
                     session.commit()
                 self.access_granted = True
+                # begär uppdateringar från servern
+                status = {}
+                status["POI"] = dict([(p.unique_id, p.changed.strftime("%s")) \
+                        for p in session.query(POI).all()])
+                print status
+                p = str(packet.Packet("request_updates", status=status))
+                gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
             else:
                 print "Denied"
                 self.status_label.set_label("Status: Access Denied!")
