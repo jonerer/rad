@@ -662,8 +662,6 @@ class Gui(hildon.Program):
         # Programmet är inte i fullscreen-läge från början.
         self.window_in_fullscreen = False
         
-        #Visar login-dialog
-        self.show_login()
 
 
         self.view = gtk.Notebook()
@@ -674,6 +672,11 @@ class Gui(hildon.Program):
         #self.view.insert_page(self.create_login_view())
         self.view.show()
         
+        rpc.register("access", self.access)
+        #Visar login-dialog
+        self.show_login()
+        
+
         # Lägger in vyn i fönstret
         self.window.add(self.view)
 
@@ -936,13 +939,49 @@ class Gui(hildon.Program):
         rpc.register("access", access)
         return hboxOUT
 
+
+    def access(self, bol):
+        print "ja körde visst andra :S"
+        if bol:
+            print "Access"
+            self.status_label.set_label("Status: Access Granted!")
+            #Kollar om user redan finns
+            insession = True
+            session = get_session()
+            for users in session.query(User):
+                if users.type:
+                    users.type.is_self = False
+                if users.name == self.user:
+                    insession = False
+                    current_user = users
+                    break
+                else:
+                    insession = True
+            if insession:
+                print "Skapar användare"
+                current_user = User(self.user,self.pw)
+                session.add(current_user)
+                session.commit()
+            #�ndrar users unit
+            for units in session.query(Unit).filter_by(name=self.unit_name):
+                current_user.type = units
+                current_user.type.is_self = True
+                session.commit()
+            self.access_granted = True
+            # begär uppdateringar från servern
+            status = {}
+            status["POI"] = dict([(p.unique_id, p.changed.strftime("%s")) \
+                    for p in session.query(POI).all()])
+            print status
+            p = str(packet.Packet("request_updates", status=status))
+            gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
+            self.login_window.destroy()
+        else:
+            print "Denied"
+            self.status_label.set_label("Status: Access Denied!")
+
     def show_login(self):
-        def dbcheck_press_callback():   
-            #Detta behövs inte här, men kanske inte fungerar på andra stället
-            #session = get_session()
-            #create_tables()        
-            #session.bind
-            #session.query(User).all()
+        def dbcheck_press_callback(widget):   
             self.user = unicode(user_text.get_text())
             self.pw = unicode(pass_text.get_text())
             self.unit_name = unicode(self.unit_type_selector.get_active_text())
@@ -950,67 +989,23 @@ class Gui(hildon.Program):
             print self.pw
             print self.unit_name
             login = str(packet.Packet("login",
-                                    username=self.user,
-                                    password=self.pw,
-                                    unitname=self.unit_name))
+            username=self.user,
+            password=self.pw,
+            unitname=self.unit_name))
             print login
             rpc.send("qos", "add_packet", packet=login)
 
-        def access(bol):
-            print "ja körde visst andra :S"
-            if bol:
-                print "Access"
-                self.status_label.set_label("Status: Access Granted!")
-                #Kollar om user redan finns
-                insession = True
-                for users in session.query(User):
-                    if users.type:
-                        users.type.is_self = False
-                    if users.name == self.user:
-                        insession = False
-                        current_user = users
-                        break
-                    else:
-                        insession = True
-                if insession:
-                    print "Skapar användare"
-                    current_user = User(self.user,self.pw)
-                    session.add(current_user)
-                    session.commit()
-                #�ndrar users unit
-                for units in session.query(Unit).filter_by(name=self.unit_name):
-                    current_user.type = units
-                    current_user.type.is_self = True
-                    session.commit()
-                self.access_granted = True
-                # begär uppdateringar från servern
-                status = {}
-                status["POI"] = dict([(p.unique_id, p.changed.strftime("%s")) \
-                        for p in session.query(POI).all()])
-                print status
-                p = str(packet.Packet("request_updates", status=status))
-                gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
-            else:
-                print "Denied"
-                self.status_label.set_label("Status: Access Denied!")
-            self.dialog.response(gtk.RESPONSE_NONE)
-       
-        rpc.register("access", access)
-
-        self.access_granted = False
-        login_not_checked = True
-        self.dialog = gtk.Dialog("Logga in",
-                            self.window, 
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                            ("Logga in", gtk.RESPONSE_ACCEPT,
-                            "Avsluta", gtk.RESPONSE_REJECT))
+        self.login_window = gtk.Window()
+        self.login_window.set_transient_for(self.window)
+        self.login_window.set_modal(True)
+        #self.login_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        #self.window.connect("destroy", sys.exit)
 
         user_text = gtk.Entry(max=0)
         user_label = gtk.Label("Användarnamn")
         user_box = gtk.HBox(spacing=1)
         user_box.pack_start(user_label, expand=False, fill=False, padding=1)
-        user_box.pack_start(user_text, expand=False, fill=False, padding=1)
-
+        user_box.pack_start(user_text, expand=False, fill=False, padding=1) 
         pass_text = gtk.Entry(max=0)
         pass_text.set_invisible_char("*")
         pass_text.set_visibility(False)
@@ -1025,21 +1020,33 @@ class Gui(hildon.Program):
             self.unit_type_selector.append_text(unit.name)
         self.unit_type_selector.set_active(3) 
         self.status_label = gtk.Label("Status:")
-
-        self.dialog.vbox.pack_start(user_box)
-        self.dialog.vbox.pack_start(pass_box)
-        self.dialog.vbox.pack_start(self.unit_type_selector)
-        self.dialog.vbox.pack_start(self.status_label)
-        self.dialog.vbox.show_all()
         
-        while not self.access_granted:
-            response = self.dialog.run()
-            if response == gtk.RESPONSE_ACCEPT:
-                dbcheck_press_callback()
-                self.dialog.run()
-            else:
-                sys.exit()
-        self.dialog.destroy()
+        insert_box = gtk.VBox(spacing=0)
+
+        insert_box.pack_start(user_box)
+        insert_box.pack_start(pass_box)
+        insert_box.pack_start(self.unit_type_selector)
+        insert_box.pack_start(self.status_label)
+
+        button_box = gtk.HBox(spacing=0)
+        login_button = create_menuButton("static/ikoner/disk.png",
+                                            "Logga in")
+        login_button.connect("clicked", dbcheck_press_callback)
+        exit_button = create_menuButton("static/ikoner/arrow_undo.png",
+                                            "Avsluta")
+        exit_button.connect("clicked", sys.exit)
+        button_box.pack_start(login_button)
+        button_box.pack_end(exit_button)
+
+        window_box = gtk.VBox(spacing=0)
+        window_box.pack_start(insert_box)
+        window_box.pack_end(button_box)
+
+
+        self.login_window.add(window_box)
+        self.login_window.show_all()
+
+
 
     def create_settings_view(self):
         frame = gtk.Frame("Inställningar")
