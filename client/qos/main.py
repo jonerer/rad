@@ -35,7 +35,7 @@ def read_keys():
 class Connection(object):
     
     def __init__(self):
-        self.pingtime = 6
+        self.pingtime = 30
         #self.host_addr = "localhost" self.host_port = 2345
         
         self.out_queue = Queue.Queue()
