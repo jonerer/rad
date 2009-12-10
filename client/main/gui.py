@@ -975,10 +975,11 @@ class Gui(hildon.Program):
             print status
             p = str(packet.Packet("request_updates", status=status))
             gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
+            self.view.show()
             self.login_window.destroy()
         else:
             print "Denied"
-            self.status_label.set_label("Status: Access Denied!")
+            self.status_label.set_label("Status: Fel användarnamn eller lösenord")
 
     def show_login(self):
         def dbcheck_press_callback(widget):   
@@ -992,10 +993,11 @@ class Gui(hildon.Program):
             username=self.user,
             password=self.pw,
             unitname=self.unit_name))
-            print login
+            self.status_label.set_label("Status: Kontaktar Servern...")
             rpc.send("qos", "add_packet", packet=login)
 
-        self.login_window = gtk.Window()
+        self.view.hide()
+        self.login_window = hildon.Window()
         self.login_window.set_transient_for(self.window)
         self.login_window.set_modal(True)
         #self.login_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
@@ -1045,8 +1047,7 @@ class Gui(hildon.Program):
 
         self.login_window.add(window_box)
         self.login_window.show_all()
-
-
+        self.add_window(self.login_window)
 
     def create_settings_view(self):
         frame = gtk.Frame("Inställningar")
