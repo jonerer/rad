@@ -143,9 +143,10 @@ class Mission(Base):
     desc = Column(Unicode)
     #poi_ids = relation(POI, backref=backref("poi", order_by=id))
     #unit_ids = relation(Unit, backref=backref("units", order_by=id))
-    
+
     def __repr__(self):
         return "Entity '%s' of type %s" % (self.id, self.name)
+
     def __init__(self, name, time_created, time_changed):
         self.name = name
         self.time_created = time_created
