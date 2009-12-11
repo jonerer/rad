@@ -670,21 +670,18 @@ class Gui(hildon.Program):
         self.view.insert_page(self.create_map_view())
         self.view.insert_page(self.create_settings_view())
         #self.view.insert_page(self.create_login_view())
-        self.view.show()
-        
-        rpc.register("access", self.access)
-        #Visar login-dialog
-        self.show_login()
-        
 
         # Lägger in vyn i fönstret
         self.window.add(self.view)
 
         # Skapar menyn
         self.window.set_menu(self.create_menu())
-
+        
+        rpc.register("access", self.access)
+        #Visar login-dialog
+        self.show_login()
+        
         rpc.register("require_login", self.require_login)
-
     
     def switch_page(self, page_name, widget=None):
         # if widget is supplied, it actually contains page_name, so swap!
