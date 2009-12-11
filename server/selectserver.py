@@ -109,8 +109,8 @@ def request_updates(connection, pack):
         if str(poi.unique_id) in client_pois.keys():
             client_poi_changed = datetime.fromtimestamp(float(client_pois[str(poi.unique_id)]))
             print u"client har den också!! me datan %s" % client_poi_changed
-            if client_poi_changed > poi.changed:
-                print "klienten e nyare."
+            if client_poi_changed >= poi.changed:
+                print "klienten e nyare/samma."
                 # TODO: be klienten om uppdaterade
             else:
                 to_send.append(poi)
@@ -175,10 +175,10 @@ def login(connection, pack):
             # kolla om usern redan var inloggad
             # ta isf bort den "gamla"
             print "loggade in som %s" % username
-            for old_conn in connections.values():
+            for old_id, old_conn in connections.iteritems():
                 if old_conn.user == username and \
                         old_conn.id != connection.id:
-                    to_be_removed.append(old_conn)
+                    to_be_removed.append(old_id)
                     print "redan inloggad på annan connection tar bort."
             connection.user = username
         else:
