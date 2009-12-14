@@ -272,9 +272,9 @@ class Map(gtk.DrawingArea):
                 print "hit! "
                 hit = True
                 unit = obj["id"]
-                self._gui.show_object(obj)
                 self._map.set_focus(dotx,doty)
-                              
+                self._gui.show_object(obj)
+                          
         self._map.delete_object(5000)
         
         if hit == False:
