@@ -74,12 +74,16 @@ def send(target_name, method, args=None, **kwargs):
         else:
             val = callbacks[str(method)]()
     else:
-        val = osso_rpc.rpc_run("rad.%s" % target_name,
-            "/rad/%s" % target_name,
-            "rad.%s" % target_name,
-            method,
-            rpc_args,
-            wait_reply=True)
+        try:
+            val = osso_rpc.rpc_run("rad.%s" % target_name,
+                "/rad/%s" % target_name,
+                "rad.%s" % target_name,
+                method,
+                rpc_args,
+                wait_reply=True)
+        except osso.OssoRPCException, e:
+            logging.error("fick ett fel i RPC från %s till %s, %s: %s" 
+                    % (name, target_name, method, e))
         try:
             val = simplejson.loads(val)
         except simplejson.JSONDecodeError, e:
