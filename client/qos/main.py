@@ -14,6 +14,7 @@ from shared.data import get_session, create_tables
 from shared.data.defs import *
 from shared.settings import HOST_IP, HOST_PORT
 import logging
+import gobject
 
 #subprocess.call('ssh -f jonbe759@130.236.189.23 -L 2345:127.0.0.1:2345 -N sleep 1', shell=True)
 
@@ -155,7 +156,8 @@ network_listeners["login_required"] = login_required
 def unit_response(pack):
     connection.timestamp = time.time()
     print "Du kör unit_response"
-    rpc.send("main","ping_with_coordinates", lon = pack.data["lon"], lat = pack.data["lat"], pack = str(pack))
+    #rpc.send("main","ping_with_coordinates", lon = pack.data["lon"], lat = pack.data["lat"], pack = str(pack))
+    gobject.timeout_add(0, rpc.send, "main", "ping_with_coordinates", {"lon":pack.data["lon"], "lat":pack.data["lat"], "pack":str(pack)})
 network_listeners["unit_response"] = unit_response
  
 def ping_response(pack):
