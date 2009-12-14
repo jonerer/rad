@@ -972,6 +972,7 @@ class Gui(hildon.Program):
             print status
             p = str(packet.Packet("request_updates", status=status))
             gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet": p})
+            self.window.show()
             self.view.show()
             self.login_window.destroy()
         else:
@@ -997,8 +998,6 @@ class Gui(hildon.Program):
         self.login_window = hildon.Window()
         self.login_window.set_transient_for(self.window)
         self.login_window.set_modal(True)
-        #self.login_window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        #self.window.connect("destroy", sys.exit)
 
         user_text = gtk.Entry(max=0)
         user_label = gtk.Label("Användarnamn")
@@ -1122,5 +1121,4 @@ class Gui(hildon.Program):
         gtk.main_quit()
 
     def run(self):
-        self.window.show()
         gtk.main()
