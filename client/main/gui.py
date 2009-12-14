@@ -531,11 +531,12 @@ class AddObjectPage(Page):
 class ShowObjectPage(Page):
     def checkNew(self, button, widget=None):
         self.gui._pages["showObject"].details(None, None, "show")
-        self.gui.switch_page("addObject")
+        self.gui.switch_page("showObject")
 
     def __init__(self, gui):
         
-        super(ShowObjectPage, self).__init__("object", gui, homogeneous=False,
+        super(ShowObjectPage, self).__init__("showObject", gui,
+homogeneous=False,
                 spacing=0)
         
         
@@ -655,6 +656,7 @@ class Gui(hildon.Program):
         self._pages["removeMission"] = RemoveMissionPage(self)
         self._pages["object"] = ObjectPage(self)
         self._pages["addObject"] = AddObjectPage(self)
+        self._pages["showObject"] = ShowObjectPage(self)
 
         # Möjliggör fullscreen-läge
         self.window.connect("key-press-event", self.on_key_press)
