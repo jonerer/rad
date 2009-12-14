@@ -993,7 +993,10 @@ class Gui(hildon.Program):
             unitname=self.unit_name))
             self.status_label.set_label("Status: Kontaktar Servern...")
             rpc.send("qos", "add_packet", packet=login)
-
+        def skip_mode(widget):
+            self.login_window.destroy()
+            self.window.show()
+            self.view.show()
         self.view.hide()
         self.login_window = hildon.Window()
         self.login_window.set_transient_for(self.window)
@@ -1029,12 +1032,16 @@ class Gui(hildon.Program):
         button_box = gtk.HBox(spacing=0)
         login_button = create_menuButton("static/ikoner/disk.png",
                                             "Logga in")
+        skip_button = create_menuButton("static/ikoner/disk.png",
+                                            "Jag orkar inte")
         login_button.connect("clicked", dbcheck_press_callback)
+        skip_button.connect("clicked", skip_mode)
         exit_button = create_menuButton("static/ikoner/arrow_undo.png",
                                             "Avsluta")
         exit_button.connect("clicked", sys.exit)
         button_box.pack_start(login_button)
         button_box.pack_end(exit_button)
+        button_box.pack_end(skip_button)
 
         window_box = gtk.VBox(spacing=0)
         window_box.pack_start(insert_box)
