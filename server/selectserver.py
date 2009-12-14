@@ -24,8 +24,8 @@ if "exempeldata" in sys.argv and len(units) == 0:
     session.add(sjukhus)
 
     #Lägger till alla poi's
-    session.add(POI(15.6001709, 58.40633172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), 501))
-    session.add(POI(15.5981709, 58.40533172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), 1001))
+    sjuk = POI(15.6001709, 58.40633172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), 501)
+    session.add(sjuk)
 
     #UnitTypes
     ambulans = UnitType(u"Ambulans1", "static/ikoner/ambulans.png")
