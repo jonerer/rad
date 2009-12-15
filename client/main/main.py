@@ -36,9 +36,12 @@ units = session.query(Unit).all()
 types = session.query(UnitType).all()
 
 if "exempeldata" in sys.argv and len(types) == 0:
+    print "laggar in exempeldatan"
     #POIType
     sjukhus = POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
+    hinder = POIType(u"hinder", "static/ikoner/cancel.png")
     session.add(sjukhus)
+    session.add(hinder)
 
     #Lägger till alla poi's
     session.add(POI(15.6001709, 58.40533172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), unique_id=1001))

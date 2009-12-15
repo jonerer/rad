@@ -66,26 +66,6 @@ class POI(Base):
         self.changed = time_changed
         self.unique_id = unique_id
         
-#class Alarm(Base):
-    #__tablename__ = "alarm"
-    #id = Column(Integer, primary_key=True)
-    #name = Column(Unicode)
-    #type_id = Column(Integer, ForeignKey("alarm_types.id"))
-    #type = relation(AlarmType, backref=backref("alarm", order_by=id))
-    #extrainfo = Column(Unicode)
-    #coordx = Column(Float)
-    #coordy = Column(Float)
-    #timestamp = Column(DateTime)
-
-    #def __init__(self, coordx, coordy, id, name, sub_type, timestamp):
-        #self.coordx = coordx
-        #self.coordy = coordy
-        #self.id = id
-        #self.name = name
-        #self.sub_type = sub_type
-        #self.timestamp = timestamp
-
-
 class Unit(Base):
     __tablename__ = "units"
     id = Column(Integer, primary_key=True)
@@ -137,12 +117,13 @@ class Mission(Base):
     time_created = Column(Integer)
     time_changed = Column(Integer)
     name = Column(Unicode)
-    coordx = Column(Float)
-    coordy = Column(Float)
     status = Column(Unicode)
     desc = Column(Unicode)
-    #poi_ids = relation(POI, backref=backref("poi", order_by=id))
+    poi_id = Column(Integer, ForeignKey('poi.id'))
+    poi = relation(POI, backref=backref("missions", order_by=id))
     #unit_ids = relation(Unit, backref=backref("units", order_by=id))
+
+    unique_id = Column(Integer, nullable=True)
 
     def __repr__(self):
         return "Entity '%s' of type %s" % (self.id, self.name)

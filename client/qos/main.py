@@ -93,6 +93,8 @@ class Connection(object):
                         print "> %s, %s" % (pack.type, str(pack.data))
                         if pack.type in network_listeners:
                             network_listeners[pack.type](pack)
+                        else:
+                            logging.warn("qos fick ett paket den inte vet vad den ska göra med: %s" % pack.type)
                 else:
                     self.connected = False
                     print "fick en tom read i client"

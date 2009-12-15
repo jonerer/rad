@@ -219,15 +219,6 @@ class AddMissionPage(Page):
                 spacing=0)
         self.size_request = (300,300)
         self.unit = None
-        def dbupdate_press_callback(self, widget, data=None):   
-            name = unicode(nameEntry.get_text())
-            info = unicode(infoEntry.get_text())
-            xEntry = unicode(xEntry.get_text())
-            yEntry = unicode(yEntry.get_text())
-            mission_save = str(packet.Packet("mission_save", name=name,\
-                                info=info, xEntry=xEntry, yEntry=yEntry))
-            print rpc.send("qos", "add_packet", packet=mission_save)
-            
 
             
         hbox1 = gtk.HBox()
@@ -236,17 +227,16 @@ class AddMissionPage(Page):
         nameLabel = gtk.Label("Namn:")
         self.nameEntry = gtk.Entry()
         infoLabel = gtk.Label("Info:")
-        infoEntry = gtk.Entry()
+        self.infoEntry = gtk.Entry()
         poiLabel = gtk.Label("POI:")
         self.poiEntry = gtk.Entry()
         poiButton = gtk.Button("Lägg Till")
         self.combo = gtk.Combo()
         self.poiList = []
-        self.poiListDATA = []
         self.combo.set_popdown_strings(self.poiList)
         self.poiEntry.set_text("Välj en POI")
 
-        okButton = gtk.Button("ok")
+        #okButton = gtk.Button("ok")
         
         self.infoView = gtk.TextView(buffer=None)
         self.infoView.set_wrap_mode(gtk.WRAP_WORD)
@@ -257,12 +247,12 @@ class AddMissionPage(Page):
         vbox1.pack_start(nameLabel, False, False,0)
         vbox1.pack_start(self.nameEntry, False, False,0)
         vbox1.pack_start(infoLabel, False, False,0)
-        vbox1.pack_start(infoEntry, False, False,0)
+        vbox1.pack_start(self.infoEntry, False, False,0)
         vbox1.pack_start(poiLabel, False, False,0)
         vbox1.pack_start(self.poiEntry, False, False,0)
         vbox1.pack_start(poiButton, False, False,0)
         vbox1.pack_start(self.combo,False,False,10)
-        vbox1.pack_start(okButton, False, False,0)
+        #vbox1.pack_start(okButton, False, False,0)
         
         
         saveButton = create_menuButton("static/ikoner/disk.png","Spara")
@@ -271,11 +261,10 @@ class AddMissionPage(Page):
         self.showDetails = create_menuButton("static/ikoner/resultset_first.png","Visa Detaljer")
         self.hideDetails = create_menuButton("static/ikoner/resultset_last.png","G�m Detaljer")
         backButton.connect("clicked", self.gui.switch_page, "mission")
-        okButton.connect("clicked", dbupdate_press_callback, None)
+        #okButton.connect("clicked", dbupdate_press_callback, None)
         poiButton.connect("clicked", self.add_poi, None)
         self.showDetails.connect("clicked", self.details, "show")
         self.hideDetails.connect("clicked", self.details, "hide")
-        
         
         hbox2 = gtk.HBox()
         hbox2.pack_start(backButton, True, True, padding=2)
@@ -297,13 +286,20 @@ class AddMissionPage(Page):
         
     def save(self, button, widget=None):
         session = get_session()
-        missionPacket = str(packet.Packet("mission_save", name = self.nameEntry.get_text()))
-        rpc.send("qos", "add_packet", packet=missionPacket)  
+        name = unicode(self.nameEntry.get_text())
+        info = unicode(self.infoEntry.get_text())
+        # the poi to use is the first one I guess :p
+        poi = self.poiList[0]
+        mission_save = str(packet.Packet("mission_save", name=name,\
+                                desc=info, poi=poi.unique_id ))
+        rpc.send("qos", "add_packet", packet=mission_save)  
           
     def add_poi(self, button, widget=None):
-        self.poiList.append(str(self.unit["name"]))
-        self.poiListDATA.append(self.unit["id"])
-        self.combo.set_popdown_strings(self.poiList)
+        sess = get_session()
+        unit = sess.query(POI).filter(POI.id==self.unit["id"]).one()
+        print "uni: %s" % unit
+        self.poiList.append(unit)
+        self.combo.set_popdown_strings([x.name for x in self.poiList])
         self.poiEntry.set_text("Välj en POI")
         self.unit = None     
 
@@ -331,10 +327,14 @@ class AddMissionPage(Page):
         print "add_mission"
         pack = packet.Packet.from_str(str(pack))
         session = get_session()
-        name = pack.data["name"]
-        time_created = datetime.now()
-        time_changed = datetime.now()
-        session.add(Mission(name, time_created, time_changed))
+        data = pack.data
+        miss = Mission(data["name"], data["created"], data["changed"])
+        miss.status = data["status"]
+        miss.desc = data["desc"]
+        poi = session.query(POI).filter(POI.unique_id==data["poi"]).one()
+        miss.poi = poi
+        miss.unique_id = data["unique_id"]
+        session.add(miss)
         session.commit()
             
 class RemoveMissionPage(Page):

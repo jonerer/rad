@@ -21,7 +21,9 @@ if "exempeldata" in sys.argv and len(units) == 0:
     
     #POIType
     sjukhus = POIType(u"sjukhus1", "static/ikoner/sjukhus.png")
+    hinder = POIType(u"hinder", "static/ikoner/cancel.png")
     session.add(sjukhus)
+    session.add(hinder)
 
     #Lägger till alla poi's
     sjuk = POI(15.6001709, 58.40633172, u"Sjukhus", sjukhus, datetime.now(), datetime.now(), 501)
@@ -81,6 +83,7 @@ connections = {}
 clientrequests = {}
 
 def get_unique_id():
+    # todo: se till att den här verkligen e unik :p
     import random
     return int(str(random.randint(0,100000)) + "1")
 
@@ -144,16 +147,33 @@ def contact_send(connection, pack):
 clientrequests["contact_req"] = contact_send
 
 def mission(connection, pack):
-    print "du är inne i mission"
     connection.timestamp = time.time()
     connection.timepinged = 0
-    session.query(Mission).all()
-    loginfo = pack.data
-    name = loginfo["name"]
-    time_created = datetime.now()
-    time_changed = datetime.now()
+    mission_data = pack.data
+        #mission_save = str(packet.Packet("mission_save", name=name,\
+        #                        desc=info, poi=poi.unique_id ))
+    mission_data["created"] = float(datetime.now().strftime("%s"))
+    mission_data["changed"] = float(datetime.now().strftime("%s"))
+    mission_data["unique_id"] = get_unique_id()
+    mission_data["status"] = "active"
+    print "fick ett mission, infos: %s" % mission_data
+    s = get_session()
+    try: 
+        poi = s.query(POI).filter(POI.unique_id==mission_data["poi"]).one()
+    except:
+        logging.error("servern hade inte den POI:en.")
+        return
+    print "Poi: %s" % poi
+    miss = Mission(mission_data["name"], mission_data["created"], mission_data["changed"])
+    miss.status = mission_data["status"]
+    miss.desc = mission_data["desc"]
+    miss.unique_id = mission_data["unique_id"]
+    miss.poi = poi
+    s.add(miss)
+    s.commit()
+
     mission_response = packet.Packet("mission_response")
-    mission_response.data = pack.data
+    mission_response.data = mission_data
     connection.out_queue.put(mission_response)
 clientrequests["mission_save"] = mission
 
