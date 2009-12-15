@@ -217,6 +217,7 @@ def unit_update(connection, pack):
             conn.out_queue.put(unit_response)
 clientrequests["unit_update"] = unit_update
 
+@require_login
 def poi(connection, pack):
     connection.timestamp = time.time()
     connection.timepinged = 0
@@ -240,7 +241,7 @@ def poi(connection, pack):
     print hej
     print poi_type_name
     print "Innan foren"
-    poi_type = session.query(POIType).get_by(POIType.name==u"default")
+    poi_type = session.query(POIType).filter(POIType.name==u"sjukhus1")[0]
     for poi_types in session.query(POIType).filter(POIType.name==poi_type_name):
         print "Kom in i foren"
         poi_type = poi_types

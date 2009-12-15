@@ -146,11 +146,13 @@ if "--read-keys" in sys.argv or True: # ha true nu iaf
     
 def mission_response(pack):
     connection.timestamp = time.time()
-    rpc.send("main", "add_mission", pack=str(pack))
+    #rpc.send("main", "add_mission", pack=str(pack))
+    gobject.timeout_add(0, rpc.send, "main", "add_mission", {"pack":str(pack)})
 network_listeners["mission_response"] = mission_response
 
 def login_required(pack):
-    rpc.send("main", "require_login")
+    #rpc.send("main", "require_login")
+    gobject.timeout_add(0, rpc.send, "main", "require_login")
 network_listeners["login_required"] = login_required
 
 def unit_response(pack):
@@ -158,6 +160,7 @@ def unit_response(pack):
     print "Du kör unit_response"
     #rpc.send("main","ping_with_coordinates", lon = pack.data["lon"], lat = pack.data["lat"], pack = str(pack))
     gobject.timeout_add(0, rpc.send, "main", "ping_with_coordinates", {"lon":pack.data["lon"], "lat":pack.data["lat"], "pack":str(pack)})
+    print "klar med gobject i unit_response"
 network_listeners["unit_response"] = unit_response
  
 def ping_response(pack):
@@ -169,7 +172,8 @@ def login_response(pack):
     login_boolean = parseBoolean(pack.data["login"])
     connection.timestamp = time.time()
     print "innan rpc access"
-    rpc.send("main", "access", bol=login_boolean)
+    #rpc.send("main", "access", bol=login_boolean)
+    gobject.timeout_add(0, rpc.send, "main", "access", {"bol":login_boolean})
 network_listeners["login_response"] = login_response
  
 def parseBoolean(login):
@@ -181,14 +185,16 @@ def alarm_response(pack):
 network_listeners["alarm_response"] = alarm_response
 
 def contact_response(pack):
-    rpc.send("main", "add_contactlist", pack = str(pack))
+    #rpc.send("main", "add_contactlist", pack = str(pack))
+    gobject.timeout_add(0, rpc.send, "add_contactlist", {"pack":str(pack)})
     connection.timestamp = time.time()
 network_listeners["contact_resp"] = contact_response
 
 def poi_response(pack):
     connection.timestamp = time.time()
     print "Hille du e king på poi_response"
-    rpc.send("main", "add_poi", pack=str(pack))
+    #rpc.send("main", "add_poi", pack=str(pack))
+    gobject.timeout_add(0, rpc.send, "main" "add_poi", {"pack":str(pack)})
 network_listeners["poi_response"] = poi_response
     
 rpc.register("add_packet", connection.add_packet)
