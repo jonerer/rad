@@ -55,7 +55,8 @@ class MenuPage(Page):
         print "tjockade pÃ¥ hille"
         session = get_session()
         poiPacket = str(packet.Packet("poi",id = "", poi_type = u"brand", name = "Vallarondellen", coordx = "15.5680", coordy = "58.4100"))
-        rpc.send("qos", "add_packet", packet=poiPacket)
+        #rpc.send("qos", "add_packet", packet=poiPacket)
+        gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":poiPacket})
         #alarm = str(packet.Packet("alarm", id = "", type = "skogsbrand", name = "Vallarondellen", timestamp = time.time(), poi_id = "", contact_person = "", contact_number = "", other = ""))
         #print rpc.send("qos", "add_packet", packet=alarm)
 
@@ -140,7 +141,8 @@ class ContactPage(Page):
             
     def on_show(self): 
         contact_send = str(packet.Packet("contact_req"))
-        rpc.send("qos", "add_packet", packet=contact_send)
+        #rpc.send("qos", "add_packet", packet=contact_send)
+        gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":contact_send})
         
     def __init__(self, gui):
         #super(ContactPage, self).__init__("contact", gui, width="full")
@@ -292,7 +294,7 @@ class AddMissionPage(Page):
         poi = self.poiList[0]
         mission_save = str(packet.Packet("mission_save", name=name,\
                                 desc=info, poi=poi.unique_id ))
-        rpc.send("qos", "add_packet", packet=mission_save)  
+        gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":mission_save})
           
     def add_poi(self, button, widget=None):
         sess = get_session()
@@ -498,7 +500,8 @@ class AddObjectPage(Page):
         print self.poi_type_selector.get_active_text()
         poi = str(packet.Packet("poi",id = "", poi_type = unicode(self.poi_type_selector.get_active_text()), name = self.nameEntry.get_text(), coordx = self.xEntry.get_text(), coordy = self.yEntry.get_text()))
         
-        rpc.send("qos", "add_packet", packet=poi)
+        #rpc.send("qos", "add_packet", packet=poi)
+        gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":poi})
     
     def map_dblclick(self, coordx, coordy):
         print "Jon bajsar!"
@@ -841,7 +844,8 @@ class Gui(hildon.Program):
             self.pw = unicode(passText.get_text())
             self.unit_name = unicode(self.combo.get_active_text())
             login = str(packet.Packet("login", username=self.user, password=self.pw, unitname=self.unit_name))
-            print rpc.send("qos", "add_packet", packet=login)
+            #print rpc.send("qos", "add_packet", packet=login)
+            gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":login})
 
         hboxOUT  = gtk.HBox(homogeneous=False, spacing=1)
         vbox1 = gtk.VBox(homogeneous=False, spacing=1)
@@ -994,7 +998,8 @@ class Gui(hildon.Program):
             password=self.pw,
             unitname=self.unit_name))
             self.status_label.set_label("Status: Kontaktar Servern...")
-            rpc.send("qos", "add_packet", packet=login)
+            #rpc.send("qos", "add_packet", packet=login)
+            gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":login})
         def skip_mode(widget):
             self.login_window.destroy()
             self.window.show()
