@@ -81,14 +81,14 @@ def send(target_name, method, args=None, **kwargs):
                 method,
                 rpc_args,
                 wait_reply=True)
-        except osso.OssoRPCException, e:
+            try:
+                val = simplejson.loads(val)
+                return val
+            except simplejson.JSONDecodeError, e:
+                logging.error("fick ett fel i RPC till %s, %s: %s" % (target_name,method,val))
+        except Exception, e:
             logging.error("fick ett fel i RPC från %s till %s, %s: %s" 
                     % (name, target_name, method, e))
-        try:
-            val = simplejson.loads(val)
-        except simplejson.JSONDecodeError, e:
-            logging.error("fick ett fel i RPC till %s, %s: %s" % (target_name,method,val))
-    return val
 
 def register(cb_name, callback):
     if name is None:

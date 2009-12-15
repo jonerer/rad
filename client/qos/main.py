@@ -196,7 +196,7 @@ def poi_response(pack):
     connection.timestamp = time.time()
     print "Hille du e king på poi_response"
     #rpc.send("main", "add_poi", pack=str(pack))
-    gobject.timeout_add(0, rpc.send, "main" "add_poi", {"pack":str(pack)})
+    gobject.timeout_add(0, rpc.send, "main", "add_poi", {"pack":str(pack)})
 network_listeners["poi_response"] = poi_response
     
 rpc.register("add_packet", connection.add_packet)
