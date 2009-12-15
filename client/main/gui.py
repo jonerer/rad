@@ -201,13 +201,16 @@ class MissionPage(Page):
         self.size_request = (300,300)
 
         super(MissionPage, self).__init__("mission", gui, homogeneous=False,spacing=0)
+        showMissionButton = create_menuButton("static/ikoner/book_add.png","Uppdragsinfo")
         newMissionButton = create_menuButton("static/ikoner/book_add.png","Lagg till")
         deleteMissionButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
         
         backButton.connect("clicked", self.gui.switch_page, "menu")
+        showMissionButton.connect("clicked", self.gui.switch_page, "showMission")
         newMissionButton.connect("clicked", self.gui.switch_page, "addMission")
         deleteMissionButton.connect("clicked", self.gui.switch_page, "removeMission")
+        self.pack_start(showMissionButton, False, False, padding=2)
         self.pack_start(newMissionButton, False, False, padding=2)
         self.pack_start(deleteMissionButton, False, False, padding=2)
         self.pack_start(backButton, False, False, padding=2)
@@ -592,7 +595,57 @@ homogeneous=False,
                 self.xLabel.set_text("coord X: " + str(poi.coordx))
                 self.yLabel.set_text("coord Y: " + str(poi.coordy))
                 self.changedLabel.set_text("Senast Ändrad: " + str(poi.time_changed))
-                session.commit()
+
+class ShowMissionPage(Page):
+    def __init__(self, gui):
+        
+        super(ShowMissionPage, self).__init__("showMission", gui,
+homogeneous=False,
+                spacing=0)
+        hbox1 = gtk.HBox(False, 0)
+        hbox2 = gtk.HBox(False, 0)
+        hbox3 = gtk.HBox(False, 0)
+        hbox4 = gtk.HBox(False, 0)
+        self.label = gtk.Label("navn")
+        self.image = gtk.Image()
+        self.image.set_from_file(None)
+        self.idLabel = gtk.Label("ID: ")
+        self.poi = gtk.Label("Plats: ")
+        self.status = gtk.Label("Status: ")
+        self.desc = gtk.Label("Beskrivning: ")
+        #hbox1.pack_start(self.label, False, False, padding=2)
+        #hbox1.pack_start(self.idLabel, False, False, padding=2)
+        #hbox1.pack_start(self.poi, False, False, padding=2)
+        #hbox1.pack_start(self.status, False, False, padding=2)
+        #hbox1.pack_start(self.desc, False, False, padding=2)
+        hbox1.pack_start(self.image, False, False, padding=15)
+        hbox1.pack_start(self.label, False, False, padding=2)
+
+        
+       #vbox1.pack_start(self.idLabel, False, False, padding=2)
+       #vbox1.pack_start(self.changedLabel, False, False, padding=2)
+        #hbox1.pack_start(vbox1, False, False, padding=2)
+        self.pack_start(hbox1, False, False, padding=2)
+        self.pack_start(self.poi, False, False, padding=2)
+        self.pack_start(self.idLabel, False, False, padding=2)
+        self.pack_start(self.status, False, False, padding=2)
+        self.pack_start(self.desc, False, False, padding=2)
+        self.show_all()
+
+    def on_show(self):
+        self.update()
+        
+    def update(self, mission=None):
+        session = get_session()
+        if mission is None:
+            mission = session.query(Mission).one()
+
+        self.image.set_from_file(mission.poi.type.image)
+        self.label.set_text(str(mission.name))
+        self.idLabel.set_text(str(mission.unique_id))
+        self.poi.set_text("Plats: " + str(mission.poi.name))
+        self.status.set_text("Status: " + str(mission.status))
+        self.desc.set_text("Beskrivning: " + str(mission.desc))
         
 class Gui(hildon.Program):
     _map = None
@@ -660,6 +713,7 @@ class Gui(hildon.Program):
         self._pages["object"] = ObjectPage(self)
         self._pages["addObject"] = AddObjectPage(self)
         self._pages["showObject"] = ShowObjectPage(self)
+        self._pages["showMission"] = ShowMissionPage(self)
 
         # Möjliggör fullscreen-läge
         self.window.connect("key-press-event", self.on_key_press)
