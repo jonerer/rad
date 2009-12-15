@@ -134,8 +134,6 @@ clientrequests["request_updates"] = request_updates
 @require_login
 def contact_send(connection, pack):
     print "du e fan king på contact_send i servern"
-    connection.timestamp = time.time()
-    connection.timepinged = 0
     responsepacket = packet.Packet("contact_resp")
     responsepacket.data["users"] = []
     for conn in connections.values():
@@ -147,8 +145,6 @@ def contact_send(connection, pack):
 clientrequests["contact_req"] = contact_send
 
 def mission(connection, pack):
-    connection.timestamp = time.time()
-    connection.timepinged = 0
     mission_data = pack.data
         #mission_save = str(packet.Packet("mission_save", name=name,\
         #                        desc=info, poi=poi.unique_id ))
@@ -180,8 +176,6 @@ clientrequests["mission_save"] = mission
 def login(connection, pack):
     global to_be_removed
     print "Du är inne i login acceptor"
-    connection.timestamp = time.time()
-    connection.timepinged = 0
     session.query(User).all()
     loginfo = pack.data
     username = loginfo["username"]
@@ -227,8 +221,6 @@ clientrequests["login"] = login
 #clientrequests["alarm"] = alarm
 
 def unit_update(connection, pack):
-    connection.timestamp = time.time()
-    connection.timepinged = 0
     unit_response = packet.Packet("unit_response")
     unit_response.data = pack.data
     for conn in connections.values():
@@ -239,8 +231,6 @@ clientrequests["unit_update"] = unit_update
 
 @require_login
 def poi(connection, pack):
-    connection.timestamp = time.time()
-    connection.timepinged = 0
     #lägg i databas
     id = pack.data["id"]
     name = pack.data["name"]
