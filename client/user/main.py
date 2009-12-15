@@ -36,8 +36,8 @@ def main():
         print lon
         print lat
         '''
-        lon = start_lon + rad*math.sin(angle)
-        lon = lon + rad2*math.sin(angle2)
+        lon = start_lon + 2*rad*math.sin(angle)
+        lon = lon + 2*rad2*math.sin(angle2)
         print "lon:",lon
         lat = start_lat + rad*math.cos(angle)
         lat = lat + rad2*math.cos(angle2)
