@@ -7,6 +7,7 @@ from shared import packet
 from shared import rpc
 from shared.data import get_session, create_tables
 from shared.data.defs import *
+import gobject
 
 # Tar reda på en PNG-bilds storlek
 def png_size(path):
@@ -347,7 +348,8 @@ class MapObject(Picture):
                 unit.coordx=lon
                 unit.coordy=lat
                 unit_packet = str(packet.Packet("unit_update", name = unit.name, lon = unit.coordx , lat = unit.coordy))
-                rpc.send("qos", "add_packet", packet=unit_packet)
+                #rpc.send("qos", "add_packet", packet=unit_packet)
+                gobject.timeout_add(0, rpc.send, "qos", "add_packet", {"packet":unit_packet})
                 print "rpc till qos klar"
         else:
             for unit in session.query(Unit).filter(Unit.name == pack):
