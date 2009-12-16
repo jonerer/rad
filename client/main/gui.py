@@ -201,7 +201,7 @@ class MissionPage(Page):
         self.size_request = (300,300)
 
         super(MissionPage, self).__init__("mission", gui, homogeneous=False,spacing=0)
-        showMissionButton = create_menuButton("static/ikoner/book_add.png","Uppdragsinfo")
+        showMissionButton = create_menuButton("static/ikoner/book.png","Uppdragsinfo")
         newMissionButton = create_menuButton("static/ikoner/book_add.png","Lagg till")
         deleteMissionButton = create_menuButton("static/ikoner/book_delete.png","Ta bort")
         backButton = create_menuButton("static/ikoner/arrow_left.png","Tillbaka")
@@ -241,8 +241,6 @@ class AddMissionPage(Page):
         self.combo.set_popdown_strings(self.poiList)
         self.poiEntry.set_text("Välj en POI")
 
-        #okButton = gtk.Button("ok")
-        
         self.infoView = gtk.TextView(buffer=None)
         self.infoView.set_wrap_mode(gtk.WRAP_WORD)
         infoLabel2 = gtk.Label("Info:")
@@ -314,7 +312,11 @@ class AddMissionPage(Page):
                
     def on_show(self):
         # simulera en "göm detaljer"
+        print "skön lr"
+        self.poiList = []
+        self.combo.set_popdown_strings([x.name for x in self.poiList])
         self.details(None, "hide")
+        self.poiEntry.set_text("Välj en POI")
         
     def details(self, button, state, widget=None):
         if state == "show":
@@ -599,14 +601,28 @@ homogeneous=False,
 class ShowMissionPage(Page):
     def __init__(self, gui):
         
-        super(ShowMissionPage, self).__init__("showMission", gui,
-homogeneous=False,
-                spacing=0)
+        super(ShowMissionPage, self).__init__("showMission", gui, 
+                homogeneous=False, spacing=0)
+
+        # TODO: fixa så d här inte failar på missions me samma namn!
+        s = get_session()
+        self.missionList = [x.name for x in s.query(Mission).all()]
+        self.combo = gtk.combo_box_new_text()
+        self.combo.get_model().clear()
+        for user in self.missionList:
+            self.combo.append_text(user)
+
         hbox1 = gtk.HBox(False, 0)
         hbox2 = gtk.HBox(False, 0)
         hbox3 = gtk.HBox(False, 0)
         hbox4 = gtk.HBox(False, 0)
         self.label = gtk.Label("navn")
+
+        self.doButton = gtk.Button()
+        self.doButton.add(gtk.Label(">>"))
+        self.doButton.show_all()
+        self.doButton.connect("clicked", self.buttonPushed, None)
+
         self.image = gtk.Image()
         self.image.set_from_file(None)
         self.idLabel = gtk.Label("ID: ")
@@ -620,11 +636,13 @@ homogeneous=False,
         #hbox1.pack_start(self.desc, False, False, padding=2)
         hbox1.pack_start(self.image, False, False, padding=15)
         hbox1.pack_start(self.label, False, False, padding=2)
-
         
-       #vbox1.pack_start(self.idLabel, False, False, padding=2)
-       #vbox1.pack_start(self.changedLabel, False, False, padding=2)
+        #vbox1.pack_start(self.idLabel, False, False, padding=2)
+        #vbox1.pack_start(self.changedLabel, False, False, padding=2)
         #hbox1.pack_start(vbox1, False, False, padding=2)
+        hbox2.pack_start(self.combo, False, False, padding=2)
+        hbox2.pack_start(self.doButton, False, False, padding=2)
+        self.pack_start(hbox2, False, False, padding=2)
         self.pack_start(hbox1, False, False, padding=2)
         self.pack_start(self.poi, False, False, padding=2)
         self.pack_start(self.idLabel, False, False, padding=2)
@@ -632,17 +650,28 @@ homogeneous=False,
         self.pack_start(self.desc, False, False, padding=2)
         self.show_all()
 
+
+    def buttonPushed(self, whatev, lulz):
+        s = get_session()
+        miss = s.query(Mission).filter(Mission.name==self.combo.get_active_text())[0]
+        self.update(miss)
+
     def on_show(self):
+        s = get_session()
+        self.missionList = [x.name for x in s.query(Mission).all()]
+        self.combo.get_model().clear()
+        for user in self.missionList:
+            self.combo.append_text(user)
         self.update()
         
     def update(self, mission=None):
-        session = get_session()
         if mission is None:
-            mission = session.query(Mission).one()
+            session = get_session()
+            mission = session.query(Mission)[0]
 
         self.image.set_from_file(mission.poi.type.image)
         self.label.set_text(str(mission.name))
-        self.idLabel.set_text(str(mission.unique_id))
+        self.idLabel.set_text("ID: " + str(mission.unique_id))
         self.poi.set_text("Plats: " + str(mission.poi.name))
         self.status.set_text("Status: " + str(mission.status))
         self.desc.set_text("Beskrivning: " + str(mission.desc))

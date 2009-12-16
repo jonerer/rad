@@ -188,7 +188,7 @@ network_listeners["alarm_response"] = alarm_response
 
 def contact_response(pack):
     #rpc.send("main", "add_contactlist", pack = str(pack))
-    gobject.timeout_add(0, rpc.send, "add_contactlist", {"pack":str(pack)})
+    gobject.timeout_add(0, rpc.send, "main", "add_contactlist", {"pack":str(pack)})
     connection.timestamp = time.time()
 network_listeners["contact_resp"] = contact_response
 
