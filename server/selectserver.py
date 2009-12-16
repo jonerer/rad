@@ -170,7 +170,9 @@ def mission(connection, pack):
 
     mission_response = packet.Packet("mission_response")
     mission_response.data = mission_data
-    connection.out_queue.put(mission_response)
+    for connection in connections.values():
+        connection.out_queue.put(mission_response)
+    #connection.out_queue.put(mission_response)
 clientrequests["mission_save"] = mission
 
 def login(connection, pack):
