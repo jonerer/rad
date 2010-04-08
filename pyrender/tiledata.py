@@ -45,9 +45,11 @@ def GetOsmTileData(z,x,y):
 
   if(z < 4):
     return
+  # changed: fixed the merge-thing
   elif(z == DownloadLevel()):
+  #elif (1):
     # Download the data
-    URL = 'http://dev.openstreetmap.org/~ojw/api/?/map/%d/%d/%d' % (z,x,y)
+    #URL = 'http://dev.openstreetmap.org/~ojw/api/?/map/%d/%d/%d' % (z,x,y)
     URL = 'http://%s/api/0.6/map?bbox=%f,%f,%f,%f' % ('api.openstreetmap.org',W,S,E,N)
      
     if(not os.path.exists(filename)): # TODO: allow expiry of old data
@@ -56,6 +58,8 @@ def GetOsmTileData(z,x,y):
     return(filename)
     
   elif(z > DownloadLevel()):
+    # tbh, this shouldn't work.
+    # TODO: chekkit?
     # use larger tile
     while(z > DownloadLevel()):
       z = z - 1
@@ -65,21 +69,25 @@ def GetOsmTileData(z,x,y):
 
   elif(z < DownloadLevel()):
     # merge smaller tiles
-    filenames = []
-    for i in (0,1):
-      for j in (0,1):
-        lx = x * 2 + i
-        ly = y * 2 + j
-        lz = z + 1
-        #print "Downloading subtile %d,%d at %d" % (x,y,z)
-        # download (or otherwise obtain) each subtile
-        filenames.append(GetOsmTileData(lz,lx,ly))
-    # merge them together
-    OsmMerge(filename, z, filenames)
-    return(filename)
+    if not os.path.exists(filename):
+      filenames = []
+      for i in (0,1):
+        for j in (0,1):
+          lx = x * 2 + i
+          ly = y * 2 + j
+          lz = z + 1
+          #print "Downloading subtile %d,%d at %d" % (x,y,z)
+          # download (or otherwise obtain) each subtile
+          filenames.append(GetOsmTileData(lz,lx,ly))
+      # merge them together
+      OsmMerge(filename, z, filenames)
+      print "Merge done (z=%s, filename=%s)" % (z, filename)
+      return(filename)
+    else:
+      return filename
     
-  print "Below download level"
-  return(None)
+  #print "Below download level"
+  #return(None)
 
 if(__name__ == "__main__"):
   """test mode"""

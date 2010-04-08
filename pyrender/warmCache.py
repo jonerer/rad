@@ -1,4 +1,6 @@
-# by teh jonerer and the elofferer
+# by teh jonerer and the elofferer.
+# just grabs some images (like... linkoping) to populate the cache.
+
 from tiledata import GetOsmTileData
 from tilenames import tileXY
 

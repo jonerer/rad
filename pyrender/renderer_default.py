@@ -173,7 +173,7 @@ def wayStyles(layer, tags):
   #jons:
   #styleshhets = stylesheets.get("default")
   stylesheet = stylesheets.get(layer, None)
-  print "piamp"
+  #print "piamp"
   if(stylesheet == None):
     return([])
   
@@ -198,12 +198,12 @@ class RenderClass(OsmRenderBase):
   # draws a complete way
   def draw_way(self, w):
       layeradd = 0
-      print w['t']
-      print "self maplayer: ", self.mapLayer
-      print wayStyles(self.mapLayer, w['t'])
-      print stylesheets.keys()
-      import pprint
-      pp = pprint.PrettyPrinter()
+      #print w['t']
+      #print "self maplayer: ", self.mapLayer
+      #print wayStyles(self.mapLayer, w['t'])
+      #print stylesheets.keys()
+      #import pprint
+      #pp = pprint.PrettyPrinter()
       #pp.pprint(stylesheets)
       self.mapLayer = "default"
       for style in wayStyles(self.mapLayer, w['t']):
@@ -218,14 +218,14 @@ class RenderClass(OsmRenderBase):
         ctx.set_line_width(width)
         xy = []
 
-        print w['n']
+        #print w['n']
         for n in w['n']: 
           # project that into image coordinates
           (lat, lon) = self.osm.nodes[n['id']]
           #(lat, lon) = float(n['lat']), float(n['lon'])
           (x,y) = self.proj.project(lat,lon)
           
-          print "%f,%f -> %f, %f" % (lat, lon, x,y)
+          #print "%f,%f -> %f, %f" % (lat, lon, x,y)
           xy.append((x, y))
           #xy.append(self.proj.project(float(n['lat']), float(n['lon'])))
           #print "%f,%f -> %f, %f" % (n['lat'], n['lon'], x,y)
@@ -267,13 +267,15 @@ class RenderClass(OsmRenderBase):
       self.draw_way(w)
 
     # POIs
-    if(0):
+    if(1):
       for poi in self.osm.poi:
         n = poi['id']
         (lat,lon) = self.osm.nodes[n]
         (x,y) = self.proj.project(lat,lon)
         s = 1
-        self.drawContext.rectangle((x-s,y-s,x+s,y+s),fill='blue')
+        ctx = self.getCtx(100000000000)
+	ctx.set_source_rgb(0., 0., 1.)
+        ctx.rectangle(x-s,y-s,x+s,y+s)
 
 
 
@@ -286,10 +288,11 @@ if(__name__ == '__main__'):
   filename = "sample_"+__file__+".png"
   #a.RenderTile(15, 16372, 10895, 'default', filename) # london
   #a.RenderTile(14, 8166, 5447, 'default', filename) # Z14
-  (x,y) = tileXY(58.3877, 15.5972, 15)
-  a.RenderTile(15, x, y, 'default', filename) # i linkan
+  (x,y) = tileXY(58.409, 15.572, 9)
+  a.RenderTile(9, x, y, 'default', filename) # i linkan
   #a.RenderTile(17, 65385, 43659, 'default', filename) # fran render_PIL
 
   
   print "------------------------------------"
+  print "(x,y):",x,y
   print "Saved image to " + filename

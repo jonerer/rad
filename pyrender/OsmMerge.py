@@ -57,10 +57,11 @@ def OsmMerge(dest, z, sources):
   # Store the result as an OSM XML file
   f=codecs.open(dest, mode='w', encoding='utf-8')
   f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-  f.write('<osm version="0.5" generator="OsmMerge">\n')
+  f.write('<osm version="0.6" generator="OsmMerge">\n')
   
+  # TODO: Write the bounds
   # TODO: Write the nodes
-  if(0):
+  if(1):
 	  for n,data in nodes.items():
 	    (lat,lon) = nodes[n]
 	    f.write('<node id="%d" lat="%f" lon="%f">' % (n,lat,lon))
@@ -115,13 +116,15 @@ def OsmMerge(dest, z, sources):
           
         #print "Dist2 = %f" % dd
         
-      if(storeThisNode):
-        (lastx,lasty,count) = (lon,lat,count+1)
-      
-        f.write("\n<nd id='%d' x='%1.0f' y='%1.0f'/>" % (n['id'], lon * divisor, lat * divisor))
-        countUsed = countUsed + 1
-      else:
-        countNotUsed = countNotUsed + 1
+      #if(storeThisNode):
+      #  (lastx,lasty,count) = (lon,lat,count+1)
+      #
+      #  f.write("\n<nd id='%d' x='%1.0f' y='%1.0f'/>" % (n['id'], lon * divisor, lat * divisor))
+      # changed: always print it, but just print the ref. we already have the node.
+      f.write("\n<nd ref='%d' />" % (n['id']))
+      #  countUsed = countUsed + 1
+      #else:
+      #  countNotUsed = countNotUsed + 1
     f.write("</way>\n")
   #print "Used %d, skipped %d" % (countUsed, countNotUsed)
   
