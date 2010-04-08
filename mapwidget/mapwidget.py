@@ -126,14 +126,14 @@ class MapWidget(gtk.DrawingArea):
     def handle_button_press_event(self, widget, event):
         self.movement_from["x"] = event.x
         self.movement_from["y"] = event.y
-        self.origin_position = self.mapdata.focus
+        self.origin_position = self.focus
         self.last_movement_timestamp = time.time()
-        self.set_clicked_coord(widget, event)
-        self.draw_clicked_pos(widget, event)
-        result = self.draw_marked_object(widget, event)
+        #self.set_clicked_coord(widget, event)
+        #self.draw_clicked_pos(widget, event)
+        #result = self.draw_marked_object(widget, event)
         
-        if result:
-            self.allow_movement = True
+        #if result:
+        self.allow_movement = True
         return True
 
     def handle_button_release_event(self, widget, event):
@@ -152,14 +152,17 @@ class MapWidget(gtk.DrawingArea):
             # Genom tidskontroll undviker vi oavsiktlig rörelse av kartan,
             # t ex ifall någon råkar nudda skärmen med ett finger eller liknande.
             if time.time() > self.last_movement_timestamp + 0.1:
-                lon, lat = self.pixel_to_gps(self.movement_from["x"] - x,
-                                             self.movement_from["y"] - y)
-                self.mapdata.set_focus(self.origin_position["longitude"] + lon,
-                                       self.origin_position["latitude"] - lat)
+                deltax = self.movement_from["x"] - x
+                deltay = self.movement_from["y"] - y
+                print deltax, deltay
+                #self.mapdata.set_focus(self.origin_position["longitude"] + lon,
+                                       #self.origin_position["latitude"] - lat)
                 self.movement_from["x"] = x
                 self.movement_from["y"] = y
 
                 # Ritar om kartan
+                self.focus = (self.focus[0] + deltay*self.tileheight_deg/256, deltax*self.tilewidth_deg/256 + self.focus[1])
+                #self.focus = (self.focus[0] + 0.01, self.focus[1]+0.01)
                 self.queue_draw()
 
         return True
@@ -180,25 +183,33 @@ class MapWidget(gtk.DrawingArea):
     def draw(self):
         def draw_tile_box(x, y):
             edges = tilenames.tileEdges(x, y, self.zoom_level)
-            print edges
+            #print edges
             offsetlat = edges[0]-focus[0]
             offsetlong = edges[1]-focus[1]
+            self.tileheight_deg = edges[2]-edges[0]
 
             self.context.rectangle(
-                    offsetlong/tilewidth_deg*256,
-                    offsetlat/(edges[2]-edges[0])*256,
+                    offsetlong / self.tilewidth_deg * 256,
+                    offsetlat / self.tileheight_deg * 256,
                     256,
                     256)
             self.context.fill()
+
+            self.context.move_to(
+                    offsetlong / self.tilewidth_deg * 256 + 128,
+                    offsetlat / self.tileheight_deg * 256 + 128)
+            self.context.set_source_rgb(0, 0, 0)
+            self.context.set_font_size(12)
+            self.context.show_text("%s, %s" % (x, y))
 
         (x, y, w, h) = self.get_allocation()
         focus = self.focus
         self.context.translate(w/2, h/2)
         x, y = tilenames.tileXY(focus[0], focus[1], self.zoom_level)
-        tilewidth_deg = 360.0/tilenames.numTiles(self.zoom_level)
-        tileheight_deg = 180.0/tilenames.numTiles(self.zoom_level)
-        print self.focus
-        print x, y
+        self.tilewidth_deg = 360.0/tilenames.numTiles(self.zoom_level)
+        #tileheight_deg = 180.0/tilenames.numTiles(self.zoom_level)
+        #print self.focus
+        #print x, y
 
         self.context.set_source_rgb(0, 0, 1)
         draw_tile_box(x, y)
