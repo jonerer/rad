@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/!svn/ver/9238/applications/rendering/pyrender
+END
+renderer_labels.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/!svn/ver/8499/applications/rendering/pyrender/renderer_labels.py
+END
+parseOsm.py
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/!svn/ver/8231/applications/rendering/pyrender/parseOsm.py
+END
+slippy.html
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/!svn/ver/8493/applications/rendering/pyrender/slippy.html
+END
+places.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/!svn/ver/8492/applications/rendering/pyrender/places.txt
+END
+COPYING.txt
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/!svn/ver/7742/applications/rendering/pyrender/COPYING.txt
+END
+testmerge.py
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/!svn/ver/8329/applications/rendering/pyrender/testmerge.py
+END
+readme.svg
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/!svn/ver/9221/applications/rendering/pyrender/readme.svg
+END
+server.py
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/!svn/ver/8493/applications/rendering/pyrender/server.py
+END
+OsmTileData.py
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/!svn/ver/8193/applications/rendering/pyrender/OsmTileData.py
+END
+renderer_sample.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/!svn/ver/8189/applications/rendering/pyrender/renderer_sample.py
+END
+render_base.py
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/!svn/ver/8231/applications/rendering/pyrender/render_base.py
+END
+renderer_default.py
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/!svn/ver/8514/applications/rendering/pyrender/renderer_default.py
+END
+renderer_PIL.py
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/!svn/ver/8189/applications/rendering/pyrender/renderer_PIL.py
+END
+OsmMerge.py
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/!svn/ver/8750/applications/rendering/pyrender/OsmMerge.py
+END
+tilenames.py
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/!svn/ver/7742/applications/rendering/pyrender/tilenames.py
+END
+renderer_sample_cairo.py
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/!svn/ver/8190/applications/rendering/pyrender/renderer_sample_cairo.py
+END
+render_cairo_base.py
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/!svn/ver/8749/applications/rendering/pyrender/render_cairo_base.py
+END
+tiledata.py
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/!svn/ver/8329/applications/rendering/pyrender/tiledata.py
+END
+whatAmIOn.py
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/!svn/ver/9238/applications/rendering/pyrender/whatAmIOn.py
+END
