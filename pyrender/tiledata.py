@@ -37,6 +37,7 @@ def GetOsmTileData(z,x,y):
   
   directory = 'cache/%d/%d/%d' % (z,x,y)
   filename = '%s/data.osm' % (directory)
+  #filename = 'linkoping.osm'
   if(not os.path.exists(directory)):
     os.makedirs(directory)
 

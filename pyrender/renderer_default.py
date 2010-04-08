@@ -218,13 +218,15 @@ class RenderClass(OsmRenderBase):
         ctx.set_line_width(width)
         xy = []
 
+        print w['n']
         for n in w['n']: 
           # project that into image coordinates
           (lat, lon) = self.osm.nodes[n['id']]
+          #(lat, lon) = float(n['lat']), float(n['lon'])
           (x,y) = self.proj.project(lat,lon)
-          print self.proj
           
           print "%f,%f -> %f, %f" % (lat, lon, x,y)
+          xy.append((x, y))
           #xy.append(self.proj.project(float(n['lat']), float(n['lon'])))
           #print "%f,%f -> %f, %f" % (n['lat'], n['lon'], x,y)
 
@@ -279,11 +281,15 @@ class RenderClass(OsmRenderBase):
 # Test suite - call this file from the command-line to generate a
 # sample image
 if(__name__ == '__main__'):
+  from tilenames import tileXY
   a = RenderClass()
   filename = "sample_"+__file__+".png"
-  #a.RenderTile(15, 16372, 10895, filename) # london
+  #a.RenderTile(15, 16372, 10895, 'default', filename) # london
   #a.RenderTile(14, 8166, 5447, 'default', filename) # Z14
-  a.RenderTile(17, 65385, 43659, filename) # fran render_PIL
+  (x,y) = tileXY(58.3877, 15.5972, 15)
+  a.RenderTile(15, x, y, 'default', filename) # i linkan
+  #a.RenderTile(17, 65385, 43659, 'default', filename) # fran render_PIL
+
   
   print "------------------------------------"
   print "Saved image to " + filename

@@ -10,8 +10,8 @@ from shared.data.defs import *
 from shared import rpc, packet
 from datetime import datetime
 import data_storage
-from video import GTK_Main
-from video2 import GTK_Maine
+#from video import GTK_Main
+#from video2 import GTK_Maine
 from datetime import datetime
 import gobject
 

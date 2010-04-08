@@ -76,6 +76,9 @@ class parseOsm(handler.ContentHandler):
       #print attrs.keys()
       #print attrs.values()
       if attrs.has_key("ref"):
+        if not self.nodes.has_key(int(attrs["ref"])):
+          print "i fails it?"
+          return
         node = {
           'id': int(attrs["ref"]),
 	  'lat': float(self.nodes[int(attrs["ref"])][0]) / self.divisor,
